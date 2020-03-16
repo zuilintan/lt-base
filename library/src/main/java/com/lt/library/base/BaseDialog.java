@@ -185,6 +185,10 @@ public abstract class BaseDialog extends DialogFragment {
         return this;
     }//设置外部取消
 
+    public void show(FragmentManager manager) {
+        this.show(manager, getClass().getSimpleName());
+    }//显示Dialog
+
     protected abstract int setLayoutResId();
 
     protected abstract void initView(BaseViewHolder vh, BaseDialog dialog);
