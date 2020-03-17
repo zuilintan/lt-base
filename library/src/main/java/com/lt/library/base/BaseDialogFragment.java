@@ -33,7 +33,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
  * implementation 'com.android.support:recyclerview-v7:28.0.0'
  */
 
-public abstract class BaseDialog extends DialogFragment {
+public abstract class BaseDialogFragment extends DialogFragment {
     protected Context mContext;
     private int mLayoutResId;
     private int mLayoutWidth;
@@ -154,33 +154,33 @@ public abstract class BaseDialog extends DialogFragment {
         setCancelable(mIsOutCancel);
     }
 
-    public BaseDialog setLayoutSize(int width, int height) {
+    public BaseDialogFragment setLayoutSize(int width, int height) {
         mLayoutWidth = width;
         mLayoutHeight = height;
         return this;
     }//设置大小
 
-    public BaseDialog setHorizontalMargin(int horizontalMargin) {
+    public BaseDialogFragment setHorizontalMargin(int horizontalMargin) {
         mHorizontalMargin = horizontalMargin;
         return this;
     }//设置水平外边距
 
-    public BaseDialog setWindowAnimations(@StyleRes int windowAnimations) {
+    public BaseDialogFragment setWindowAnimations(@StyleRes int windowAnimations) {
         mWindowAnimations = windowAnimations;
         return this;
     }//设置过场动画
 
-    public BaseDialog setGravity(int gravity) {
+    public BaseDialogFragment setGravity(int gravity) {
         mGravity = gravity;
         return this;
     }//设置显示位置
 
-    public BaseDialog setDimAmout(@FloatRange(from = 0, to = 1) float dimAmount) {
+    public BaseDialogFragment setDimAmout(@FloatRange(from = 0, to = 1) float dimAmount) {
         mDimAmount = dimAmount;
         return this;
     }//设置外围暗度
 
-    public BaseDialog setOutCancel(boolean isOutCancel) {
+    public BaseDialogFragment setOutCancel(boolean isOutCancel) {
         mIsOutCancel = isOutCancel;
         return this;
     }//设置外部取消
@@ -191,5 +191,5 @@ public abstract class BaseDialog extends DialogFragment {
 
     protected abstract int setLayoutResId();
 
-    protected abstract void initView(BaseViewHolder vh, BaseDialog dialog);
+    protected abstract void initView(BaseViewHolder vh, BaseDialogFragment dialog);
 }
