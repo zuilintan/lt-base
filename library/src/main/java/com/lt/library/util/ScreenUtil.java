@@ -66,18 +66,18 @@ public class ScreenUtil {
         return displayMetrics.heightPixels;
     }//获取屏幕高度
 
-    @SuppressLint("PrivateApi")
     public static int getStatusBarWidth(Context context) {
         return getScreenWidth(context);
     }//获取状态栏宽度
 
     @SuppressLint("PrivateApi")
     public static int getStatusBarHeight(Context context) {
-        Object statusBarHeightObj = ReflectionUtil.getField("com.android.internal.R$dimen",
-                                                            "status_bar_height");
-        int statusBarHeight = Integer.parseInt(Objects.requireNonNull(statusBarHeightObj)
-                                                      .toString());
-        return context.getResources().getDimensionPixelSize(statusBarHeight);
+        //Plan A
+        //Object statusBarHeightObj = ReflectionUtil.getField("com.android.internal.R$dimen", "status_bar_height");
+        //int resId = Integer.parseInt(Objects.requireNonNull(statusBarHeightObj).toString());
+        //Plan B
+        int resId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        return context.getResources().getDimensionPixelSize(resId);
     }//获取状态栏高度
 
     public static Drawable snapShotWithStatusBar(Activity activity) {

@@ -19,9 +19,11 @@ import android.view.ViewGroup;
 import android.view.Window;
 
 import com.lt.library.util.DensityUtil;
-import com.lt.library.util.ScreenUtil;
+
+import java.util.Objects;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 
 /**
  * @作者: LinTan
@@ -35,10 +37,8 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public abstract class BaseDialogFragment extends DialogFragment {
     protected Context mContext;
-    private int mLayoutResId;
     private int mLayoutWidth;
     private int mLayoutHeight;
-    private int mHorizontalMargin;
     private int mWindowAnimations;
     private int mGravity = Gravity.CENTER;
     private float mDimAmount = 0.5F;
@@ -53,21 +53,25 @@ public abstract class BaseDialogFragment extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLayoutResId = setLayoutResId();
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        initWindow();
-        View view = inflater.inflate(mLayoutResId, container);
-        initView(BaseViewHolder.newInstance(view), this);
-        return view;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return super.onCreateDialog(savedInstanceState);
+    }//Plan A, 不推荐, 一般用于创建替代传统的Dialog对话框的场景, UI简单, 功能单一
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        initWindow();
+        View view = inflater.inflate(setLayoutResId(), container);
+        initView(BaseViewHolder.newInstance(view), this);
+        return view;
+    }//Plan B, 一般用于创建复杂内容弹窗或全屏展示效果的场景,UI复杂, 功能复杂, 或有网络请求等异步操作
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -77,8 +81,18 @@ public abstract class BaseDialogFragment extends DialogFragment {
 
     @Override
     public void onStart() {
+        Window activityWindow = Objects.requireNonNull(getActivity().getWindow());
+        Window dialogWindow = Objects.requireNonNull(getDialog().getWindow());
+        boolean isSystemUiVisibilitySame = activityWindow.getDecorView().getSystemUiVisibility() == dialogWindow.getDecorView().getSystemUiVisibility();
+        if (!isSystemUiVisibilitySame) {
+            dialogWindow.addFlags(FLAG_NOT_FOCUSABLE);
+        }//若Activity与Dialog的SystemUiVisibility不同, 则在回调父类onStart()前主动移除按键输入焦点
         super.onStart();
-        initParams();
+        if (!isSystemUiVisibilitySame) {
+            dialogWindow.getDecorView().setSystemUiVisibility(activityWindow.getDecorView().getSystemUiVisibility());
+            dialogWindow.clearFlags(FLAG_NOT_FOCUSABLE);
+        }//若Activity与Dialog的SystemUiVisibility不同, 则在回调父类onStart()后以Activity为准, 统一二者的SystemUiVisibility, 并取回按键输入焦点
+        initParams(dialogWindow);
     }
 
     @Override
@@ -123,7 +137,9 @@ public abstract class BaseDialogFragment extends DialogFragment {
 
     @Override
     public void show(FragmentManager manager, String tag) {
-        manager.beginTransaction().remove(this).commit();//规避并发点击时, IllegalStateException: Fragment already added
+        manager.beginTransaction()
+               .remove(this)
+               .commit();//规避并发点击时, IllegalStateException: Fragment already added
         super.show(manager, tag);
     }
 
@@ -135,23 +151,18 @@ public abstract class BaseDialogFragment extends DialogFragment {
     }
 
     private void initWindow() {
-        Window window = getDialog().getWindow();
-        if (window != null) {
-            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        Window window = Objects.requireNonNull(getDialog().getWindow());
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
-    private void initParams() {
-        Window window = getDialog().getWindow();
-        if (window != null) {
-            window.setLayout(mLayoutWidth != 0 ? DensityUtil.dp2px(mContext, mLayoutWidth) : ScreenUtil.getScreenWidth(mContext) - 2 * DensityUtil.dp2px(mContext, mHorizontalMargin),
-                             mLayoutHeight != 0 ? DensityUtil.dp2px(mContext, mLayoutHeight) : WRAP_CONTENT);
-            window.setGravity(mGravity);
-            window.setDimAmount(mDimAmount);
-            window.setWindowAnimations(mWindowAnimations);
-        }
-        setCancelable(mIsOutCancel);
+    private void initParams(Window window) {
+        getDialog().setCancelable(mIsOutCancel);
+        window.setLayout(mLayoutWidth != 0 ? DensityUtil.dp2px(mContext, mLayoutWidth) : WRAP_CONTENT,
+                         mLayoutHeight != 0 ? DensityUtil.dp2px(mContext, mLayoutHeight) : WRAP_CONTENT);
+        window.setGravity(mGravity);
+        window.setDimAmount(mDimAmount);
+        window.setWindowAnimations(mWindowAnimations);
     }
 
     public BaseDialogFragment setLayoutSize(int width, int height) {
@@ -159,11 +170,6 @@ public abstract class BaseDialogFragment extends DialogFragment {
         mLayoutHeight = height;
         return this;
     }//设置大小
-
-    public BaseDialogFragment setHorizontalMargin(int horizontalMargin) {
-        mHorizontalMargin = horizontalMargin;
-        return this;
-    }//设置水平外边距
 
     public BaseDialogFragment setWindowAnimations(@StyleRes int windowAnimations) {
         mWindowAnimations = windowAnimations;
@@ -191,5 +197,5 @@ public abstract class BaseDialogFragment extends DialogFragment {
 
     protected abstract int setLayoutResId();
 
-    protected abstract void initView(BaseViewHolder vh, BaseDialogFragment dialog);
+    protected abstract void initView(BaseViewHolder vh, BaseDialogFragment df);
 }
