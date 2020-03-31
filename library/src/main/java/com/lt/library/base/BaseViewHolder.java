@@ -1,7 +1,11 @@
 package com.lt.library.base;
 
 import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
@@ -46,9 +50,9 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
         view.setText(text);
     }//设置文本
 
-    public void setText(int viewId, int resId) {
+    public void setText(int viewId, @StringRes int stringId) {
         TextView view = findViewById(viewId);
-        view.setText(resId);
+        view.setText(stringId);
     }//设置文本
 
     public String getText(int viewId) {
@@ -56,29 +60,39 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
         return view.getText().toString();
     }//获取文本
 
-    public void setTextColor(int viewId, int colorId) {
+    public void setTextSize(int viewId, float size) {
         TextView view = findViewById(viewId);
-        view.setTextColor(colorId);
+        view.setTextSize(size);
+    }//设置文本大小
+
+    public void setTextColor(int viewId, @ColorInt int colorInt) {
+        TextView view = findViewById(viewId);
+        view.setTextColor(colorInt);
     }//设置文本颜色
 
-    public void setImageDrawable(int viewId, Drawable resDrawable) {
+    public void setImageDrawable(int viewId, @Nullable Drawable drawable) {
         ImageView view = findViewById(viewId);
-        view.setImageDrawable(resDrawable);
+        view.setImageDrawable(drawable);
     }//设置图片资源
 
-    public void setImageResource(int viewId, int resId) {
+    public void setImageResource(int viewId, @DrawableRes int resId) {
         ImageView view = findViewById(viewId);
         view.setImageResource(resId);
     }//设置图片资源
 
-    public void setBackgroundResource(int viewId, int resId) {
+    public void setBackground(int viewId, @Nullable Drawable drawable) {
+        View view = findViewById(viewId);
+        view.setBackground(drawable);
+    }//设置背景资源
+
+    public void setBackgroundResource(int viewId, @DrawableRes int resId) {
         View view = findViewById(viewId);
         view.setBackgroundResource(resId);
     }//设置背景资源
 
-    public void setBackgroundColor(int viewId, int colorId) {
+    public void setBackgroundColor(int viewId, @ColorInt int colorInt) {
         View view = findViewById(viewId);
-        view.setBackgroundColor(colorId);
+        view.setBackgroundColor(colorInt);
     }//设置背景颜色
 
     public void setVisibility(int viewId, int visibility) {
@@ -86,7 +100,7 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
         view.setVisibility(visibility);
     }//设置显隐
 
-    public void setOnClickListener(int viewId, View.OnClickListener listener) {
+    public void setOnClickListener(int viewId, @Nullable View.OnClickListener listener) {
         View view = findViewById(viewId);
         view.setOnClickListener(listener);
     }//设置点击事件
