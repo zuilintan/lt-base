@@ -1,8 +1,6 @@
 package com.lt.library.base;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -12,17 +10,22 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 
 import com.lt.library.util.DensityUtil;
+import com.lt.library.util.ScreenUtil;
 
+import java.lang.ref.WeakReference;
 import java.util.Objects;
 
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 
 /**
@@ -36,9 +39,10 @@ import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
  */
 
 public abstract class BaseDialogFragment extends DialogFragment {
-    protected Context mContext;
+    protected WeakReference<FragmentActivity> mActivityWeakReference;
     private int mLayoutWidth;
     private int mLayoutHeight;
+    private int mHorizontalMargin = 64;
     private int mWindowAnimations;
     private int mGravity = Gravity.CENTER;
     private float mDimAmount = 0.5F;
@@ -47,7 +51,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mContext = context;
+        mActivityWeakReference = new WeakReference<>((FragmentActivity) context);
     }
 
     @Override
@@ -55,23 +59,32 @@ public abstract class BaseDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
     }
 
+    @NonNull
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         return super.onCreateDialog(savedInstanceState);
     }//Plan A, 不推荐, 一般用于创建替代传统的Dialog对话框的场景, UI简单, 功能单一
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        initWindow();
-        View view = inflater.inflate(setLayoutResId(), container);
-        initView(BaseViewHolder.newInstance(view), this);
+        View view = inflater.inflate(setLayoutResId(), container, false);
+        initView(new BaseViewHolder(view), this);
         return view;
     }//Plan B, 一般用于创建复杂内容弹窗或全屏展示效果的场景,UI复杂, 功能复杂, 或有网络请求等异步操作
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getDialog().setCanceledOnTouchOutside(mIsOutCancel);
+        Window window = getDialog().getWindow();
+        if (Objects.nonNull(window)) {
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            if (mWindowAnimations > 0) {
+                window.setWindowAnimations(mWindowAnimations);
+            }
+        }
     }
 
     @Override
@@ -81,18 +94,24 @@ public abstract class BaseDialogFragment extends DialogFragment {
 
     @Override
     public void onStart() {
-        Window activityWindow = Objects.requireNonNull(getActivity().getWindow());
-        Window dialogWindow = Objects.requireNonNull(getDialog().getWindow());
-        boolean isSystemUiVisibilitySame = activityWindow.getDecorView().getSystemUiVisibility() == dialogWindow.getDecorView().getSystemUiVisibility();
-        if (!isSystemUiVisibilitySame) {
-            dialogWindow.addFlags(FLAG_NOT_FOCUSABLE);
-        }//若Activity与Dialog的SystemUiVisibility不同, 则在回调父类onStart()前主动移除按键输入焦点
-        super.onStart();
-        if (!isSystemUiVisibilitySame) {
-            dialogWindow.getDecorView().setSystemUiVisibility(activityWindow.getDecorView().getSystemUiVisibility());
-            dialogWindow.clearFlags(FLAG_NOT_FOCUSABLE);
-        }//若Activity与Dialog的SystemUiVisibility不同, 则在回调父类onStart()后以Activity为准, 统一二者的SystemUiVisibility, 并取回按键输入焦点
-        initParams(dialogWindow);
+        Window activityWindow = mActivityWeakReference.get().getWindow();
+        Window dialogWindow = getDialog().getWindow();
+        if (Objects.isNull(activityWindow) || Objects.isNull(dialogWindow)) {
+            super.onStart();
+        } else {
+            int activitySystemUiVisibility = activityWindow.getDecorView().getSystemUiVisibility();
+            int dialogSystemUiVisibility = dialogWindow.getDecorView().getSystemUiVisibility();
+            boolean isDiffVisibility = activitySystemUiVisibility != dialogSystemUiVisibility;
+            if (isDiffVisibility) {
+                dialogWindow.addFlags(FLAG_NOT_FOCUSABLE);
+            }//若Activity与Dialog的SystemUiVisibility不同, 则在回调父类onStart()前主动移除按键输入焦点
+            super.onStart();
+            if (isDiffVisibility) {
+                dialogWindow.getDecorView().setSystemUiVisibility(activitySystemUiVisibility);
+                dialogWindow.clearFlags(FLAG_NOT_FOCUSABLE);
+            }//若Activity与Dialog的SystemUiVisibility不同, 则在回调父类onStart()后以Activity为准, 统一二者的SystemUiVisibility, 并取回按键输入焦点
+            initParam(dialogWindow);
+        }
     }
 
     @Override
@@ -113,6 +132,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        freeView();
     }
 
     @Override
@@ -150,19 +170,16 @@ public abstract class BaseDialogFragment extends DialogFragment {
         }
     }
 
-    private void initWindow() {
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        Window window = Objects.requireNonNull(getDialog().getWindow());
-        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-    }
-
-    private void initParams(Window window) {
-        getDialog().setCancelable(mIsOutCancel);
-        window.setLayout(mLayoutWidth != 0 ? DensityUtil.dp2px(mContext, mLayoutWidth) : WRAP_CONTENT,
-                         mLayoutHeight != 0 ? DensityUtil.dp2px(mContext, mLayoutHeight) : WRAP_CONTENT);
-        window.setGravity(mGravity);
-        window.setDimAmount(mDimAmount);
-        window.setWindowAnimations(mWindowAnimations);
+    private void initParam(Window dialogWindow) {
+        dialogWindow.setLayout(mLayoutWidth > 0
+                                       ? DensityUtil.dp2px(mActivityWeakReference.get(), mLayoutWidth)
+                                       : ScreenUtil.getScreenWidth(mActivityWeakReference.get())
+                                       - 2 * DensityUtil.dp2px(mActivityWeakReference.get(), mHorizontalMargin),
+                               mLayoutHeight > 0
+                                       ? DensityUtil.dp2px(mActivityWeakReference.get(), mLayoutHeight)
+                                       : WindowManager.LayoutParams.WRAP_CONTENT);
+        dialogWindow.setGravity(mGravity);
+        dialogWindow.setDimAmount(mDimAmount);
     }
 
     public BaseDialogFragment setLayoutSize(int width, int height) {
@@ -170,6 +187,11 @@ public abstract class BaseDialogFragment extends DialogFragment {
         mLayoutHeight = height;
         return this;
     }//设置大小
+
+    public BaseDialogFragment setHorizontalMargin(int horizontalMargin) {
+        mHorizontalMargin = horizontalMargin;
+        return this;
+    }//设置水平边距
 
     public BaseDialogFragment setWindowAnimations(@StyleRes int windowAnimations) {
         mWindowAnimations = windowAnimations;
@@ -181,7 +203,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
         return this;
     }//设置显示位置
 
-    public BaseDialogFragment setDimAmout(@FloatRange(from = 0, to = 1) float dimAmount) {
+    public BaseDialogFragment setDimAmount(@FloatRange(from = 0, to = 1) float dimAmount) {
         mDimAmount = dimAmount;
         return this;
     }//设置外围暗度
@@ -198,4 +220,6 @@ public abstract class BaseDialogFragment extends DialogFragment {
     protected abstract int setLayoutResId();
 
     protected abstract void initView(BaseViewHolder vh, BaseDialogFragment df);
+
+    protected abstract void freeView();
 }

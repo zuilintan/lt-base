@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @作者: LinTan
@@ -28,9 +29,9 @@ import java.util.List;
 
 public abstract class BaseRecyclerViewAdapter<DS, VH extends ViewHolder> extends RecyclerView.Adapter<VH>
         implements OnClickListener, OnLongClickListener {//DS:DataSource，VH:ViewHolder
-    private final int VIEW_TYPE_ITEM = 1008601;
-    private final int VIEW_TYPE_HEAD = 1008602;
-    private final int VIEW_TYPE_FOOT = 1008603;
+    private final int VIEW_TYPE_ITEM = 0;
+    private final int VIEW_TYPE_HEAD = 1;
+    private final int VIEW_TYPE_FOOT = 2;
     private int mItemViewId;
     private int mHeadViewId = -1;
     private int mFootViewId = -1;
@@ -70,7 +71,7 @@ public abstract class BaseRecyclerViewAdapter<DS, VH extends ViewHolder> extends
             default:
                 break;
         }
-        return (VH) BaseViewHolder.newInstance(view);
+        return (VH) new BaseViewHolder(Objects.requireNonNull(view));
     }//创建视图管理器
 
     @Override
@@ -97,6 +98,21 @@ public abstract class BaseRecyclerViewAdapter<DS, VH extends ViewHolder> extends
                 break;
         }
     }//绑定数据到视图
+
+    @Override
+    public void onBindViewHolder(@NonNull VH viewHolder, int position, @NonNull List<Object> payloads) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(viewHolder, position, payloads);
+        }//更新整个item
+        else {
+            if (mHeadViewId == -1) {
+                localUpdateView(viewHolder, mDataSourceList.get(position), position, payloads);
+            }//无HeadView时的处理
+            else {
+                localUpdateView(viewHolder, mDataSourceList.get(position - 1), position - 1, payloads);
+            }//有HeadView时的处理
+        }//仅更新item中指定的View
+    }//绑定数据到视图(局部刷新)
 
     @Override
     public long getItemId(int position) {
@@ -177,7 +193,7 @@ public abstract class BaseRecyclerViewAdapter<DS, VH extends ViewHolder> extends
     @Override
     public void onViewRecycled(@NonNull VH viewHolder) {
         super.onViewRecycled(viewHolder);
-        unInitView(viewHolder);
+        freeView(viewHolder);
     }//Item回收时回调
 
     @Override
@@ -261,20 +277,24 @@ public abstract class BaseRecyclerViewAdapter<DS, VH extends ViewHolder> extends
     }//清空数据源集合，并更新item
 
     public void refresh(List<DS> dataSourceList) {
-        int size = mDataSourceList.size();
-        mDataSourceList.clear();
-        if (mHeadViewId == -1) {
-            notifyItemRangeRemoved(0, size);
-            notifyItemRangeChanged(0, size);
-            mDataSourceList.addAll(dataSourceList);
-            notifyItemRangeInserted(0, dataSourceList.size());
-            notifyItemRangeChanged(0, dataSourceList.size());
+        if (mDataSourceList.isEmpty()) {
+            loadMore(dataSourceList);
         } else {
-            notifyItemRangeRemoved(1, size);
-            notifyItemRangeChanged(1, size);
-            mDataSourceList.addAll(dataSourceList);
-            notifyItemRangeInserted(1, dataSourceList.size());
-            notifyItemRangeChanged(1, dataSourceList.size());
+            int size = mDataSourceList.size();
+            mDataSourceList.clear();
+            if (mHeadViewId == -1) {
+                notifyItemRangeRemoved(0, size);
+                notifyItemRangeChanged(0, size);
+                mDataSourceList.addAll(dataSourceList);
+                notifyItemRangeInserted(0, dataSourceList.size());
+                notifyItemRangeChanged(0, dataSourceList.size());
+            } else {
+                notifyItemRangeRemoved(1, size);
+                notifyItemRangeChanged(1, size);
+                mDataSourceList.addAll(dataSourceList);
+                notifyItemRangeInserted(1, dataSourceList.size());
+                notifyItemRangeChanged(1, dataSourceList.size());
+            }
         }
     }//刷新数据源集合，并更新item
 
@@ -300,7 +320,9 @@ public abstract class BaseRecyclerViewAdapter<DS, VH extends ViewHolder> extends
 
     protected abstract void initView(VH vh, DS ds, int position);
 
-    protected abstract void unInitView(VH vh);
+    protected abstract void freeView(VH vh);
+
+    protected abstract void localUpdateView(VH vh, DS ds, int position, List<Object> payloads);
 
     public interface OnItemClickListener {
         void onItemClick(View view, int position);

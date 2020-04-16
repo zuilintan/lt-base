@@ -26,13 +26,9 @@ import android.widget.TextView;
 public class BaseViewHolder extends RecyclerView.ViewHolder {
     private SparseArray<View> mSparseArray;//Key为View的Id，Value为View对象
 
-    private BaseViewHolder(@NonNull View itemView) {
+    public BaseViewHolder(@NonNull View itemView) {
         super(itemView);
         mSparseArray = new SparseArray<>();
-    }
-
-    public static BaseViewHolder newInstance(View view) {
-        return new BaseViewHolder(view);
     }
 
     @SuppressWarnings("unchecked")
