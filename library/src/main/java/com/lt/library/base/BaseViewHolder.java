@@ -12,11 +12,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Objects;
+
 /**
  * @作者: LinTan
  * @日期: 2018/12/12 12:10
  * @版本: 1.0
- * @描述: //RecyclerView的封装类。注意引入依赖。
+ * @描述: //BaseViewHolder, 注意引入依赖
  * 源址: https://blog.csdn.net/a_zhon/article/details/66971369
  * 1.0: Initial Commit
  * <p>
@@ -34,7 +36,7 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
     @SuppressWarnings("unchecked")
     public <T extends View> T findViewById(int viewId) {
         View view = mSparseArray.get(viewId);
-        if (view == null) {
+        if (Objects.isNull(view)) {
             view = itemView.findViewById(viewId);
             mSparseArray.put(viewId, view);
         }

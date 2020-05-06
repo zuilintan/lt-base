@@ -1,2 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.lt.library" />
+    package="com.lt.library">
+
+    <application>
+        <provider
+            android:name=".util.context.ContextProvider"
+            android:authorities="${applicationId}.contextprovider"
+            android:exported="false" />
+    </application>
+
+</manifest>

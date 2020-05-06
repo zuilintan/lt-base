@@ -32,7 +32,7 @@ import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
  * @作者: LinTan
  * @日期: 2019/5/15 10:23
  * @版本: 1.0
- * @描述: //DialogFragment的封装类。
+ * @描述: //BaseDialogFragment, 注意引入依赖
  * 1.0: Initial Commit
  * <p>
  * implementation 'com.android.support:recyclerview-v7:28.0.0'
@@ -219,7 +219,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
 
     protected abstract int setLayoutResId();
 
-    protected abstract void initView(BaseViewHolder vh, BaseDialogFragment df);
+    protected abstract void initView(BaseViewHolder viewHolder, BaseDialogFragment dialogFragment);
 
     protected abstract void freeView();
 }
