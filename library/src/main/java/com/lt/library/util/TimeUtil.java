@@ -14,7 +14,7 @@ import java.util.Locale;
  * @作者: LinTan
  * @日期: 2019/5/1 20:57
  * @版本: 1.0
- * @描述: //日期时间的工具类。
+ * @描述: //TimeUtil
  * 1.0: Initial Commit
  */
 

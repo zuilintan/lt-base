@@ -23,7 +23,7 @@ import okhttp3.ResponseBody;
  * @作者: LinTan
  * @日期: 2019/3/17 17:52
  * @版本: 1.0
- * @描述: //OkHttp的工具类。注意引入依赖。
+ * @描述: //OkHttpUtil, 注意引入依赖
  * 源址: https://blog.csdn.net/qq_16240393/article/details/54863646
  * 1.0: Initial Commit
  * <p>

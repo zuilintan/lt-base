@@ -17,12 +17,10 @@ import java.util.Objects;
 /**
  * @作者: LinTan
  * @日期: 2018/12/25 17:11
- * @版本: 1.2
- * @描述: //屏幕的工具类。
+ * @版本: 1.0
+ * @描述: //ScreenUtil
  * 源址: https://blog.csdn.net/lmj623565791/article/details/38965311
  * 1.0: Initial Commit
- * 1.1: 替换setNoTitleBar()为setNoActionBar()
- * 1.2: 修改snapShotWithStatusBar()和snapShotWithoutStatusBar()的返回值类型为Drawable
  */
 
 public class ScreenUtil {

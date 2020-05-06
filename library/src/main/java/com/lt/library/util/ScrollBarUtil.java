@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
  * @作者: LinTan
  * @日期: 2020/1/13 15:50
  * @版本: 1.0
- * @描述: //通过反射动态设置RecyclerView或ListView的滚动条的显示效果
+ * @描述: //ScrollBarUtil, 通过反射动态设置RecyclerView或ListView的滚动条的显示效果
  * 1.0: Initial Commit
  */
 
@@ -24,8 +24,8 @@ public class ScrollBarUtil {
     }
 
     public static void setThumb(View view, @Orientation int orientation, Drawable drawable) {
-        Object scrollabilityCacheObj = ReflectionUtil.invokeMethod(View.class, view, "getScrollCache");
-        Object scrollBarObj = ReflectionUtil.getField(scrollabilityCacheObj, "scrollBar");
+        Object scrollCacheObj = ReflectionUtil.invokeMethod(View.class, view, "getScrollCache");
+        Object scrollBarObj = ReflectionUtil.getField(scrollCacheObj, "scrollBar");
         switch (orientation) {
             case ORIENTATION_HORIZONTAL:
                 ReflectionUtil.setField(scrollBarObj, "mHorizontalThumb", drawable);

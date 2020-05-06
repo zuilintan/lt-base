@@ -14,7 +14,7 @@ import java.util.Map;
  * @作者: LinTan
  * @日期: 2018/12/25 17:16
  * @版本: 1.0
- * @描述: //Gson的工具类。注意引入依赖。
+ * @描述: //GsonUtil, 注意引入依赖
  * 源址: https://www.jianshu.com/p/5ad3d87a7e47
  * 1.0: Initial Commit
  * <p>

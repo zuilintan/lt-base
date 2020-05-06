@@ -8,11 +8,10 @@ import android.widget.Toast;
 /**
  * @作者: LinTan
  * @日期: 2019/1/5 18:02
- * @版本: 1.1
- * @描述: //Toast的工具类。
+ * @版本: 1.0
+ * @描述: //ToastUtil
  * 源址: https://www.jianshu.com/p/c226225db747
  * 1.0: Initial Commit
- * 1.1: 优化Toast并发逻辑
  */
 
 public class ToastUtil {

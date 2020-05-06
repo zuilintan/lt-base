@@ -13,7 +13,7 @@ import java.net.URL;
  * @作者: LinTan
  * @日期: 2019/1/6 18:13
  * @版本: 1.0
- * @描述: //HttpURLConnection的工具类。
+ * @描述: //HttpUtil
  * 源址: https://blog.csdn.net/lmj623565791/article/details/38965311
  * 1.0: Initial Commit
  */

@@ -9,7 +9,7 @@ import java.util.Locale;
  * @作者: LinTan
  * @日期: 2018/12/29 20:27
  * @版本: 1.0
- * @描述: //Log的工具类。从XUtils3中独立出来。
+ * @描述: //LogUtil
  * 源址: http://blog.51cto.com/9098858/2096644
  * 1.0: Initial Commit
  */
