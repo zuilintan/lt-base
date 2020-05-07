@@ -51,15 +51,15 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
     private int mEntityViewId = setLayoutResId();
     private int mExtrasViewId = -1;
     private int mFooterViewId = -1;
-    private List<DS> mEntityDataSourceList;
+    private List<DS> mDataSourceList;
     private boolean mIsHeaderFullSpan = true;
     private boolean mIsFooterFullSpan = true;
 
-    public BaseRecyclerViewAdapter(List<DS> entityDataSourceList) {
-        if (Objects.isNull(mEntityDataSourceList)) {
-            mEntityDataSourceList = new ArrayList<>();
+    public BaseRecyclerViewAdapter(List<DS> dataSourceList) {
+        if (Objects.isNull(mDataSourceList)) {
+            mDataSourceList = new ArrayList<>();
         } else {
-            mEntityDataSourceList.addAll(entityDataSourceList);
+            mDataSourceList.addAll(dataSourceList);
         }
     }
 
@@ -119,7 +119,7 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
         } else if (viewHolder instanceof EntityViewHolder) {
             int fixPosition = position - (mHeaderViewCount + mStatusViewCount);
             viewHolder.itemView.setTag(fixPosition);
-            initEntityView((EntityViewHolder) viewHolder, mEntityDataSourceList.get(fixPosition), fixPosition);
+            initEntityView((EntityViewHolder) viewHolder, mDataSourceList.get(fixPosition), fixPosition);
         } else if (viewHolder instanceof ExtrasViewHolder) {
             initExtrasView((ExtrasViewHolder) viewHolder);
         } else if (viewHolder instanceof FooterViewHolder) {
@@ -135,7 +135,7 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
         else {
             if (viewHolder instanceof EntityViewHolder) {
                 int fixPosition = position - (mHeaderViewCount + mStatusViewCount);
-                updatePartView((EntityViewHolder) viewHolder, mEntityDataSourceList.get(fixPosition), fixPosition, payloads);
+                updatePartEntityView((EntityViewHolder) viewHolder, mDataSourceList.get(fixPosition), fixPosition, payloads);
             }
         }//更新item中特定View
     }//绑定数据到视图(局部刷新)
@@ -161,16 +161,16 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
     public long getItemId(int position) {
         long i;
         if (hasStableIds() && isEntityView(position)) {
-            i = mEntityDataSourceList.get(position - (mHeaderViewCount + mStatusViewCount)).hashCode();
+            i = mDataSourceList.get(position - (mHeaderViewCount + mStatusViewCount)).hashCode();
         } else {
             i = RecyclerView.NO_ID;
         }
         return i;
-    }//为每个Item绑定唯一的Id，需搭配adapter.setHasStableIds(true), 且要在setAdapter()前调用
+    }//为每个Item绑定唯一的Id, 需搭配adapter.setHasStableIds(true), 且要在setAdapter()前调用
 
     @Override
     public int getItemCount() {
-        int entityViewCount = getEntityViewCount();
+        int entityViewCount = size();
         return mHeaderViewCount + mStatusViewCount + entityViewCount + mExtrasViewCount + mFooterViewCount;
     }//获取Item的总数
 
@@ -252,27 +252,23 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
     }
 
     private boolean isEntityView(int position) {
-        int entityViewCount = getEntityViewCount();
+        int entityViewCount = size();
         return entityViewCount > 0
                 && mHeaderViewCount + mStatusViewCount <= position
                 && position < mHeaderViewCount + mStatusViewCount + entityViewCount;
     }
 
     private boolean isExtrasView(int position) {
-        int entityViewCount = getEntityViewCount();
+        int entityViewCount = size();
         return mExtrasViewCount > 0
                 && mHeaderViewCount + mStatusViewCount + entityViewCount <= position
                 && position < mHeaderViewCount + mStatusViewCount + entityViewCount + mExtrasViewCount;
     }
 
     private boolean isFooterView(int position) {
-        int entityViewCount = getEntityViewCount();
+        int entityViewCount = size();
         return mFooterViewCount > 0
                 && mHeaderViewCount + mStatusViewCount + entityViewCount + mExtrasViewCount <= position;
-    }
-
-    private int getEntityViewCount() {
-        return mEntityDataSourceList.size();
     }
 
     public void setHeaderView(@LayoutRes int layoutResId) {
@@ -301,14 +297,14 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
     public void addExtrasView(@LayoutRes int layoutResId) {
         mExtrasViewId = layoutResId;
         mExtrasViewCount = 1;
-        int entityViewCount = getEntityViewCount();
+        int entityViewCount = size();
         notifyItemInserted(mHeaderViewCount + mStatusViewCount + entityViewCount);
     }//添加ExtrasView
 
     public void remExtrasView() {
         mExtrasViewId = -1;
         mExtrasViewCount = 0;
-        int entityViewCount = getEntityViewCount();
+        int entityViewCount = size();
         notifyItemRemoved(mHeaderViewCount + mStatusViewCount + entityViewCount);
     }//移除ExtrasView
 
@@ -320,32 +316,65 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
         mFooterViewId = layoutResId;
         mIsFooterFullSpan = isFullSpan;
         mFooterViewCount = 1;
-        int entityViewCount = getEntityViewCount();
+        int entityViewCount = size();
         notifyItemInserted(mHeaderViewCount + mStatusViewCount + entityViewCount + mExtrasViewCount + mFooterViewCount);
     }//设置FooterView
 
-    public void refAll(List<DS> entityDataSourceList) {
-        if (mEntityDataSourceList.isEmpty()) {
-            addAll(entityDataSourceList);
-        } else {
-            remAll();
-            addAll(entityDataSourceList);
+    public void refAllWithNoAnim(List<DS> dataSourceList) {
+        if (!mDataSourceList.isEmpty()) {
+            mDataSourceList.clear();
         }
-    }//刷新数据源集合，并更新item
+        mDataSourceList.addAll(dataSourceList);
+        notifyDataSetChanged();
+    }//刷新数据源集合, 并更新item, 性能较低, 无动画
+
+    public void refAll(List<DS> dataSourceList) {
+        if (!mDataSourceList.isEmpty()) {
+            remAll();
+        }
+        addAll(dataSourceList);
+    }//刷新数据源集合, 并更新item
 
     public void remAll() {
-        int entityViewCount = getEntityViewCount();
-        mEntityDataSourceList.clear();
+        int entityViewCount = size();
+        mDataSourceList.clear();
         notifyItemRangeRemoved(mHeaderViewCount + mStatusViewCount, entityViewCount);
         notifyItemRangeChanged(mHeaderViewCount + mStatusViewCount, entityViewCount);
-    }//清空数据源集合，并更新item
+    }//清空数据源集合, 并更新item
 
-    public void addAll(List<DS> entityDataSourceList) {
-        int entityViewCount = getEntityViewCount();
-        mEntityDataSourceList.addAll(entityDataSourceList);
-        notifyItemRangeInserted(mHeaderViewCount + mStatusViewCount + entityViewCount, entityDataSourceList.size());
-        notifyItemRangeChanged(mHeaderViewCount + mStatusViewCount + entityViewCount, entityDataSourceList.size());
-    }//加载更多数据到数据源集合，并更新item
+    public void addAll(List<DS> dataSourceList) {
+        int entityViewCount = size();
+        mDataSourceList.addAll(dataSourceList);
+        notifyItemRangeInserted(mHeaderViewCount + mStatusViewCount + entityViewCount, dataSourceList.size());
+        notifyItemRangeChanged(mHeaderViewCount + mStatusViewCount + entityViewCount, dataSourceList.size());
+    }//添加数据源集合, 并更新item
+
+    public void ref(DS dataSource, int position) {
+        mDataSourceList.set(position, dataSource);
+        notifyItemChanged(mHeaderViewCount + mStatusViewCount + position);
+    }//刷新数据源, 并更新item
+
+    public void rem(int position) {
+        int entityViewCount = size();
+        mDataSourceList.remove(position);
+        notifyItemRemoved(mHeaderViewCount + mStatusViewCount + position);
+        notifyItemRangeChanged(mHeaderViewCount + mStatusViewCount + position, entityViewCount - position);
+    }//清空数据源, 并更新item
+
+    public void add(DS dataSource, int position) {
+        int entityViewCount = size();
+        mDataSourceList.add(position, dataSource);
+        notifyItemInserted(mHeaderViewCount + mStatusViewCount + position);
+        notifyItemRangeChanged(mHeaderViewCount + mStatusViewCount + position, entityViewCount - position);
+    }//添加数据源, 并更新item
+
+    public DS get(int position) {
+        return mDataSourceList.get(position);
+    }//获取数据源
+
+    public int size() {
+        return mDataSourceList.size();
+    }//获取数据源大小
 
     public void setOnHeaderClickListener(OnHeaderClickListener onHeaderClickListener) {
         mOnHeaderClickListener = onHeaderClickListener;
@@ -361,6 +390,14 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
 
     public void setOnStatusLongClickListener(OnStatusLongClickListener onStatusLongClickListener) {
         mOnStatusLongClickListener = onStatusLongClickListener;
+    }
+
+    public void setOnEntityClickListener(OnEntityClickListener onEntityClickListener) {
+        mOnEntityClickListener = onEntityClickListener;
+    }
+
+    public void setOnEntityLongClickListener(OnEntityLongClickListener onEntityLongClickListener) {
+        mOnEntityLongClickListener = onEntityLongClickListener;
     }
 
     public void setOnExtrasClickListener(OnExtrasClickListener onExtrasClickListener) {
@@ -379,27 +416,19 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
         mOnFooterLongClickListener = onFooterLongClickListener;
     }
 
-    public void setOnEntityClickListener(OnEntityClickListener onEntityClickListener) {
-        mOnEntityClickListener = onEntityClickListener;
-    }
-
-    public void setOnEntityLongClickListener(OnEntityLongClickListener onEntityLongClickListener) {
-        mOnEntityLongClickListener = onEntityLongClickListener;
-    }
-
     protected abstract int setLayoutResId();
 
     protected abstract void initHeaderView(HeaderViewHolder viewHolder);
 
     protected abstract void initStatusView(StatusViewHolder viewHolder);
 
+    protected abstract void initEntityView(EntityViewHolder viewHolder, DS dataSource, int position);
+
+    protected abstract void updatePartEntityView(EntityViewHolder viewHolder, DS dataSource, int position, List<Object> payloads);
+
     protected abstract void initExtrasView(ExtrasViewHolder viewHolder);
 
     protected abstract void initFooterView(FooterViewHolder viewHolder);
-
-    protected abstract void initEntityView(EntityViewHolder viewHolder, DS dataSource, int position);
-
-    protected abstract void updatePartView(EntityViewHolder viewHolder, DS dataSource, int position, List<Object> payloads);
 
     protected abstract void freeView(EntityViewHolder viewHolder);
 
@@ -407,7 +436,7 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
         void onHeaderClick(View view);
     }
 
-    private interface OnHeaderLongClickListener {
+    public interface OnHeaderLongClickListener {
         boolean onHeaderLongClick(View view);
     }
 
@@ -415,7 +444,7 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
         void onStatusClick(View view);
     }
 
-    private interface OnStatusLongClickListener {
+    public interface OnStatusLongClickListener {
         boolean onStatusLongClick(View view);
     }
 
@@ -423,7 +452,7 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
         void onEntityClick(View view, int position);
     }
 
-    private interface OnEntityLongClickListener {
+    public interface OnEntityLongClickListener {
         boolean onEntityLongClick(View view, int position);
     }
 
@@ -431,7 +460,7 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
         void onExtrasClick(View view);
     }
 
-    private interface OnExtrasLongClickListener {
+    public interface OnExtrasLongClickListener {
         boolean onExtrasLongClick(View view);
     }
 
@@ -439,7 +468,7 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
         void onFooterClick(View view);
     }
 
-    private interface OnFooterLongClickListener {
+    public interface OnFooterLongClickListener {
         boolean onFooterLongClick(View view);
     }
 
@@ -504,11 +533,11 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
             return b;
         }
 
-        public void setOnStatusClickListener(OnStatusClickListener onStatusClickListener) {
+        private void setOnStatusClickListener(OnStatusClickListener onStatusClickListener) {
             mOnStatusClickListener = onStatusClickListener;
         }
 
-        public void setOnStatusLongClickListener(OnStatusLongClickListener onStatusLongClickListener) {
+        private void setOnStatusLongClickListener(OnStatusLongClickListener onStatusLongClickListener) {
             mOnStatusLongClickListener = onStatusLongClickListener;
         }
     }
@@ -520,6 +549,7 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
         private EntityViewHolder(@NonNull View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
@@ -552,7 +582,7 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
             mOnEntityClickListener = onEntityClickListener;
         }
 
-        public void setOnEntityLongClickListener(OnEntityLongClickListener onEntityLongClickListener) {
+        private void setOnEntityLongClickListener(OnEntityLongClickListener onEntityLongClickListener) {
             mOnEntityLongClickListener = onEntityLongClickListener;
         }
     }
@@ -583,11 +613,11 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
             return b;
         }
 
-        public void setOnExtrasClickListener(OnExtrasClickListener onExtrasClickListener) {
+        private void setOnExtrasClickListener(OnExtrasClickListener onExtrasClickListener) {
             mOnExtrasClickListener = onExtrasClickListener;
         }
 
-        public void setOnExtrasLongClickListener(OnExtrasLongClickListener onExtrasLongClickListener) {
+        private void setOnExtrasLongClickListener(OnExtrasLongClickListener onExtrasLongClickListener) {
             mOnExtrasLongClickListener = onExtrasLongClickListener;
         }
     }
@@ -618,11 +648,11 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
             return b;
         }
 
-        public void setOnFooterClickListener(OnFooterClickListener onFooterClickListener) {
+        private void setOnFooterClickListener(OnFooterClickListener onFooterClickListener) {
             mOnFooterClickListener = onFooterClickListener;
         }
 
-        public void setOnFooterLongClickListener(OnFooterLongClickListener onFooterLongClickListener) {
+        private void setOnFooterLongClickListener(OnFooterLongClickListener onFooterLongClickListener) {
             mOnFooterLongClickListener = onFooterLongClickListener;
         }
     }

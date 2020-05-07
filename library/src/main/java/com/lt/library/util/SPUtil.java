@@ -3,6 +3,8 @@ package com.lt.library.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.lt.library.util.context.ContextUtil;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -23,8 +25,9 @@ public class SPUtil {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 
-    public static void put(Context context, String key, Object value) {
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    public static void put(String key, Object value) {
+        SharedPreferences sp = ContextUtil.getInstance().getContext()
+                                          .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         String typeName = value.getClass().getSimpleName();
         switch (typeName) {
@@ -49,8 +52,9 @@ public class SPUtil {
         SharedPreferencesCompat.apply(editor);
     }//存放数据，通过反射获取value的类型，然后调用对应的方法存值
 
-    public static Object get(Context context, String key, Object defaultValue) {
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    public static Object get(String key, Object defaultValue) {
+        SharedPreferences sp = ContextUtil.getInstance().getContext()
+                                          .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         String typeName = defaultValue.getClass().getSimpleName();
         Object result = null;
         switch (typeName) {
@@ -75,27 +79,31 @@ public class SPUtil {
         return result;
     }//获取数据，通过反射获取value的类型，然后调用对应的方法取值
 
-    public static void remove(Context context, String key) {
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    public static void remove(String key) {
+        SharedPreferences sp = ContextUtil.getInstance().getContext()
+                                          .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.remove(key);
         SharedPreferencesCompat.apply(editor);
     }//移除某个key值已经对应的值
 
-    public static void clear(Context context) {
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    public static void clear() {
+        SharedPreferences sp = ContextUtil.getInstance().getContext()
+                                          .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.clear();
         SharedPreferencesCompat.apply(editor);
     }//清除所有数据
 
-    public static boolean contains(Context context, String key) {
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    public static boolean contains(String key) {
+        SharedPreferences sp = ContextUtil.getInstance().getContext()
+                                          .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         return sp.contains(key);
     }//查询某个key是否已经存在
 
-    public static Map<String, ?> getAll(Context context) {
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    public static Map<String, ?> getAll() {
+        SharedPreferences sp = ContextUtil.getInstance().getContext()
+                                          .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         return sp.getAll();
     }//返回所有的键值对
 

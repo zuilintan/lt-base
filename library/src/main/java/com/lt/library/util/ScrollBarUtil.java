@@ -16,21 +16,21 @@ import java.lang.annotation.RetentionPolicy;
  */
 
 public class ScrollBarUtil {
-    public static final int ORIENTATION_HORIZONTAL = 0;
-    public static final int ORIENTATION_VERTICAL = 1;
+    public static final int HORIZONTAL = 0;
+    public static final int VERTICAL = 1;
 
     private ScrollBarUtil() {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 
-    public static void setThumb(View view, @Orientation int orientation, Drawable drawable) {
+    public static void setThumb(View view, @OrientationDef int orientation, Drawable drawable) {
         Object scrollCacheObj = ReflectionUtil.invokeMethod(View.class, view, "getScrollCache");
         Object scrollBarObj = ReflectionUtil.getField(scrollCacheObj, "scrollBar");
         switch (orientation) {
-            case ORIENTATION_HORIZONTAL:
+            case HORIZONTAL:
                 ReflectionUtil.setField(scrollBarObj, "mHorizontalThumb", drawable);
                 break;
-            case ORIENTATION_VERTICAL:
+            case VERTICAL:
                 ReflectionUtil.setField(scrollBarObj, "mVerticalThumb", drawable);
                 break;
             default:
@@ -38,8 +38,8 @@ public class ScrollBarUtil {
         }
     }
 
-    @IntDef({ORIENTATION_HORIZONTAL, ORIENTATION_VERTICAL})
+    @IntDef({HORIZONTAL, VERTICAL})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Orientation {
+    public @interface OrientationDef {
     }
 }

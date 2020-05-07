@@ -12,6 +12,8 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.lt.library.util.context.ContextUtil;
+
 import java.util.Objects;
 
 /**
@@ -48,34 +50,38 @@ public class ScreenUtil {
                 .addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }//隐藏StatusBar
 
-    public static int getScreenWidth(Context context) {
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    public static int getScreenWidth() {
+        WindowManager windowManager = (WindowManager) ContextUtil.getInstance().getContext()
+                                                                 .getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay()
                      .getMetrics(displayMetrics);
         return displayMetrics.widthPixels;
     }//获取屏幕宽度
 
-    public static int getScreenHeight(Context context) {
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    public static int getScreenHeight() {
+        WindowManager windowManager = (WindowManager) ContextUtil.getInstance().getContext()
+                                                                 .getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay()
                      .getMetrics(displayMetrics);
         return displayMetrics.heightPixels;
     }//获取屏幕高度
 
-    public static int getStatusBarWidth(Context context) {
-        return getScreenWidth(context);
+    public static int getStatusBarWidth() {
+        return getScreenWidth();
     }//获取状态栏宽度
 
     @SuppressLint("PrivateApi")
-    public static int getStatusBarHeight(Context context) {
+    public static int getStatusBarHeight() {
         //Plan A
         //Object statusBarHeightObj = ReflectionUtil.getField("com.android.internal.R$dimen", "status_bar_height");
         //int resId = Integer.parseInt(Objects.requireNonNull(statusBarHeightObj).toString());
         //Plan B
-        int resId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        return context.getResources().getDimensionPixelSize(resId);
+        int resId = ContextUtil.getInstance().getContext()
+                               .getResources().getIdentifier("status_bar_height", "dimen", "android");
+        return ContextUtil.getInstance().getContext()
+                          .getResources().getDimensionPixelSize(resId);
     }//获取状态栏高度
 
     public static Drawable snapShotWithStatusBar(Activity activity) {
@@ -83,8 +89,8 @@ public class ScreenUtil {
                             .getDecorView();
         view.setDrawingCacheEnabled(true);
         view.buildDrawingCache();
-        int width = getScreenWidth(activity);
-        int height = getScreenHeight(activity);
+        int width = getScreenWidth();
+        int height = getScreenHeight();
         Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache(), 0, 0, width, height);
         view.destroyDrawingCache();
         view.setDrawingCacheEnabled(false);
@@ -105,8 +111,8 @@ public class ScreenUtil {
                 .getWindowVisibleDisplayFrame(rect);
         int statusBarHeight = rect.top;
         //获取屏幕宽高
-        int width = getScreenWidth(activity);
-        int height = getScreenHeight(activity);
+        int width = getScreenWidth();
+        int height = getScreenHeight();
         //移除状态栏
         Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache(), 0, statusBarHeight, width, height - statusBarHeight);
         //销毁缓存信息

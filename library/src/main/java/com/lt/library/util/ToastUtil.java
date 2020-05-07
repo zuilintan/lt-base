@@ -1,9 +1,15 @@
 package com.lt.library.util;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.support.annotation.IntDef;
+import android.support.annotation.StringRes;
 import android.view.Gravity;
 import android.widget.Toast;
+
+import com.lt.library.util.context.ContextUtil;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * @作者: LinTan
@@ -24,57 +30,70 @@ public class ToastUtil {
 
     public static void isEnabled(boolean isEnabled) {
         sIsEnabled = isEnabled;
-    }//全局控制是否启用Toast
+    }//全局控制是否启用ToastUtil
 
-    public static void showShortTop(Context context, Object message) {
-        show(context, message, Gravity.TOP, Toast.LENGTH_SHORT);
-    }//居上显示, 短时间
+    public static void show(@StringRes int stringId) {
+        if (!sIsEnabled) return;
+        generateToast(stringId, Gravity.CENTER, Toast.LENGTH_SHORT).show();
+    }
 
-    public static void showShortCenter(Context context, Object message) {
-        show(context, message, Gravity.CENTER, Toast.LENGTH_SHORT);
-    }//居中显示, 短时间
+    public static void show(String string) {
+        generateToast(string, Gravity.CENTER, Toast.LENGTH_SHORT).show();
+    }
 
-    public static void showShortBottom(Context context, Object message) {
-        show(context, message, Gravity.BOTTOM, Toast.LENGTH_SHORT);
-    }//居下显示, 短时间
+    public static void show(@StringRes int stringId, @GravityDef int gravity) {
+        generateToast(stringId, gravity, Toast.LENGTH_SHORT).show();
+    }
 
-    public static void showLongTop(Context context, Object message) {
-        show(context, message, Gravity.TOP, Toast.LENGTH_LONG);
-    }//居上显示, 长时间
+    public static void show(String string, @GravityDef int gravity) {
+        generateToast(string, gravity, Toast.LENGTH_SHORT).show();
+    }
 
-    public static void showLongCenter(Context context, Object message) {
-        show(context, message, Gravity.CENTER, Toast.LENGTH_LONG);
-    }//居中显示, 长时间
+    public static void show(@StringRes int stringId, @GravityDef int gravity, @DurationDef int duration) {
+        generateToast(stringId, gravity, duration).show();
+    }
 
-    public static void showLongBottom(Context context, Object message) {
-        show(context, message, Gravity.BOTTOM, Toast.LENGTH_LONG);
-    }//居下显示, 长时间
+    public static void show(String string, @GravityDef int gravity, @DurationDef int duration) {
+        generateToast(string, gravity, duration).show();
+    }
 
-    public static void cancelToast() {
+    public static void cancel() {
         if (sIsEnabled && sToast != null) {
             sToast.cancel();
             sToast = null;
         }
-    }//取消显示
+    }
 
     @SuppressLint("ShowToast")
-    private static void show(Context context, Object message, int gravity, int duration) {
-        if (sIsEnabled) {
-            String showMessage = "";
-            if (message instanceof Integer) {
-                showMessage = context.getString((Integer) message);
-            } else if (message instanceof String) {
-                showMessage = (String) message;
-            }
-            if (sToast == null) {
-                sToast = Toast.makeText(context, showMessage, duration);
-            }//如果Toast不存在则创建
-            else {
-                sToast.cancel();
-                sToast = Toast.makeText(context, showMessage, duration);
-            }//如果当前Toast没有消失，则取消该Toast，然后重新创建
-            sToast.setGravity(gravity, 0, 0);//设置位置只有在初次创建的时候有效
-            sToast.show();
+    private static Toast generateToast(Object object, @GravityDef int gravity, @DurationDef int duration) {
+        String text = null;
+        String typeName = object.getClass().getSimpleName();
+        switch (typeName) {
+            case "String":
+                text = (String) object;
+                break;
+            case "Integer":
+                text = ContextUtil.getInstance().getContext().getString((Integer) object);
+                break;
+            default:
+                break;
         }
-    }//显示, 不对外开放
+        if (text == null) {
+            text = "";
+        }
+        cancel();//如果当前Toast没有消失，则取消该Toast
+        sToast = Toast.makeText(ContextUtil.getInstance().getContext(), text, duration);
+        sToast.setGravity(gravity, 0, 0);//仅初次创建时有效
+        return sToast;
+    }
+
+    @IntDef({Gravity.CENTER, Gravity.TOP, Gravity.BOTTOM})
+    @Retention(RetentionPolicy.SOURCE)
+    @interface GravityDef {
+    }
+
+    @IntDef({Toast.LENGTH_SHORT, Toast.LENGTH_LONG})
+    @Retention(RetentionPolicy.SOURCE)
+    @interface DurationDef {
+    }
 }

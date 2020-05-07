@@ -172,11 +172,11 @@ public abstract class BaseDialogFragment extends DialogFragment {
 
     private void initParam(Window dialogWindow) {
         dialogWindow.setLayout(mLayoutWidth > 0
-                                       ? DensityUtil.dp2px(mActivityWeakReference.get(), mLayoutWidth)
-                                       : ScreenUtil.getScreenWidth(mActivityWeakReference.get())
-                                       - 2 * DensityUtil.dp2px(mActivityWeakReference.get(), mHorizontalMargin),
+                                       ? DensityUtil.dp2px(mLayoutWidth)
+                                       : ScreenUtil.getScreenWidth()
+                                       - 2 * DensityUtil.dp2px(mHorizontalMargin),
                                mLayoutHeight > 0
-                                       ? DensityUtil.dp2px(mActivityWeakReference.get(), mLayoutHeight)
+                                       ? DensityUtil.dp2px(mLayoutHeight)
                                        : WindowManager.LayoutParams.WRAP_CONTENT);
         dialogWindow.setGravity(mGravity);
         dialogWindow.setDimAmount(mDimAmount);

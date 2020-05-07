@@ -1,7 +1,8 @@
 package com.lt.library.util;
 
-import android.content.Context;
 import android.util.TypedValue;
+
+import com.lt.library.util.context.ContextUtil;
 
 /**
  * @作者: LinTan
@@ -17,29 +18,33 @@ public class DensityUtil {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 
-    public static int dp2px(Context context, float dpValue) {
+    public static int dp2px(float dpValue) {
         float density = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValue,
-                                                  context.getResources()
-                                                         .getDisplayMetrics());
+                                                  ContextUtil.getInstance().getContext()
+                                                             .getResources()
+                                                             .getDisplayMetrics());
         return (int) (density + 0.5F);//加0.5F以四舍五入，eg: 1.4+0.5=1.9转为int是1，而1.5 + 0.5 = 2.0转换成int后就是2
     }//dp转px
 
-    public static int px2dp(Context context, float pxValue) {
-        float scale = context.getResources()
-                             .getDisplayMetrics().density;
+    public static int px2dp(float pxValue) {
+        float scale = ContextUtil.getInstance().getContext()
+                                 .getResources()
+                                 .getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5F);//加0.5F以四舍五入，eg: 1.4+0.5=1.9转为int是1，而1.5 + 0.5 = 2.0转换成int后就是2
     }//px转dp
 
-    public static int sp2px(Context context, float spValue) {
+    public static int sp2px(float spValue) {
         float density = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, spValue,
-                                                  context.getResources()
-                                                         .getDisplayMetrics());
+                                                  ContextUtil.getInstance().getContext()
+                                                             .getResources()
+                                                             .getDisplayMetrics());
         return (int) (density + 0.5F);//加0.5F以四舍五入，eg: 1.4+0.5=1.9转为int是1，而1.5 + 0.5 = 2.0转换成int后就是2
     }//sp转px
 
-    public static int px2sp(Context context, float pxValue) {
-        float scale = context.getResources()
-                             .getDisplayMetrics().scaledDensity;
+    public static int px2sp(float pxValue) {
+        float scale = ContextUtil.getInstance().getContext()
+                                 .getResources()
+                                 .getDisplayMetrics().scaledDensity;
         return (int) (pxValue / scale + 0.5F);//加0.5F以四舍五入，eg: 1.4+0.5=1.9转为int是1，而1.5 + 0.5 = 2.0转换成int后就是2
     }//px转sp
 }
