@@ -1,16 +1,19 @@
 package com.lt.library.base;
 
 import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.lt.library.util.context.ContextUtil;
 
 import java.util.Objects;
 
@@ -63,9 +66,14 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
         view.setTextSize(size);
     }//设置文本大小
 
-    public void setTextColor(int viewId, @ColorInt int colorInt) {
+    public void setTextColor(int viewId, @ColorRes int resId) {
         TextView view = findViewById(viewId);
-        view.setTextColor(colorInt);
+        view.setTextColor(ContextCompat.getColor(ContextUtil.getInstance().getContext(), resId));
+    }//设置文本颜色
+
+    public void setTextColorStateList(int viewId, @ColorRes int resId) {
+        TextView view = findViewById(viewId);
+        view.setTextColor(ContextCompat.getColorStateList(ContextUtil.getInstance().getContext(), resId));
     }//设置文本颜色
 
     public void setImageDrawable(int viewId, @Nullable Drawable drawable) {
@@ -88,9 +96,9 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
         view.setBackgroundResource(resId);
     }//设置背景资源
 
-    public void setBackgroundColor(int viewId, @ColorInt int colorInt) {
+    public void setBackgroundColor(int viewId, @ColorRes int resId) {
         View view = findViewById(viewId);
-        view.setBackgroundColor(colorInt);
+        view.setBackgroundColor(ContextCompat.getColor(ContextUtil.getInstance().getContext(), resId));
     }//设置背景颜色
 
     public void setVisibility(int viewId, int visibility) {
