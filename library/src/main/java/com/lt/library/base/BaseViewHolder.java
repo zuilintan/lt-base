@@ -55,14 +55,16 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
         return ContextUtil.getInstance().getContext();
     }
 
-    public void setText(int viewId, CharSequence text) {
+    public BaseViewHolder setText(int viewId, CharSequence text) {
         TextView view = findViewById(viewId);
         view.setText(text);
+        return this;
     }//设置文本
 
-    public void setText(int viewId, @StringRes int stringId) {
+    public BaseViewHolder setText(int viewId, @StringRes int stringId) {
         TextView view = findViewById(viewId);
         view.setText(stringId);
+        return this;
     }//设置文本
 
     public String getText(int viewId) {
@@ -70,69 +72,80 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
         return view.getText().toString();
     }//获取文本
 
-    public void setTextSize(int viewId, @DimenRes int dimenId) {
+    public BaseViewHolder setTextSize(int viewId, @DimenRes int dimenId) {
         setTextSize(viewId, dimenId, TypedValue.COMPLEX_UNIT_SP);
+        return this;
     }//设置文本大小
 
-    public void setTextSize(int viewId, @DimenRes int dimenId, int unit) {
+    public BaseViewHolder setTextSize(int viewId, @DimenRes int dimenId, int unit) {
         TextView view = findViewById(viewId);
         view.setTextSize(unit, getContext().getResources().getDimension(dimenId));
+        return this;
     }//设置文本大小
 
-    public void setTextColor(int viewId, @ColorRes int colorId) {
+    public BaseViewHolder setTextColor(int viewId, @ColorRes int colorId) {
         TextView view = findViewById(viewId);
         view.setTextColor(ContextCompat.getColor(getContext(), colorId));
+        return this;
     }//设置文本颜色
 
-    public void setTextColorStateList(int viewId, @ColorRes int colorId) {
+    public BaseViewHolder setTextColorStateList(int viewId, @ColorRes int colorId) {
         TextView view = findViewById(viewId);
         view.setTextColor(ContextCompat.getColorStateList(getContext(), colorId));
+        return this;
     }//设置文本颜色
 
-    public void setImageDrawable(int viewId, @DrawableRes int drawableId) {
+    public BaseViewHolder setImageDrawable(int viewId, @DrawableRes int drawableId) {
         ImageView view = findViewById(viewId);
         if (drawableId == RES_EMPTY_ID) {
             view.setImageDrawable(null);
         } else {
             view.setImageDrawable(ContextCompat.getDrawable(getContext(), drawableId));
         }
+        return this;
     }//设置图片资源
 
-    public void setImageDrawableTint(int viewId, @DrawableRes int drawableId, @ColorRes int colorId) {
+    public BaseViewHolder setImageDrawableTint(int viewId, @DrawableRes int drawableId, @ColorRes int colorId) {
         ImageView view = findViewById(viewId);
         Drawable drawable = ContextCompat.getDrawable(getContext(), drawableId);
         DrawableCompat.setTint(Objects.requireNonNull(drawable), ContextCompat.getColor(getContext(), colorId));
         view.setImageDrawable(drawable);
+        return this;
     }//设置图片资源
 
-    public void setImageDrawableTintList(int viewId, @DrawableRes int drawableId, @ColorRes int colorId) {
+    public BaseViewHolder setImageDrawableTintList(int viewId, @DrawableRes int drawableId, @ColorRes int colorId) {
         ImageView view = findViewById(viewId);
         Drawable drawable = ContextCompat.getDrawable(getContext(), drawableId);
         DrawableCompat.setTintList(Objects.requireNonNull(drawable), ContextCompat.getColorStateList(getContext(), colorId));
         view.setImageDrawable(drawable);
+        return this;
     }//设置图片资源
 
-    public void setBackground(int viewId, @DrawableRes int drawableId) {
+    public BaseViewHolder setBackground(int viewId, @DrawableRes int drawableId) {
         View view = findViewById(viewId);
         if (drawableId == RES_EMPTY_ID) {
             view.setBackground(null);
         } else {
             view.setBackground(ContextCompat.getDrawable(getContext(), drawableId));
         }
+        return this;
     }//设置背景资源
 
-    public void setBackgroundColor(int viewId, @ColorRes int colorId) {
+    public BaseViewHolder setBackgroundColor(int viewId, @ColorRes int colorId) {
         View view = findViewById(viewId);
         view.setBackgroundColor(ContextCompat.getColor(getContext(), colorId));
+        return this;
     }//设置背景颜色
 
-    public void setVisibility(int viewId, int visibility) {
+    public BaseViewHolder setVisibility(int viewId, int visibility) {
         View view = findViewById(viewId);
         view.setVisibility(visibility);
+        return this;
     }//设置显隐状态
 
-    public void setOnClickListener(int viewId, @Nullable View.OnClickListener listener) {
+    public BaseViewHolder setOnClickListener(int viewId, @Nullable View.OnClickListener listener) {
         View view = findViewById(viewId);
         view.setOnClickListener(listener);
+        return this;
     }//设置点击事件
 }
