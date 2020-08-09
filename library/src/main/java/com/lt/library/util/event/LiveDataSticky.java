@@ -7,6 +7,13 @@ import android.arch.lifecycle.Observer;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @作者: LinTan
+ * @日期: 2020/8/9 10:59
+ * @版本: 1.0
+ * @描述: //LiveDataSticky
+ * 1.0: Initial Commit
+ */
 public class LiveDataSticky {
     private ConcurrentHashMap<String, MutableLiveData<Object>> mLiveDataMap;
     private String mTag;

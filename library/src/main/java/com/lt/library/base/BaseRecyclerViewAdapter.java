@@ -1,5 +1,6 @@
 package com.lt.library.base;
 
+import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.lt.library.util.LogUtil;
+import com.lt.library.util.context.ContextUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,10 +55,13 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
     private int mExtrasViewId = -1;
     private int mFooterViewId = -1;
 
+    public BaseRecyclerViewAdapter() {
+        this(null);
+    }//需要后续主动调用notifyEntityRefAll(List<DS> dataSourceList)添加数据源
+
     public BaseRecyclerViewAdapter(List<DS> entityList) {
-        if (Objects.isNull(mEntityList)) {
-            mEntityList = new ArrayList<>();
-        } else {
+        mEntityList = new ArrayList<>();
+        if (Objects.nonNull(entityList)) {
             mEntityList.addAll(entityList);
         }
     }
@@ -445,6 +450,10 @@ public abstract class BaseRecyclerViewAdapter<DS> extends RecyclerView.Adapter<B
 
     public void setOnFooterLongClickListener(OnFooterLongClickListener onFooterLongClickListener) {
         mOnFooterLongClickListener = onFooterLongClickListener;
+    }
+
+    protected Context getAppContext() {
+        return ContextUtil.getInstance().getApplication();
     }
 
     protected abstract int setLayoutResId();

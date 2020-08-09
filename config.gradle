@@ -6,7 +6,7 @@ ext {
             minSdk       : 28,
             targetSdk    : 28,
             versionCode  : 1,
-            versionName  : "1.1.1",
+            versionName  : "1.1.2",
 
             storeFile    : 'C:\\SoftwareGreen\\DTP\\KeyStore\\CPY\\Android_O\\platform.keystore',
             storePassword: 'android',
@@ -15,8 +15,7 @@ ext {
     ]
 
     dependencies = [
-            supportLib : '28.0.0',
-            hunterDebug: '0.9.6',
-            leakcanary : '2.2'
+            supportLib   : '28.0.0',
+            latestVersion: '+'
     ]
 }

@@ -9,6 +9,14 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+/**
+ * @作者: LinTan
+ * @日期: 2020/8/9 11:00
+ * @版本: 1.0
+ * @描述: //ContextProvider
+ * 1.0: Initial Commit
+ */
+
 public class ContextProvider extends ContentProvider {
     @SuppressLint("StaticFieldLeak")
     public static Context sContext;

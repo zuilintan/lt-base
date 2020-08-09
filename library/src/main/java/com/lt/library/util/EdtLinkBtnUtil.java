@@ -8,6 +8,14 @@ import android.widget.EditText;
 
 import java.util.Map;
 
+/**
+ * @作者: LinTan
+ * @日期: 2020/8/9 10:59
+ * @版本: 1.0
+ * @描述: //EdtLinkBtnUtil, 联动EditText与Button
+ * 1.0: Initial Commit
+ */
+
 public class EdtLinkBtnUtil implements TextWatcher {
     private ArrayMap<EditText, Integer> mEditTextMap;
     private Button mButton;
