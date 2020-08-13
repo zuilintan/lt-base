@@ -31,6 +31,6 @@ dependencies {
     compileOnly 'com.android.support:recyclerview-v7:' + rootProject.ext.dependencies.supportLib
     //noinspection GradleDependency
     compileOnly 'com.squareup.okhttp3:okhttp:3.12.1'
-    //noinspection GradleDependency 注意, Gson 2.8.6不支持HunterDebug
+    //noinspection GradleDependency 注意, Gson 2.8.6 使用了ASM 6, HunterDebug使用的是ASM 5, 后者不兼容前者
     compileOnly 'com.google.code.gson:gson:2.8.5'
 }
