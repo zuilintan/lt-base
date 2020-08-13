@@ -87,12 +87,10 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Window dW = getDialog().getWindow();
-        if (Objects.nonNull(dW)) {
-            initParamByBeforeShow(dW);
-        }
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getDialog().setCanceledOnTouchOutside(mIsOutCancel);
         View view = inflater.inflate(getLayoutResId(), container, false);
-        initView(new BaseViewHolder(view), this);
+        initView(new BaseViewHolder(view));
         return view;
     }//Plan B, 推荐, 一般用于创建复杂内容弹窗或全屏展示效果的场景, UI复杂, 功能复杂, 或有网络请求等异步操作
 
@@ -111,7 +109,7 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
             } else {
                 super.onStart();
             }
-            initParamByAfterShow(dW);
+            initParam(dW);
         } else {
             LogUtil.w("activity getWindow = " + aW + ", dialog getWindow = " + dW);
             super.onStart();
@@ -178,16 +176,8 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
         }
     }
 
-    private void initParamByBeforeShow(@NonNull Window dW) {
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getDialog().setCanceledOnTouchOutside(mIsOutCancel);
+    private void initParam(@NonNull Window dW) {
         dW.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        if (mWindowAnimation != INVALID_VALUE) {
-            dW.setWindowAnimations(mWindowAnimation);
-        }
-    }
-
-    private void initParamByAfterShow(@NonNull Window dW) {
         if (mLayoutWidth != INVALID_VALUE && mLayoutHeight != INVALID_VALUE) {
             dW.setLayout(DensityUtil.dp2px(mLayoutWidth),
                          DensityUtil.dp2px(mLayoutHeight));
@@ -208,6 +198,9 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
         if (mGravity != INVALID_VALUE) {
             dW.setGravity(mGravity);
         }
+        if (mWindowAnimation != INVALID_VALUE) {
+            dW.setWindowAnimations(mWindowAnimation);
+        }
         if (mDimAmount != INVALID_VALUE) {
             dW.setDimAmount(mDimAmount);
         }
@@ -227,7 +220,7 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
         }//super.onStart()后, 以Activity为准, 统一SystemUiVisibility, 并取回焦点
     }//焦点变更时保持SystemUi状态
 
-    public BaseDialogFragment setLayoutSize(@Dimension(unit = Dimension.DP) int width, int height) {
+    public BaseDialogFragment setLayout(@Dimension(unit = Dimension.DP) int width, int height) {
         mLayoutWidth = width;
         mLayoutHeight = height;
         return this;
@@ -278,7 +271,7 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
 
     protected abstract int getLayoutResId();
 
-    protected abstract void initView(BaseViewHolder viewHolder, BaseDialogFragment dialogFragment);
+    protected abstract void initView(BaseViewHolder viewHolder);
 
     protected abstract void freeView();
 }
