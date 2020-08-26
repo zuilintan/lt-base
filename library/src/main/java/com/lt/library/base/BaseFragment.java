@@ -45,8 +45,13 @@ public abstract class BaseFragment<A extends FragmentActivity, V extends ViewBin
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mViewBinding = bindView(inflater, container);
-        initView();
         return mViewBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initView();
     }
 
     @Override

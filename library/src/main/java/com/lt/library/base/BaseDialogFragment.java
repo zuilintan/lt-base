@@ -17,7 +17,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,16 +86,21 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(getLayoutResId(), container, false);
+    }//Plan B, 推荐, 一般用于创建复杂内容弹窗或全屏展示效果的场景, UI复杂, 功能复杂, 或有网络请求等异步操作
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         getDialog().setCanceledOnTouchOutside(mIsOutCancel);
-        View view = inflater.inflate(getLayoutResId(), container, false);
         initView(new BaseViewHolder(view));
-        return view;
-    }//Plan B, 推荐, 一般用于创建复杂内容弹窗或全屏展示效果的场景, UI复杂, 功能复杂, 或有网络请求等异步操作
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        loadTempData(savedInstanceState);
     }
 
     @Override
@@ -110,6 +114,7 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
                 super.onStart();
             }
             initParam(dW);
+            initEvent();
         } else {
             LogUtil.w("activity getWindow = " + aW + ", dialog getWindow = " + dW);
             super.onStart();
@@ -119,16 +124,25 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
     @Override
     public void onResume() {
         super.onResume();
+        showView();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        hideView();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        freeEvent();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        saveTempData(outState);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -160,19 +174,21 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
 
     @Override
     public void show(FragmentManager manager, String tag) {
-        FragmentTransaction fragmentTransaction = manager.beginTransaction();
         Fragment fragment = manager.findFragmentByTag(tag);
-        if (Objects.nonNull(fragment)) {
-            fragmentTransaction.remove(fragment);
+        if (Objects.isNull(fragment)) {
+            super.show(manager, tag);
         }//规避并发点击时, IllegalStateException: Fragment already added
-        fragmentTransaction.commit();
-        super.show(manager, tag);
+        else {
+            LogUtil.w("dialogFragment isAdded, tag = " + tag);
+        }
     }
 
     @Override
     public void dismiss() {
         if (isAdded()) {
             super.dismiss();
+        } else {
+            LogUtil.w("dialogFragment nonAdded");
         }
     }
 
@@ -262,7 +278,7 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
     }//设置保持SystemUi状态
 
     public void show(FragmentManager manager) {
-        this.show(manager, getClass().getSimpleName());
+        show(manager, getClass().getSimpleName());
     }//显示Dialog
 
     protected Context getAppContext() {
@@ -272,6 +288,18 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
     protected abstract int getLayoutResId();
 
     protected abstract void initView(BaseViewHolder viewHolder);
+
+    protected abstract void loadTempData(@Nullable Bundle savedInstanceState);
+
+    protected abstract void initEvent();
+
+    protected abstract void showView();
+
+    protected abstract void hideView();
+
+    protected abstract void freeEvent();
+
+    protected abstract void saveTempData(@NonNull Bundle outState);
 
     protected abstract void freeView();
 }
