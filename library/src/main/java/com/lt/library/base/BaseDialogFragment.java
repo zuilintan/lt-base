@@ -75,6 +75,7 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        bindData(getArguments());
     }
 
     @NonNull
@@ -86,7 +87,7 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(getLayoutResId(), container, false);
+        return inflater.inflate(bindView(), container, false);
     }//Plan B, 推荐, 一般用于创建复杂内容弹窗或全屏展示效果的场景, UI复杂, 功能复杂, 或有网络请求等异步操作
 
     @Override
@@ -100,6 +101,7 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        initData();
         loadTempData(savedInstanceState);
     }
 
@@ -148,6 +150,7 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        freeData();
         freeView();
     }
 
@@ -285,9 +288,13 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
         return ContextUtil.getInstance().getApplication();
     }
 
-    protected abstract int getLayoutResId();
+    protected abstract void bindData(Bundle arguments);
+
+    protected abstract int bindView();
 
     protected abstract void initView(BaseViewHolder viewHolder);
+
+    protected abstract void initData();
 
     protected abstract void loadTempData(@Nullable Bundle savedInstanceState);
 
@@ -300,6 +307,8 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
     protected abstract void freeEvent();
 
     protected abstract void saveTempData(@NonNull Bundle outState);
+
+    protected abstract void freeData();
 
     protected abstract void freeView();
 }
