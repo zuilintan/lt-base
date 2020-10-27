@@ -1,4 +1,4 @@
-package com.lt.library.base;
+package com.lt.library.base.recyclerview.viewholder;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.lt.library.base.recyclerview.viewholder.BaseViewHolder;
 import com.lt.library.util.DensityUtil;
 import com.lt.library.util.LogUtil;
 import com.lt.library.util.ScreenUtil;
