@@ -51,6 +51,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private static final int VIEW_TYPE_ENTITY = 3;
     private static final int VIEW_TYPE_EXTRAS = 4;
     private static final int VIEW_TYPE_FOOTER = 5;
+    private RecyclerView mRecyclerView;
     private OnHeaderClickListener mOnHeaderClickListener;
     private OnHeaderLongClickListener mOnHeaderLongClickListener;
     private OnStatusClickListener mOnStatusClickListener;
@@ -61,17 +62,16 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private OnExtrasLongClickListener mOnExtrasLongClickListener;
     private OnFooterClickListener mOnFooterClickListener;
     private OnFooterLongClickListener mOnFooterLongClickListener;
-    private int mHeaderViewCount = 0;
-    private int mStatusViewCount = 0;
-    private int mExtrasViewCount = 0;
-    private int mFooterViewCount = 0;
+    private int mHeaderCount = 0;
+    private int mStatusCount = 0;
+    private int mExtrasCount = 0;
+    private int mFooterCount = 0;
     private List<DS> mEntityList;
-    private int mHeaderViewId = -1;
-    private int mStatusViewId = -1;
-    private int mEntityViewId = setLayoutResId();
-    private int mExtrasViewId = -1;
-    private int mFooterViewId = -1;
-    private int mPresetClickPosition;
+    private int mHeaderId = -1;
+    private int mStatusId = -1;
+    private int mEntityId = getLayoutRes();
+    private int mExtrasId = -1;
+    private int mFooterId = -1;
 
     public BaseAdapter() {
         this(null);
@@ -91,23 +91,23 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
         BaseViewHolder viewHolder;
         switch (viewType) {
             case VIEW_TYPE_HEADER:
-                view = LayoutInflater.from(viewGroup.getContext()).inflate(mHeaderViewId, viewGroup, false);
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(mHeaderId, viewGroup, false);
                 viewHolder = new HeaderViewHolder(view, mOnHeaderClickListener, mOnHeaderLongClickListener);
                 break;
             case VIEW_TYPE_STATUS:
-                view = LayoutInflater.from(viewGroup.getContext()).inflate(mStatusViewId, viewGroup, false);
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(mStatusId, viewGroup, false);
                 viewHolder = new StatusViewHolder(view, mOnStatusClickListener, mOnStatusLongClickListener);
                 break;
             case VIEW_TYPE_ENTITY:
-                view = LayoutInflater.from(viewGroup.getContext()).inflate(mEntityViewId, viewGroup, false);
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(mEntityId, viewGroup, false);
                 viewHolder = new EntityViewHolder(view, mOnEntityClickListener, mOnEntityLongClickListener);
                 break;
             case VIEW_TYPE_EXTRAS:
-                view = LayoutInflater.from(viewGroup.getContext()).inflate(mExtrasViewId, viewGroup, false);
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(mExtrasId, viewGroup, false);
                 viewHolder = new ExtrasViewHolder(view, mOnExtrasClickListener, mOnExtrasLongClickListener);
                 break;
             case VIEW_TYPE_FOOTER:
-                view = LayoutInflater.from(viewGroup.getContext()).inflate(mFooterViewId, viewGroup, false);
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(mFooterId, viewGroup, false);
                 viewHolder = new FooterViewHolder(view, mOnFooterClickListener, mOnFooterLongClickListener);
                 break;
             default:
@@ -149,15 +149,15 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     @Override
     public int getItemViewType(int position) {
         int itemViewType = RecyclerView.INVALID_TYPE;
-        if (isHeaderView(position)) {
+        if (isHeader(position)) {
             itemViewType = VIEW_TYPE_HEADER;
-        } else if (isStatusView(position)) {
+        } else if (isStatus(position)) {
             itemViewType = VIEW_TYPE_STATUS;
-        } else if (isEntityView(position)) {
+        } else if (isEntity(position)) {
             itemViewType = VIEW_TYPE_ENTITY;
-        } else if (isExtrasView(position)) {
+        } else if (isExtras(position)) {
             itemViewType = VIEW_TYPE_EXTRAS;
-        } else if (isFooterView(position)) {
+        } else if (isFooter(position)) {
             itemViewType = VIEW_TYPE_FOOTER;
         }
         return itemViewType;
@@ -166,8 +166,8 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     @Override
     public long getItemId(int position) {
         long i;
-        if (hasStableIds() && isEntityView(position)) {
-            i = getEntity(position - (mHeaderViewCount + mStatusViewCount)).hashCode();
+        if (hasStableIds() && isEntity(position)) {
+            i = getEntity(getFixEntityPosition(position)).hashCode();
         } else {
             i = RecyclerView.NO_ID;
         }
@@ -177,7 +177,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     @Override
     public int getItemCount() {
         int entityViewCount = getEntityListSize();
-        return mHeaderViewCount + mStatusViewCount + entityViewCount + mExtrasViewCount + mFooterViewCount;
+        return mHeaderCount + mStatusCount + entityViewCount + mExtrasCount + mFooterCount;
     }//获取Item的总数
 
     @Override
@@ -201,58 +201,59 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         mergeGridLayoutManagerFullSpan(recyclerView);//当LayoutManager为GridLayoutManager时, 让非EntityView占满所在行
-        presetSelection(recyclerView);
+        mRecyclerView = recyclerView;
     }//setAdapter()后新的Adapter回调
 
     @Override
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
+        mRecyclerView = null;
     }//setAdapter()后旧的Adapter回调
 
-    private boolean isHeaderView(int position) {
-        return mHeaderViewCount > 0
-                && position < mHeaderViewCount;
+    private boolean isHeader(int position) {
+        return mHeaderCount > 0
+                && position < mHeaderCount;
     }
 
-    private boolean isStatusView(int position) {
-        return mStatusViewCount > 0
-                && mHeaderViewCount <= position
-                && position < mHeaderViewCount + mStatusViewCount;
+    private boolean isStatus(int position) {
+        return mStatusCount > 0
+                && mHeaderCount <= position
+                && position < mHeaderCount + mStatusCount;
     }
 
-    private boolean isEntityView(int position) {
+    private boolean isEntity(int position) {
         int entityViewCount = getEntityListSize();
         return entityViewCount > 0
-                && mHeaderViewCount + mStatusViewCount <= position
-                && position < mHeaderViewCount + mStatusViewCount + entityViewCount;
+                && mHeaderCount + mStatusCount <= position
+                && position < mHeaderCount + mStatusCount + entityViewCount;
     }
 
-    private boolean isExtrasView(int position) {
+    private boolean isExtras(int position) {
         int entityViewCount = getEntityListSize();
-        return mExtrasViewCount > 0
-                && mHeaderViewCount + mStatusViewCount + entityViewCount <= position
-                && position < mHeaderViewCount + mStatusViewCount + entityViewCount + mExtrasViewCount;
+        return mExtrasCount > 0
+                && mHeaderCount + mStatusCount + entityViewCount <= position
+                && position < mHeaderCount + mStatusCount + entityViewCount + mExtrasCount;
     }
 
-    private boolean isFooterView(int position) {
+    private boolean isFooter(int position) {
         int entityViewCount = getEntityListSize();
-        return mFooterViewCount > 0
-                && mHeaderViewCount + mStatusViewCount + entityViewCount + mExtrasViewCount <= position;
+        return mFooterCount > 0
+                && mHeaderCount + mStatusCount + entityViewCount + mExtrasCount <= position;
     }
 
     private int getFixEntityPosition(int rawPosition) {
-        return rawPosition - (mHeaderViewCount + mStatusViewCount);
+        return rawPosition - (mHeaderCount + mStatusCount);
     }
 
     private int getRawEntityPosition(int fixPosition) {
-        return fixPosition + (mHeaderViewCount + mStatusViewCount);
+        return fixPosition + (mHeaderCount + mStatusCount);
     }
 
     private void mergeStGridLayoutManagerFullSpan(@NonNull BaseViewHolder viewHolder) {
         ViewGroup.LayoutParams viewGroupLayoutParams = viewHolder.itemView.getLayoutParams();
         if (viewGroupLayoutParams instanceof StaggeredGridLayoutManager.LayoutParams) {
             StaggeredGridLayoutManager.LayoutParams sgLayoutManagerLayoutParams = (StaggeredGridLayoutManager.LayoutParams) viewGroupLayoutParams;
-            if (!isEntityView(viewHolder.getLayoutPosition())) {
+            if (!isEntity(viewHolder.getLayoutPosition())) {
                 sgLayoutManagerLayoutParams.setFullSpan(true);
             }
         }
@@ -266,7 +267,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
                 @Override
                 public int getSpanSize(int position) {
                     int spanSize = 1;
-                    if (!isEntityView(position)) {
+                    if (!isEntity(position)) {
                         spanSize = gridLayoutManager.getSpanCount();
                     }
                     return spanSize;
@@ -275,121 +276,120 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
         }
     }
 
-    private void presetSelection(@NonNull RecyclerView recyclerView) {
-        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(getRawEntityPosition(mPresetClickPosition));
-                if (Objects.nonNull(viewHolder)) {
-                    viewHolder.itemView.callOnClick();
-                }
-                recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-            }
-        });
+    private boolean clickEntity(int rawEntityPosition) {
+        boolean result;
+        RecyclerView.ViewHolder viewHolder = mRecyclerView.findViewHolderForAdapterPosition(rawEntityPosition);
+        if (Objects.nonNull(viewHolder)) {
+            viewHolder.itemView.callOnClick();
+            result = true;
+        } else {
+            result = false;
+        }//若ViewHolder不为null, 则表示RecyclerView布局完成; 反之, 则为未完成
+        return result;
     }
 
-    public void setHeaderView(@LayoutRes int layoutResId) {
-        delHeaderView();
-        addHeaderView(layoutResId);
+    public void setHeader(@LayoutRes int layoutResId) {
+        delHeader();
+        addHeader(layoutResId);
     }//设置HeaderView
 
-    public void delHeaderView() {
-        if (mHeaderViewId == -1 || mHeaderViewCount == 0) {
-            LogUtil.w("headerView not added, headerViewId = " + mHeaderViewId + ", headerViewCount = " + mHeaderViewCount);
+    public void delHeader() {
+        if (mHeaderId == -1 || mHeaderCount == 0) {
+            LogUtil.w("headerView not added, headerViewId = " + mHeaderId + ", headerViewCount = " + mHeaderCount);
             return;
         }
-        mHeaderViewId = -1;
-        mHeaderViewCount = 0;
+        mHeaderId = -1;
+        mHeaderCount = 0;
         notifyItemRemoved(0);
     }//移除HeaderView
 
-    public void addHeaderView(@LayoutRes int layoutResId) {
-        if (mHeaderViewId != -1 || mHeaderViewCount != 0) {
-            LogUtil.w("headerView not deleted, headerViewId = " + mHeaderViewId + ", headerViewCount = " + mHeaderViewCount);
+    public void addHeader(@LayoutRes int layoutResId) {
+        if (mHeaderId != -1 || mHeaderCount != 0) {
+            LogUtil.w("headerView not deleted, headerViewId = " + mHeaderId + ", headerViewCount = " + mHeaderCount);
             return;
         }
-        mHeaderViewId = layoutResId;
-        mHeaderViewCount = 1;
+        mHeaderId = layoutResId;
+        mHeaderCount = 1;
         notifyItemInserted(0);
     }//添加HeaderView
 
-    public void setStatusView(@LayoutRes int layoutResId) {
-        delStatusView();
-        addStatusView(layoutResId);
+    public void setStatus(@LayoutRes int layoutResId) {
+        delStatus();
+        addStatus(layoutResId);
     }//设置StatusView
 
-    public void delStatusView() {
-        if (mStatusViewId == -1 || mStatusViewCount == 0) {
-            LogUtil.w("statusView not added, statusViewId = " + mStatusViewId + ", statusViewCount = " + mStatusViewCount);
+    public void delStatus() {
+        if (mStatusId == -1 || mStatusCount == 0) {
+            LogUtil.w("statusView not added, statusViewId = " + mStatusId + ", statusViewCount = " + mStatusCount);
             return;
         }
-        mStatusViewId = -1;
-        mStatusViewCount = 0;
-        notifyItemRemoved(mHeaderViewCount);
+        mStatusId = -1;
+        mStatusCount = 0;
+        notifyItemRemoved(mHeaderCount);
     }//移除StatusView
 
-    public void addStatusView(@LayoutRes int layoutResId) {
-        if (mStatusViewId != -1 || mStatusViewCount != 0) {
-            LogUtil.w("statusView not deleted, statusViewId = " + mStatusViewId + ", statusViewCount = " + mStatusViewCount);
+    public void addStatus(@LayoutRes int layoutResId) {
+        if (mStatusId != -1 || mStatusCount != 0) {
+            LogUtil.w("statusView not deleted, statusViewId = " + mStatusId + ", statusViewCount = " + mStatusCount);
             return;
         }
-        mStatusViewId = layoutResId;
-        mStatusViewCount = 1;
-        notifyItemInserted(mHeaderViewCount);
+        mStatusId = layoutResId;
+        mStatusCount = 1;
+        notifyItemInserted(mHeaderCount);
     }//添加StatusView
 
-    public void setExtrasView(@LayoutRes int layoutResId) {
-        delExtrasView();
-        addExtrasView(layoutResId);
+    public void setExtras(@LayoutRes int layoutResId) {
+        delExtras();
+        addExtras(layoutResId);
     }//设置ExtrasView
 
-    public void delExtrasView() {
-        if (mExtrasViewId == -1 || mExtrasViewCount == 0) {
-            LogUtil.w("extrasView not added, extrasViewId = " + mExtrasViewId + ", extrasViewCount = " + mExtrasViewCount);
+    public void delExtras() {
+        if (mExtrasId == -1 || mExtrasCount == 0) {
+            LogUtil.w("extrasView not added, extrasViewId = " + mExtrasId + ", extrasViewCount = " + mExtrasCount);
             return;
         }
-        mExtrasViewId = -1;
-        mExtrasViewCount = 0;
+        mExtrasId = -1;
+        mExtrasCount = 0;
         int entityViewCount = getEntityListSize();
-        notifyItemRemoved(mHeaderViewCount + mStatusViewCount + entityViewCount);
+        notifyItemRemoved(mHeaderCount + mStatusCount + entityViewCount);
     }//移除ExtrasView
 
-    public void addExtrasView(@LayoutRes int layoutResId) {
-        if (mExtrasViewId != -1 || mExtrasViewCount != 0) {
-            LogUtil.w("extrasView not deleted, extrasViewId = " + mExtrasViewId + ", extrasViewCount = " + mExtrasViewCount);
+    public void addExtras(@LayoutRes int layoutResId) {
+        if (mExtrasId != -1 || mExtrasCount != 0) {
+            LogUtil.w("extrasView not deleted, extrasViewId = " + mExtrasId + ", extrasViewCount = " + mExtrasCount);
             return;
         }
-        mExtrasViewId = layoutResId;
-        mExtrasViewCount = 1;
+        mExtrasId = layoutResId;
+        mExtrasCount = 1;
         int entityViewCount = getEntityListSize();
-        notifyItemInserted(mHeaderViewCount + mStatusViewCount + entityViewCount);
+        notifyItemInserted(mHeaderCount + mStatusCount + entityViewCount);
     }//添加ExtrasView
 
-    public void setFooterView(@LayoutRes int layoutResId) {
-        delFooterView();
-        addFooterView(layoutResId);
+    public void setFooter(@LayoutRes int layoutResId) {
+        delFooter();
+        addFooter(layoutResId);
     }//设置FooterView
 
-    public void delFooterView() {
-        if (mFooterViewId == -1 || mFooterViewCount == 0) {
-            LogUtil.w("footerView not added, footerViewId = " + mFooterViewId + ", footerViewCount = " + mFooterViewCount);
+    public void delFooter() {
+        if (mFooterId == -1 || mFooterCount == 0) {
+            LogUtil.w("footerView not added, footerViewId = " + mFooterId + ", footerViewCount = " + mFooterCount);
             return;
         }
-        mFooterViewId = -1;
-        mFooterViewCount = 0;
+        mFooterId = -1;
+        mFooterCount = 0;
         int entityViewCount = getEntityListSize();
-        notifyItemRemoved(mHeaderViewCount + mStatusViewCount + entityViewCount + mExtrasViewCount + mFooterViewCount);
+        notifyItemRemoved(mHeaderCount + mStatusCount + entityViewCount + mExtrasCount + mFooterCount);
     }//移除FooterView
 
-    public void addFooterView(@LayoutRes int layoutResId) {
-        if (mFooterViewId != -1 || mFooterViewCount != 0) {
-            LogUtil.w("footerView not deleted, footerViewId = " + mFooterViewId + ", footerViewCount = " + mFooterViewCount);
+    public void addFooter(@LayoutRes int layoutResId) {
+        if (mFooterId != -1 || mFooterCount != 0) {
+            LogUtil.w("footerView not deleted, footerViewId = " + mFooterId + ", footerViewCount = " + mFooterCount);
             return;
         }
-        mFooterViewId = layoutResId;
-        mFooterViewCount = 1;
+        mFooterId = layoutResId;
+        mFooterCount = 1;
         int entityViewCount = getEntityListSize();
-        notifyItemInserted(mHeaderViewCount + mStatusViewCount + entityViewCount + mExtrasViewCount + mFooterViewCount);
+        notifyItemInserted(mHeaderCount + mStatusCount + entityViewCount + mExtrasCount + mFooterCount);
     }//添加FooterView
 
     public void notifyEntitySetChanged(List<DS> dataSourceList) {
@@ -412,47 +412,64 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
         }
         int entityViewCount = getEntityListSize();
         mEntityList.clear();
-        notifyItemRangeRemoved(mHeaderViewCount + mStatusViewCount, entityViewCount);
-        notifyItemRangeChanged(mHeaderViewCount + mStatusViewCount, entityViewCount);
+        notifyItemRangeRemoved(mHeaderCount + mStatusCount, entityViewCount);
+        notifyItemRangeChanged(mHeaderCount + mStatusCount, entityViewCount);
     }//清空数据源集合, 并更新item
 
     public void notifyEntityAddAll(List<DS> dataSourceList) {
         int entityViewCount = getEntityListSize();
         mEntityList.addAll(dataSourceList);
-        notifyItemRangeInserted(mHeaderViewCount + mStatusViewCount + entityViewCount, dataSourceList.size());
-        notifyItemRangeChanged(mHeaderViewCount + mStatusViewCount + entityViewCount, dataSourceList.size());
+        notifyItemRangeInserted(mHeaderCount + mStatusCount + entityViewCount, dataSourceList.size());
+        notifyItemRangeChanged(mHeaderCount + mStatusCount + entityViewCount, dataSourceList.size());
     }//添加数据源集合, 并更新item
 
     public void notifyEntityRef(DS dataSource, int position) {
         mEntityList.set(position, dataSource);
-        notifyItemChanged(mHeaderViewCount + mStatusViewCount + position);
+        notifyItemChanged(mHeaderCount + mStatusCount + position);
     }//刷新数据源, 并更新item
 
     public void notifyEntityDel(int position) {
         int entityViewCount = getEntityListSize();
         mEntityList.remove(position);
-        notifyItemRemoved(mHeaderViewCount + mStatusViewCount + position);
-        notifyItemRangeChanged(mHeaderViewCount + mStatusViewCount + position, entityViewCount - position);
+        notifyItemRemoved(mHeaderCount + mStatusCount + position);
+        notifyItemRangeChanged(mHeaderCount + mStatusCount + position, entityViewCount - position);
     }//清空数据源, 并更新item
 
     public void notifyEntityAdd(DS dataSource, int position) {
         int entityViewCount = getEntityListSize();
         mEntityList.add(position, dataSource);
-        notifyItemInserted(mHeaderViewCount + mStatusViewCount + position);
-        notifyItemRangeChanged(mHeaderViewCount + mStatusViewCount + position, entityViewCount - position);
+        notifyItemInserted(mHeaderCount + mStatusCount + position);
+        notifyItemRangeChanged(mHeaderCount + mStatusCount + position, entityViewCount - position);
     }//添加数据源, 并更新item
+
+    public void notifyEntityClick(int position) {
+        int rawEntityPosition = getRawEntityPosition(position);
+        if (isEntity(rawEntityPosition)) {
+            if (!clickEntity(rawEntityPosition)) {
+                mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        clickEntity(rawEntityPosition);
+                        mRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);//移除监听, 避免反复回调重复点击
+                    }
+                });//注册RecyclerView布局完成监听器
+            }
+        } else {
+            LogUtil.w("position = " + position + ", out of bounds");
+        }
+    }//编程式点击Item(无Beep音), 需要在setAdapter()后调用
 
     public DS getEntity(int position) {
         return mEntityList.get(position);
     }//获取数据源
 
+    public List<DS> getEntityList() {
+        return mEntityList;
+    }//获取数据源集合
+
     public int getEntityListSize() {
         return mEntityList.size();
-    }//获取数据源大小
-
-    public void setPresetSelection(int presetClickPosition) {
-        mPresetClickPosition = presetClickPosition;
-    }
+    }//获取数据源集合大小
 
     public void setOnHeaderClickListener(OnHeaderClickListener onHeaderClickListener) {
         mOnHeaderClickListener = onHeaderClickListener;
@@ -498,7 +515,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
         return ContextUtil.getInstance().getApplication();
     }
 
-    protected abstract int setLayoutResId();
+    protected abstract int getLayoutRes();
 
     protected void initHeaderView(HeaderViewHolder viewHolder) {
     }
