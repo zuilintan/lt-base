@@ -26,7 +26,7 @@ public class SPUtil {
     }
 
     public static void put(String key, Object value) {
-        SharedPreferences sp = ContextUtil.getInstance().getContext()
+        SharedPreferences sp = ContextUtil.getInstance().getApplication()
                                           .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         String typeName = value.getClass().getSimpleName();
@@ -53,7 +53,7 @@ public class SPUtil {
     }//存放数据，通过反射获取value的类型，然后调用对应的方法存值
 
     public static Object get(String key, Object defaultValue) {
-        SharedPreferences sp = ContextUtil.getInstance().getContext()
+        SharedPreferences sp = ContextUtil.getInstance().getApplication()
                                           .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         String typeName = defaultValue.getClass().getSimpleName();
         Object result = null;
@@ -80,7 +80,7 @@ public class SPUtil {
     }//获取数据，通过反射获取value的类型，然后调用对应的方法取值
 
     public static void remove(String key) {
-        SharedPreferences sp = ContextUtil.getInstance().getContext()
+        SharedPreferences sp = ContextUtil.getInstance().getApplication()
                                           .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.remove(key);
@@ -88,7 +88,7 @@ public class SPUtil {
     }//移除某个key值已经对应的值
 
     public static void clear() {
-        SharedPreferences sp = ContextUtil.getInstance().getContext()
+        SharedPreferences sp = ContextUtil.getInstance().getApplication()
                                           .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.clear();
@@ -96,13 +96,13 @@ public class SPUtil {
     }//清除所有数据
 
     public static boolean contains(String key) {
-        SharedPreferences sp = ContextUtil.getInstance().getContext()
+        SharedPreferences sp = ContextUtil.getInstance().getApplication()
                                           .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         return sp.contains(key);
     }//查询某个key是否已经存在
 
     public static Map<String, ?> getAll() {
-        SharedPreferences sp = ContextUtil.getInstance().getContext()
+        SharedPreferences sp = ContextUtil.getInstance().getApplication()
                                           .getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         return sp.getAll();
     }//返回所有的键值对

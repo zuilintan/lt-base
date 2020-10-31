@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 
 public class LogUtil {
-    private static AtomicBoolean sIsEnabled = new AtomicBoolean(true);//默认启用LogUtil
+    private static final AtomicBoolean sIsEnabled = new AtomicBoolean(true);//默认启用
 
     private LogUtil() {
         throw new UnsupportedOperationException("cannot be instantiated");

@@ -51,8 +51,8 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
         return (T) view;
     }//findViewById，并复用
 
-    public Context getContext() {
-        return ContextUtil.getInstance().getContext();
+    public Context getAppContext() {
+        return ContextUtil.getInstance().getApplication();
     }
 
     public BaseViewHolder setText(int viewId, CharSequence text) {
@@ -79,19 +79,19 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
 
     public BaseViewHolder setTextSize(int viewId, @DimenRes int dimenId, int unit) {
         TextView view = findViewById(viewId);
-        view.setTextSize(unit, getContext().getResources().getDimension(dimenId));
+        view.setTextSize(unit, getAppContext().getResources().getDimension(dimenId));
         return this;
     }//设置文本大小
 
     public BaseViewHolder setTextColor(int viewId, @ColorRes int colorId) {
         TextView view = findViewById(viewId);
-        view.setTextColor(ContextCompat.getColor(getContext(), colorId));
+        view.setTextColor(ContextCompat.getColor(getAppContext(), colorId));
         return this;
     }//设置文本颜色
 
     public BaseViewHolder setTextColorStateList(int viewId, @ColorRes int colorId) {
         TextView view = findViewById(viewId);
-        view.setTextColor(ContextCompat.getColorStateList(getContext(), colorId));
+        view.setTextColor(ContextCompat.getColorStateList(getAppContext(), colorId));
         return this;
     }//设置文本颜色
 
@@ -100,23 +100,23 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
         if (drawableId == RES_EMPTY_ID) {
             view.setImageDrawable(null);
         } else {
-            view.setImageDrawable(ContextCompat.getDrawable(getContext(), drawableId));
+            view.setImageDrawable(ContextCompat.getDrawable(getAppContext(), drawableId));
         }
         return this;
     }//设置图片资源
 
     public BaseViewHolder setImageDrawableTint(int viewId, @DrawableRes int drawableId, @ColorRes int colorId) {
         ImageView view = findViewById(viewId);
-        Drawable drawable = ContextCompat.getDrawable(getContext(), drawableId);
-        DrawableCompat.setTint(Objects.requireNonNull(drawable), ContextCompat.getColor(getContext(), colorId));
+        Drawable drawable = ContextCompat.getDrawable(getAppContext(), drawableId);
+        DrawableCompat.setTint(Objects.requireNonNull(drawable), ContextCompat.getColor(getAppContext(), colorId));
         view.setImageDrawable(drawable);
         return this;
     }//设置图片资源
 
     public BaseViewHolder setImageDrawableTintList(int viewId, @DrawableRes int drawableId, @ColorRes int colorId) {
         ImageView view = findViewById(viewId);
-        Drawable drawable = ContextCompat.getDrawable(getContext(), drawableId);
-        DrawableCompat.setTintList(Objects.requireNonNull(drawable), ContextCompat.getColorStateList(getContext(), colorId));
+        Drawable drawable = ContextCompat.getDrawable(getAppContext(), drawableId);
+        DrawableCompat.setTintList(Objects.requireNonNull(drawable), ContextCompat.getColorStateList(getAppContext(), colorId));
         view.setImageDrawable(drawable);
         return this;
     }//设置图片资源
@@ -126,14 +126,14 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
         if (drawableId == RES_EMPTY_ID) {
             view.setBackground(null);
         } else {
-            view.setBackground(ContextCompat.getDrawable(getContext(), drawableId));
+            view.setBackground(ContextCompat.getDrawable(getAppContext(), drawableId));
         }
         return this;
     }//设置背景资源
 
     public BaseViewHolder setBackgroundColor(int viewId, @ColorRes int colorId) {
         View view = findViewById(viewId);
-        view.setBackgroundColor(ContextCompat.getColor(getContext(), colorId));
+        view.setBackgroundColor(ContextCompat.getColor(getAppContext(), colorId));
         return this;
     }//设置背景颜色
 
