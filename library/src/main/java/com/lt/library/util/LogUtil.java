@@ -25,11 +25,15 @@ public class LogUtil {
     }
 
     public static void v(String msg) {
-        v("", msg, null);
+        v(null, msg, null);
     }
 
     public static void v(String tag, String msg) {
         v(tag, msg, null);
+    }
+
+    public static void v(String msg, Throwable tr) {
+        v(null, msg, tr);
     }
 
     public static void v(String tag, String msg, Throwable tr) {
@@ -44,11 +48,15 @@ public class LogUtil {
     }
 
     public static void d(String msg) {
-        d("", msg, null);
+        d(null, msg, null);
     }
 
     public static void d(String tag, String msg) {
         d(tag, msg, null);
+    }
+
+    public static void d(String msg, Throwable tr) {
+        d(null, msg, tr);
     }
 
     public static void d(String tag, String msg, Throwable tr) {
@@ -63,11 +71,15 @@ public class LogUtil {
     }
 
     public static void i(String msg) {
-        i("", msg, null);
+        i(null, msg, null);
     }
 
     public static void i(String tag, String msg) {
         i(tag, msg, null);
+    }
+
+    public static void i(String msg, Throwable tr) {
+        i(null, msg, tr);
     }
 
     public static void i(String tag, String msg, Throwable tr) {
@@ -82,11 +94,15 @@ public class LogUtil {
     }
 
     public static void w(String msg) {
-        w("", msg, null);
+        w(null, msg, null);
     }
 
     public static void w(String tag, String msg) {
         w(tag, msg, null);
+    }
+
+    public static void w(String msg, Throwable tr) {
+        w(null, msg, tr);
     }
 
     public static void w(String tag, String msg, Throwable tr) {
@@ -101,11 +117,15 @@ public class LogUtil {
     }
 
     public static void e(String msg) {
-        e("", msg, null);
+        e(null, msg, null);
     }
 
     public static void e(String tag, String msg) {
         e(tag, msg, null);
+    }
+
+    public static void e(String msg, Throwable tr) {
+        e(null, msg, tr);
     }
 
     public static void e(String tag, String msg, Throwable tr) {
@@ -120,11 +140,15 @@ public class LogUtil {
     }
 
     public static void wtf(String msg) {
-        wtf("", msg, null);
+        wtf(null, msg, null);
     }
 
     public static void wtf(String tag, String msg) {
         wtf(tag, msg, null);
+    }
+
+    public static void wtf(String msg, Throwable tr) {
+        wtf(null, msg, tr);
     }
 
     public static void wtf(String tag, String msg, Throwable tr) {
