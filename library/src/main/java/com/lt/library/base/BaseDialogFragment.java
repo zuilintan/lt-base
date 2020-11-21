@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.hunter.library.debug.HunterDebugImpl;
 import com.lt.library.base.recyclerview.viewholder.BaseViewHolder;
 import com.lt.library.util.DensityUtil;
 import com.lt.library.util.LogUtil;
@@ -41,71 +42,64 @@ import java.util.Objects;
  * implementation 'com.android.support:recyclerview-v7:28.0.0'
  */
 
-public abstract class BaseDialogFragment<A extends FragmentActivity> extends DialogFragment {
-    protected static final int INVALID_VALUE = -1;
-    protected A mActivity;
-    private int mLayoutWidth;
-    private int mLayoutHeight;
-    private int mOffsetX;
-    private int mOffsetY;
-    private int mGravity;
-    private int mWindowAnimation;
-    private float mDimAmount;
-    private boolean mIsOutCancel;
-    private boolean mIsKeepSystemUiState;
+public abstract class BaseDialogFragment extends DialogFragment {
+    protected FragmentActivity mActivity;
+    private Integer mLayoutWidth;
+    private Integer mLayoutHeight;
+    private Integer mOffsetX;
+    private Integer mOffsetY;
+    private Integer mGravity;
+    private Integer mWindowAnimation;
+    private Float mDimAmount;
+    private Boolean mIsOutCancel;
+    private Boolean mIsKeepSystemUiState;
 
-    public BaseDialogFragment() {
-        super();
-        mLayoutWidth = INVALID_VALUE;
-        mLayoutHeight = INVALID_VALUE;
-        mOffsetX = INVALID_VALUE;
-        mOffsetY = INVALID_VALUE;
-        mGravity = INVALID_VALUE;
-        mWindowAnimation = INVALID_VALUE;
-        mDimAmount = INVALID_VALUE;
-    }
-
-    @SuppressWarnings("unchecked")
+    @HunterDebugImpl
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mActivity = (A) context;
+        mActivity = (FragmentActivity) context;
     }
 
+    @HunterDebugImpl
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        bindData(getArguments());
     }
 
+    @HunterDebugImpl
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         return super.onCreateDialog(savedInstanceState);
     }//Plan A, 蠢拒, 一般用于创建替代传统的Dialog对话框的场景, UI简单, 功能单一
 
+    @HunterDebugImpl
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(bindView(), container, false);
-    }//Plan B, 推荐, 一般用于创建复杂内容弹窗或全屏展示效果的场景, UI复杂, 功能复杂, 或有网络请求等异步操作
+    }//Plan B, 推荐, 一般用于创建复杂内容弹窗, 全屏展示效果, 或有网络请求等异步操作的场景, UI复杂, 功能繁多
 
+    @HunterDebugImpl
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        bindData(getArguments(), savedInstanceState);
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         getDialog().setCanceledOnTouchOutside(mIsOutCancel);
         initView(new BaseViewHolder(view));
+        initData();
     }
 
+    @HunterDebugImpl
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initData();
-        loadTempData(savedInstanceState);
     }
 
+    @HunterDebugImpl
     @Override
     public void onStart() {
         Window aW = mActivity.getWindow();
@@ -117,37 +111,38 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
                 super.onStart();
             }
             initParam(dW);
-            initEvent();
         } else {
             LogUtil.w("activity getWindow = " + aW + ", dialog getWindow = " + dW);
             super.onStart();
         }
     }
 
+    @HunterDebugImpl
     @Override
     public void onResume() {
         super.onResume();
-        showView();
     }
 
+    @HunterDebugImpl
     @Override
     public void onPause() {
         super.onPause();
-        hideView();
     }
 
+    @HunterDebugImpl
     @Override
     public void onStop() {
         super.onStop();
-        freeEvent();
     }
 
+    @HunterDebugImpl
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        saveTempData(outState);
+        saveState(outState);
         super.onSaveInstanceState(outState);
     }
 
+    @HunterDebugImpl
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -155,27 +150,32 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
         freeView();
     }
 
+    @HunterDebugImpl
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
 
+    @HunterDebugImpl
     @Override
     public void onDetach() {
         super.onDetach();
         mActivity = null;
     }
 
+    @HunterDebugImpl
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
     }
 
+    @HunterDebugImpl
     @Override
     public void onCancel(DialogInterface dialog) {
         super.onCancel(dialog);
     }
 
+    @HunterDebugImpl
     @Override
     public void show(FragmentManager manager, String tag) {
         Fragment fragment = manager.findFragmentByTag(tag);
@@ -183,45 +183,46 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
             super.show(manager, tag);
         }//规避并发点击时, IllegalStateException: Fragment already added
         else {
-            LogUtil.w("dialogFragment isAdded, tag = " + tag);
+            LogUtil.w("dialogFragment added, tag = " + tag);
         }
     }
 
+    @HunterDebugImpl
     @Override
     public void dismiss() {
         if (isAdded()) {
             super.dismiss();
         } else {
-            LogUtil.w("dialogFragment nonAdded");
+            LogUtil.w("dialogFragment not added");
         }
     }
 
     private void initParam(@NonNull Window dW) {
         dW.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        if (mLayoutWidth != INVALID_VALUE && mLayoutHeight != INVALID_VALUE) {
+        if (Objects.nonNull(mLayoutWidth) && Objects.nonNull(mLayoutHeight)) {
             dW.setLayout(DensityUtil.dp2px(mLayoutWidth),
                          DensityUtil.dp2px(mLayoutHeight));
         } else {
             dW.setLayout((int) (ScreenUtil.getScreenWidth() * 0.75),
                          (int) (ScreenUtil.getScreenHeight() * 0.50));
         }
-        if (mOffsetX != INVALID_VALUE) {
+        if (Objects.nonNull(mOffsetX)) {
             final WindowManager.LayoutParams attrs = dW.getAttributes();
             attrs.x = DensityUtil.dp2px(mOffsetX);
             dW.setAttributes(attrs);
         }
-        if (mOffsetY != INVALID_VALUE) {
+        if (Objects.nonNull(mOffsetY)) {
             final WindowManager.LayoutParams attrs = dW.getAttributes();
             attrs.y = DensityUtil.dp2px(mOffsetY);
             dW.setAttributes(attrs);
         }
-        if (mGravity != INVALID_VALUE) {
+        if (Objects.nonNull(mGravity)) {
             dW.setGravity(mGravity);
         }
-        if (mWindowAnimation != INVALID_VALUE) {
+        if (Objects.nonNull(mWindowAnimation)) {
             dW.setWindowAnimations(mWindowAnimation);
         }
-        if (mDimAmount != INVALID_VALUE) {
+        if (Objects.nonNull(mDimAmount)) {
             dW.setDimAmount(mDimAmount);
         }
     }
@@ -281,35 +282,27 @@ public abstract class BaseDialogFragment<A extends FragmentActivity> extends Dia
         return this;
     }//设置保持SystemUi状态
 
-    public void show(FragmentManager manager) {
-        show(manager, getClass().getSimpleName());
-    }//显示Dialog
-
     protected Context getAppContext() {
         return ContextUtil.getInstance().getApplication();
     }
 
-    protected abstract void bindData(Bundle arguments);
+    protected abstract int bindView();//绑定视图
 
-    protected abstract int bindView();
+    protected void bindData(@Nullable Bundle arguments, @Nullable Bundle savedInstanceState) {
+    }//绑定数据(eg: Bundle, SaveInstanceState, SharedPreferences)
 
-    protected abstract void initView(BaseViewHolder viewHolder);
+    protected void initView(BaseViewHolder viewHolder) {
+    }//初始化视图
 
-    protected abstract void initData();
+    protected void initData() {
+    }//初始化数据
 
-    protected abstract void loadTempData(@Nullable Bundle savedInstanceState);
+    protected void saveState(@NonNull Bundle outState) {
+    }//存储临时数据(eg: SaveInstanceState)
 
-    protected abstract void initEvent();
+    protected void freeData() {
+    }//释放数据
 
-    protected abstract void showView();
-
-    protected abstract void hideView();
-
-    protected abstract void freeEvent();
-
-    protected abstract void saveTempData(@NonNull Bundle outState);
-
-    protected abstract void freeData();
-
-    protected abstract void freeView();
+    protected void freeView() {
+    }//释放视图
 }

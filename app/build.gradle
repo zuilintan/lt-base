@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.application'
     id 'hunter-debug'
-    //id 'hunter-linelog'
 }
 
 android {
@@ -29,14 +28,13 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(path: ':library')
     implementation 'com.android.support:appcompat-v7:' + rootProject.ext.dependencies.supportLib
     implementation 'com.android.support.constraint:constraint-layout:latest.release'
-    implementation project(path: ':library')
-    implementation 'com.quinn.hunter:hunter-debug-library:latest.release'
-    //implementation 'com.quinn.hunter:hunter-linelog-library:latest.release'
     testImplementation 'junit:junit:latest.release'
     androidTestImplementation 'com.android.support.test:runner:latest.release'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:latest.release'
+    implementation 'com.quinn.hunter:hunter-debug-library:latest.release'
 }
 
 debugHunterExt {

@@ -24,7 +24,7 @@ public class TimeUtil {
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     private static final String TIME_FORMAT_12_HOUR = "hh:mm:ss";//hh是12小时制
     private static final String TIME_FORMAT_24_HOUR = "HH:mm:ss";//HH是24小时制
-    private static Calendar calendar = Calendar.getInstance();
+    private static final Calendar calendar = Calendar.getInstance();
 
     private TimeUtil() {
         throw new UnsupportedOperationException("cannot be instantiated");

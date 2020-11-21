@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.viewbinding.ViewBinding;
 
+import com.hunter.library.debug.HunterDebugImpl;
 import com.lt.library.util.context.ContextUtil;
 
 /**
@@ -23,24 +24,25 @@ import com.lt.library.util.context.ContextUtil;
  * 1.0: Initial Commit
  */
 
-public abstract class BaseFragment<A extends FragmentActivity, V extends ViewBinding> extends Fragment {
-    protected A mActivity;
+public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
     protected V mViewBinding;
+    protected FragmentActivity mActivity;
 
-    @SuppressWarnings("unchecked")
+    @HunterDebugImpl
     @TargetApi(value = Build.VERSION_CODES.M)
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mActivity = (A) context;
+        mActivity = (FragmentActivity) context;
     }
 
+    @HunterDebugImpl
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        bindData(getArguments());
     }
 
+    @HunterDebugImpl
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -48,32 +50,36 @@ public abstract class BaseFragment<A extends FragmentActivity, V extends ViewBin
         return mViewBinding.getRoot();
     }
 
+    @HunterDebugImpl
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        bindData(getArguments(), savedInstanceState);
         initView();
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
         initData();
-        loadTempData(savedInstanceState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        loadLongData();
         initEvent();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
         showView();
     }
 
+    @HunterDebugImpl
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @HunterDebugImpl
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @HunterDebugImpl
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @HunterDebugImpl
     @Override
     public void onHiddenChanged(boolean isHidden) {
         super.onHiddenChanged(isHidden);
@@ -84,38 +90,42 @@ public abstract class BaseFragment<A extends FragmentActivity, V extends ViewBin
         }
     }
 
+    @HunterDebugImpl
     @Override
     public void onPause() {
         super.onPause();
-        hideView();
     }
 
+    @HunterDebugImpl
     @Override
     public void onStop() {
         super.onStop();
-        freeEvent();
-        saveLongData();
     }
 
+    @HunterDebugImpl
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        saveTempData(outState);
+        saveState(outState);
         super.onSaveInstanceState(outState);
     }
 
+    @HunterDebugImpl
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        freeEvent();
         freeData();
         freeView();
         mViewBinding = null;
     }
 
+    @HunterDebugImpl
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
 
+    @HunterDebugImpl
     @Override
     public void onDetach() {
         super.onDetach();
@@ -126,31 +136,35 @@ public abstract class BaseFragment<A extends FragmentActivity, V extends ViewBin
         return ContextUtil.getInstance().getApplication();
     }
 
-    protected abstract void bindData(Bundle arguments);
-
     protected abstract V bindView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container);
 
-    protected abstract void initView();
+    protected void bindData(@Nullable Bundle arguments, @Nullable Bundle savedInstanceState) {
+    }//绑定数据(eg: Bundle, SaveInstanceState, SharedPreferences)
 
-    protected abstract void initData();
+    protected void initView() {
+    }//初始化视图
 
-    protected abstract void loadTempData(@Nullable Bundle savedInstanceState);
+    protected void initData() {
+    }//初始化数据
 
-    protected abstract void loadLongData();
+    protected void initEvent() {
+    }//初始化事件(eg: OnClickListener)
 
-    protected abstract void initEvent();
+    protected void showView() {
+    }
 
-    protected abstract void showView();
+    protected void hideView() {
+    }
 
-    protected abstract void hideView();
+    protected void saveState(@NonNull Bundle outState) {
+    }//存储临时数据(eg: SaveInstanceState)
 
-    protected abstract void freeEvent();
+    protected void freeEvent() {
+    }//释放事件(eg: OnClickListener)
 
-    protected abstract void saveLongData();
+    protected void freeData() {
+    }//释放数据
 
-    protected abstract void saveTempData(@NonNull Bundle outState);
-
-    protected abstract void freeData();
-
-    protected abstract void freeView();
+    protected void freeView() {
+    }//释放视图
 }

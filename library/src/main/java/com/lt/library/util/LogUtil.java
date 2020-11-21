@@ -177,14 +177,13 @@ public class LogUtil {
         String fileName = stackTraceElement.getFileName();
         int lineNumber = stackTraceElement.getLineNumber();
         String methodName = stackTraceElement.getMethodName();
-        String domain3rd = processName.substring(processName.indexOf(".", processName.indexOf(".") + 1) + 1);
         String tagFormat;
         if (TextUtils.isEmpty(customTag)) {
-            tagFormat = "%s:(%s:%d).%s()";//三级及之后域名:(文件名:行号).方法名()
-            result = String.format(Locale.getDefault(), tagFormat, domain3rd, fileName, lineNumber, methodName);
+            tagFormat = "%s:(%s:%d).%s()";//进程名:(文件名:行号).方法名()
+            result = String.format(Locale.getDefault(), tagFormat, processName, fileName, lineNumber, methodName);
         } else {
-            tagFormat = "%s:(%s:%d).%s():%s";//三级及之后域名:(文件名:行号).方法名():自定义Tag
-            result = String.format(Locale.getDefault(), tagFormat, domain3rd, fileName, lineNumber, methodName, customTag);
+            tagFormat = "%s:(%s:%d).%s():%s";//进程名:(文件名:行号).方法名():自定义Tag
+            result = String.format(Locale.getDefault(), tagFormat, processName, fileName, lineNumber, methodName, customTag);
         }
         return result;
     }

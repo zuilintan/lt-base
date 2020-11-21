@@ -33,7 +33,7 @@ import okhttp3.ResponseBody;
 public class OkHttpUtil {
     private static OkHttpUtil sOkHttpUtil;
     private static OkHttpClient sOkHttpClient;
-    private Handler mHandler;
+    private final Handler mHandler;
 
     private OkHttpUtil() {
         sOkHttpClient = new OkHttpClient();//创建OkHttpClient对象

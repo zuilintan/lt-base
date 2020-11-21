@@ -17,7 +17,7 @@ import java.util.Map;
  */
 
 public class EdtLinkBtnUtil implements TextWatcher {
-    private ArrayMap<EditText, Integer> mEditTextMap;
+    private final ArrayMap<EditText, Integer> mEditTextMap;
     private Button mButton;
 
     private EdtLinkBtnUtil() {

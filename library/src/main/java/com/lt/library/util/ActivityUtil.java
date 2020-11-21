@@ -14,7 +14,7 @@ import java.util.Stack;
  */
 
 public class ActivityUtil {
-    private static Stack<Activity> sActivityStack = new Stack<>();
+    private static final Stack<Activity> sActivityStack = new Stack<>();
 
     private ActivityUtil() {
         throw new UnsupportedOperationException("cannot be instantiated");

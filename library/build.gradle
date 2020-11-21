@@ -29,8 +29,7 @@ dependencies {
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly 'com.android.support:appcompat-v7:' + rootProject.ext.dependencies.supportLib
     compileOnly 'com.android.support:recyclerview-v7:' + rootProject.ext.dependencies.supportLib
-    //noinspection GradleDependency
     compileOnly 'com.squareup.okhttp3:okhttp:latest.release'
-    //noinspection GradleDependency 注意, Gson 2.8.6 使用了ASM 6, HunterDebug使用的是ASM 5, 后者不兼容前者
     compileOnly 'com.google.code.gson:gson:latest.release'
+    compileOnly 'com.quinn.hunter:hunter-debug-library:latest.release'
 }

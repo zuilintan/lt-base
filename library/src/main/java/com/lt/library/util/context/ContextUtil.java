@@ -18,7 +18,7 @@ import android.content.Context;
  */
 
 public class ContextUtil {
-    private Context mContext;
+    private final Context mContext;
 
     private ContextUtil() {
         mContext = ContextProvider.sContext;
