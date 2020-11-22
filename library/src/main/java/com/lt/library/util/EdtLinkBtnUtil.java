@@ -63,7 +63,7 @@ public class EdtLinkBtnUtil implements TextWatcher {
     }
 
     public static class Builder {
-        private EdtLinkBtnUtil mEdtLinkBtnUtil;
+        private final EdtLinkBtnUtil mEdtLinkBtnUtil;
 
         public Builder() {
             mEdtLinkBtnUtil = new EdtLinkBtnUtil();
