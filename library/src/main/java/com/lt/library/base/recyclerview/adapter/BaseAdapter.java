@@ -66,10 +66,10 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private int mStatusCount = 0;
     private int mExtrasCount = 0;
     private int mFooterCount = 0;
-    private List<DS> mEntityList;
+    private final List<DS> mEntityList;
     private int mHeaderId = -1;
     private int mStatusId = -1;
-    private int mEntityId = getLayoutRes();
+    private final int mEntityId = getLayoutRes();
     private int mExtrasId = -1;
     private int mFooterId = -1;
 

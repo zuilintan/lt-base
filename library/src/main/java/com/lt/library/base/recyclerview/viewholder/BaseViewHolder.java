@@ -34,7 +34,7 @@ import java.util.Objects;
 
 public class BaseViewHolder extends RecyclerView.ViewHolder {
     public static final int RES_EMPTY_ID = 0;
-    private SparseArray<View> mSparseArray;//Key为View的Id，Value为View对象
+    private final SparseArray<View> mSparseArray;//Key为View的Id，Value为View对象
 
     public BaseViewHolder(@NonNull View itemView) {
         super(itemView);

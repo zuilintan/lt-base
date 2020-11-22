@@ -52,7 +52,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
     private Integer mWindowAnimation;
     private Float mDimAmount;
     private Boolean mIsOutCancel;
-    private Boolean mIsKeepSystemUiState;
+    private boolean mIsKeepSystemUiState;
 
     @HunterDebugImpl
     @TargetApi(Build.VERSION_CODES.M)
@@ -88,7 +88,9 @@ public abstract class BaseDialogFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
         bindData(getArguments(), savedInstanceState);
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getDialog().setCanceledOnTouchOutside(mIsOutCancel);
+        if (Objects.nonNull(mIsOutCancel)) {
+            getDialog().setCanceledOnTouchOutside(mIsOutCancel);
+        }
         initView(new BaseViewHolder(view));
         initData();
     }

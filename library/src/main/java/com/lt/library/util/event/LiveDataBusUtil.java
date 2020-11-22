@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 public class LiveDataBusUtil {
-    private ConcurrentHashMap<String, MutableLiveData<Object>> mLiveDataMap;
+    private final ConcurrentHashMap<String, MutableLiveData<Object>> mLiveDataMap;
 
     private LiveDataBusUtil() {
         mLiveDataMap = new ConcurrentHashMap<>();

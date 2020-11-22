@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * 1.0: Initial Commit
  */
 public class LiveDataSticky {
-    private ConcurrentHashMap<String, MutableLiveData<Object>> mLiveDataMap;
-    private String mTag;
+    private final ConcurrentHashMap<String, MutableLiveData<Object>> mLiveDataMap;
+    private final String mTag;
 
     public LiveDataSticky(String tag, ConcurrentHashMap<String, MutableLiveData<Object>> liveDataMap) {
         mTag = tag;
