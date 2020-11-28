@@ -52,7 +52,7 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
     }//findViewById，并复用
 
     public Context getAppContext() {
-        return ContextUtil.getInstance().getApplication();
+        return ContextUtil.getInstance().getApplicationContext();
     }
 
     public BaseViewHolder setText(int viewId, CharSequence text) {

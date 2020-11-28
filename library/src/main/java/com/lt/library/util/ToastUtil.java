@@ -88,7 +88,7 @@ public class ToastUtil {
                 text = (String) object;
                 break;
             case "Integer":
-                text = ContextUtil.getInstance().getApplication().getString((Integer) object);
+                text = ContextUtil.getInstance().getApplicationContext().getString((Integer) object);
                 break;
             default:
                 break;
@@ -97,7 +97,7 @@ public class ToastUtil {
             text = "";
         }
         cancel();//如果当前Toast没有消失，则取消该Toast
-        sToast = Toast.makeText(ContextUtil.getInstance().getApplication(), text, duration);
+        sToast = Toast.makeText(ContextUtil.getInstance().getApplicationContext(), text, duration);
         sToast.setGravity(gravity, 0, 0);//仅初次创建时有效
         return sToast;
     }

@@ -285,7 +285,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
     }//设置保持SystemUi状态
 
     protected Context getAppContext() {
-        return ContextUtil.getInstance().getApplication();
+        return ContextUtil.getInstance().getApplicationContext();
     }
 
     protected abstract int bindView();//绑定视图

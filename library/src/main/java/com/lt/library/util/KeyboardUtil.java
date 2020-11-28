@@ -35,7 +35,7 @@ public class KeyboardUtil {
      */
     public static void show(EditText editText, long delayMillis) {
         InputMethodManager inputMethodManager = (InputMethodManager) ContextUtil.getInstance()
-                                                                                .getApplication()
+                                                                                .getApplicationContext()
                                                                                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         if (delayMillis == 0) {
             editText.requestFocus();
@@ -52,7 +52,7 @@ public class KeyboardUtil {
      */
     public static void hide(EditText editText) {
         InputMethodManager inputMethodManager = (InputMethodManager) ContextUtil.getInstance()
-                                                                                .getApplication()
+                                                                                .getApplicationContext()
                                                                                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         postRemoved(editText);
         inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
@@ -64,7 +64,7 @@ public class KeyboardUtil {
      */
     public static void toggle() {
         InputMethodManager inputMethodManager = (InputMethodManager) ContextUtil.getInstance()
-                                                                                .getApplication()
+                                                                                .getApplicationContext()
                                                                                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(0, 0);
     }
