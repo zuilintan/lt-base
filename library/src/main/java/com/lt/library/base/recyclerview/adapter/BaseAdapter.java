@@ -1,6 +1,7 @@
 package com.lt.library.base.recyclerview.adapter;
 
 import android.content.Context;
+import android.support.annotation.IntRange;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
@@ -46,11 +47,11 @@ import java.util.Objects;
  */
 
 public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolder> {
-    private static final int VIEW_TYPE_HEADER = 1;
-    private static final int VIEW_TYPE_STATUS = 2;
-    private static final int VIEW_TYPE_ENTITY = 3;
-    private static final int VIEW_TYPE_EXTRAS = 4;
-    private static final int VIEW_TYPE_FOOTER = 5;
+    private static final int VIEW_TYPE_HEADER = 1001;
+    private static final int VIEW_TYPE_STATUS = 1002;
+    private static final int VIEW_TYPE_ENTITY = 1003;
+    private static final int VIEW_TYPE_EXTRAS = 1004;
+    private static final int VIEW_TYPE_FOOTER = 1005;
     private RecyclerView mRecyclerView;
     private OnHeaderClickListener mOnHeaderClickListener;
     private OnHeaderLongClickListener mOnHeaderLongClickListener;
@@ -66,12 +67,11 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private int mStatusCount = 0;
     private int mExtrasCount = 0;
     private int mFooterCount = 0;
-    private final List<DS> mEntityList;
     private int mHeaderId = -1;
     private int mStatusId = -1;
-    private final int mEntityId = getLayoutRes();
     private int mExtrasId = -1;
     private int mFooterId = -1;
+    private final List<DS> mEntityList;
 
     public BaseAdapter() {
         this(null);
@@ -89,6 +89,9 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         View view;
         BaseViewHolder viewHolder;
+        if (viewType == RecyclerView.INVALID_TYPE) {
+            throw new IllegalArgumentException("viewType = " + viewType + ", invalid");
+        }
         switch (viewType) {
             case VIEW_TYPE_HEADER:
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(mHeaderId, viewGroup, false);
@@ -98,10 +101,6 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(mStatusId, viewGroup, false);
                 viewHolder = new StatusViewHolder(view, mOnStatusClickListener, mOnStatusLongClickListener);
                 break;
-            case VIEW_TYPE_ENTITY:
-                view = LayoutInflater.from(viewGroup.getContext()).inflate(mEntityId, viewGroup, false);
-                viewHolder = new EntityViewHolder(view, mOnEntityClickListener, mOnEntityLongClickListener);
-                break;
             case VIEW_TYPE_EXTRAS:
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(mExtrasId, viewGroup, false);
                 viewHolder = new ExtrasViewHolder(view, mOnExtrasClickListener, mOnExtrasLongClickListener);
@@ -110,8 +109,11 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(mFooterId, viewGroup, false);
                 viewHolder = new FooterViewHolder(view, mOnFooterClickListener, mOnFooterLongClickListener);
                 break;
+            case VIEW_TYPE_ENTITY:
             default:
-                throw new IllegalArgumentException("viewType = " + viewType);
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(getEntityLayoutRes(viewType), viewGroup, false);
+                viewHolder = new EntityViewHolder(view, mOnEntityClickListener, mOnEntityLongClickListener);
+                break;
         }
         return viewHolder;
     }//创建视图管理器
@@ -119,17 +121,17 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder viewHolder, int position) {
         if (viewHolder instanceof HeaderViewHolder) {
-            initHeaderView((HeaderViewHolder) viewHolder);
+            onBindHeaderView((HeaderViewHolder) viewHolder);
         } else if (viewHolder instanceof StatusViewHolder) {
-            initStatusView((StatusViewHolder) viewHolder);
+            onBindStatusView((StatusViewHolder) viewHolder);
         } else if (viewHolder instanceof EntityViewHolder) {
             int fixEntityPosition = getFixEntityPosition(position);
             viewHolder.itemView.setTag(fixEntityPosition);
-            initEntityView((EntityViewHolder) viewHolder, getEntity(fixEntityPosition), fixEntityPosition);
+            onBindEntityView((EntityViewHolder) viewHolder, getEntity(fixEntityPosition), fixEntityPosition, viewHolder.getItemViewType());
         } else if (viewHolder instanceof ExtrasViewHolder) {
-            initExtrasView((ExtrasViewHolder) viewHolder);
+            onBindExtrasView((ExtrasViewHolder) viewHolder);
         } else if (viewHolder instanceof FooterViewHolder) {
-            initFooterView((FooterViewHolder) viewHolder);
+            onBindFooterView((FooterViewHolder) viewHolder);
         }
     }//绑定数据到视图
 
@@ -141,37 +143,39 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
         else {
             if (viewHolder instanceof EntityViewHolder) {
                 int fixEntityPosition = getFixEntityPosition(position);
-                initEntityView((EntityViewHolder) viewHolder, getEntity(fixEntityPosition), fixEntityPosition, payloads);
+                onBindEntityView((EntityViewHolder) viewHolder, getEntity(fixEntityPosition), fixEntityPosition, viewHolder.getItemViewType(), payloads);
             }
         }//更新item中特定View
     }//绑定数据到视图(局部刷新)
 
     @Override
     public int getItemViewType(int position) {
-        int itemViewType = RecyclerView.INVALID_TYPE;
+        int result;
         if (isHeader(position)) {
-            itemViewType = VIEW_TYPE_HEADER;
+            result = VIEW_TYPE_HEADER;
         } else if (isStatus(position)) {
-            itemViewType = VIEW_TYPE_STATUS;
+            result = VIEW_TYPE_STATUS;
         } else if (isEntity(position)) {
-            itemViewType = VIEW_TYPE_ENTITY;
+            result = getEntityViewType(getFixEntityPosition(position));
         } else if (isExtras(position)) {
-            itemViewType = VIEW_TYPE_EXTRAS;
+            result = VIEW_TYPE_EXTRAS;
         } else if (isFooter(position)) {
-            itemViewType = VIEW_TYPE_FOOTER;
+            result = VIEW_TYPE_FOOTER;
+        } else {
+            result = RecyclerView.INVALID_TYPE;
         }
-        return itemViewType;
+        return result;
     }//获取ItemView的类型
 
     @Override
     public long getItemId(int position) {
-        long i;
+        long result;
         if (hasStableIds() && isEntity(position)) {
-            i = getEntity(getFixEntityPosition(position)).hashCode();
+            result = getEntity(getFixEntityPosition(position)).hashCode();
         } else {
-            i = RecyclerView.NO_ID;
+            result = RecyclerView.NO_ID;
         }
-        return i;
+        return result;
     }//为每个Item绑定唯一的Id, 需搭配adapter.setHasStableIds(true), 且要在setAdapter()前调用
 
     @Override
@@ -512,27 +516,33 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     }
 
     protected Context getAppContext() {
-        return ContextUtil.getInstance().getApplication();
+        return ContextUtil.getInstance().getApplicationContext();
     }
 
-    protected abstract int getLayoutRes();
-
-    protected void initHeaderView(HeaderViewHolder viewHolder) {
+    @IntRange(from = 0)
+    protected int getEntityViewType(int position) {
+        return VIEW_TYPE_ENTITY;
     }
 
-    protected void initStatusView(StatusViewHolder viewHolder) {
+    @LayoutRes
+    protected abstract int getEntityLayoutRes(int viewType);
+
+    protected void onBindHeaderView(HeaderViewHolder viewHolder) {
     }
 
-    protected void initEntityView(EntityViewHolder viewHolder, DS dataSource, int position) {
+    protected void onBindStatusView(StatusViewHolder viewHolder) {
     }
 
-    protected void initEntityView(EntityViewHolder viewHolder, DS dataSource, int position, List<Object> payloads) {
+    protected void onBindEntityView(EntityViewHolder viewHolder, DS dataSource, int position, int viewType) {
     }
 
-    protected void initExtrasView(ExtrasViewHolder viewHolder) {
+    protected void onBindEntityView(EntityViewHolder viewHolder, DS dataSource, int position, int viewType, List<Object> payloads) {
     }
 
-    protected void initFooterView(FooterViewHolder viewHolder) {
+    protected void onBindExtrasView(ExtrasViewHolder viewHolder) {
+    }
+
+    protected void onBindFooterView(FooterViewHolder viewHolder) {
     }
 
     protected void freeView(BaseViewHolder viewHolder) {
