@@ -1,6 +1,5 @@
 plugins {
     id 'com.android.application'
-    id 'hunter-debug'
 }
 
 android {
@@ -34,9 +33,4 @@ dependencies {
     testImplementation 'junit:junit:latest.release'
     androidTestImplementation 'com.android.support.test:runner:latest.release'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:latest.release'
-    implementation 'com.quinn.hunter:hunter-debug-library:latest.release'
-}
-
-debugHunterExt {
-    runVariant = 'ALWAYS'   // 'DEBUG'，'RELEASE'，'ALWAYS'，'NEVER'，'ALWAYS'为默认值
 }

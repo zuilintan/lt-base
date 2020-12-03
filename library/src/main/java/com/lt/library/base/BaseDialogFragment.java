@@ -23,7 +23,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.hunter.library.debug.HunterDebugImpl;
 import com.lt.library.base.recyclerview.viewholder.BaseViewHolder;
 import com.lt.library.util.DensityUtil;
 import com.lt.library.util.LogUtil;
@@ -54,7 +53,6 @@ public abstract class BaseDialogFragment extends DialogFragment {
     private Boolean mIsOutCancel;
     private boolean mIsKeepSystemUiState;
 
-    @HunterDebugImpl
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void onAttach(Context context) {
@@ -62,27 +60,23 @@ public abstract class BaseDialogFragment extends DialogFragment {
         mActivity = (FragmentActivity) context;
     }
 
-    @HunterDebugImpl
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
-    @HunterDebugImpl
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         return super.onCreateDialog(savedInstanceState);
     }//Plan A, 蠢拒, 一般用于创建替代传统的Dialog对话框的场景, UI简单, 功能单一
 
-    @HunterDebugImpl
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(bindView(), container, false);
     }//Plan B, 推荐, 一般用于创建复杂内容弹窗, 全屏展示效果, 或有网络请求等异步操作的场景, UI复杂, 功能繁多
 
-    @HunterDebugImpl
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -95,13 +89,11 @@ public abstract class BaseDialogFragment extends DialogFragment {
         initData();
     }
 
-    @HunterDebugImpl
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
 
-    @HunterDebugImpl
     @Override
     public void onStart() {
         Window aW = mActivity.getWindow();
@@ -119,32 +111,27 @@ public abstract class BaseDialogFragment extends DialogFragment {
         }
     }
 
-    @HunterDebugImpl
     @Override
     public void onResume() {
         super.onResume();
     }
 
-    @HunterDebugImpl
     @Override
     public void onPause() {
         super.onPause();
     }
 
-    @HunterDebugImpl
     @Override
     public void onStop() {
         super.onStop();
     }
 
-    @HunterDebugImpl
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         saveState(outState);
         super.onSaveInstanceState(outState);
     }
 
-    @HunterDebugImpl
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -152,32 +139,27 @@ public abstract class BaseDialogFragment extends DialogFragment {
         freeView();
     }
 
-    @HunterDebugImpl
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
 
-    @HunterDebugImpl
     @Override
     public void onDetach() {
         super.onDetach();
         mActivity = null;
     }
 
-    @HunterDebugImpl
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
     }
 
-    @HunterDebugImpl
     @Override
     public void onCancel(DialogInterface dialog) {
         super.onCancel(dialog);
     }
 
-    @HunterDebugImpl
     @Override
     public void show(FragmentManager manager, String tag) {
         Fragment fragment = manager.findFragmentByTag(tag);
@@ -189,7 +171,6 @@ public abstract class BaseDialogFragment extends DialogFragment {
         }
     }
 
-    @HunterDebugImpl
     @Override
     public void dismiss() {
         if (isAdded()) {

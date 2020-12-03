@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.viewbinding.ViewBinding;
 
-import com.hunter.library.debug.HunterDebugImpl;
 import com.lt.library.util.context.ContextUtil;
 
 /**
@@ -28,7 +27,6 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
     protected V mViewBinding;
     protected FragmentActivity mActivity;
 
-    @HunterDebugImpl
     @TargetApi(value = Build.VERSION_CODES.M)
     @Override
     public void onAttach(Context context) {
@@ -36,13 +34,11 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
         mActivity = (FragmentActivity) context;
     }
 
-    @HunterDebugImpl
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
-    @HunterDebugImpl
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -50,7 +46,6 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
         return mViewBinding.getRoot();
     }
 
-    @HunterDebugImpl
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -61,25 +56,21 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
         showView();
     }
 
-    @HunterDebugImpl
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
 
-    @HunterDebugImpl
     @Override
     public void onStart() {
         super.onStart();
     }
 
-    @HunterDebugImpl
     @Override
     public void onResume() {
         super.onResume();
     }
 
-    @HunterDebugImpl
     @Override
     public void onHiddenChanged(boolean isHidden) {
         super.onHiddenChanged(isHidden);
@@ -90,26 +81,22 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
         }
     }
 
-    @HunterDebugImpl
     @Override
     public void onPause() {
         super.onPause();
     }
 
-    @HunterDebugImpl
     @Override
     public void onStop() {
         super.onStop();
     }
 
-    @HunterDebugImpl
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         saveState(outState);
         super.onSaveInstanceState(outState);
     }
 
-    @HunterDebugImpl
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -119,13 +106,11 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
         mViewBinding = null;
     }
 
-    @HunterDebugImpl
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
 
-    @HunterDebugImpl
     @Override
     public void onDetach() {
         super.onDetach();
