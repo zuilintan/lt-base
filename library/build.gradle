@@ -31,5 +31,4 @@ dependencies {
     compileOnly 'com.android.support:recyclerview-v7:' + rootProject.ext.dependencies.supportLib
     compileOnly 'com.squareup.okhttp3:okhttp:latest.release'
     compileOnly 'com.google.code.gson:gson:latest.release'
-    compileOnly 'com.quinn.hunter:hunter-debug-library:latest.release'
 }

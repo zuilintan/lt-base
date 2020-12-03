@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.viewbinding.ViewBinding;
 
-import com.hunter.library.debug.HunterDebugImpl;
 import com.lt.library.util.context.ContextUtil;
 
 /**
@@ -21,7 +20,6 @@ import com.lt.library.util.context.ContextUtil;
 public abstract class BaseActivity<V extends ViewBinding> extends AppCompatActivity {
     protected V mViewBinding;
 
-    @HunterDebugImpl
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,38 +31,32 @@ public abstract class BaseActivity<V extends ViewBinding> extends AppCompatActiv
         initEvent();
     }
 
-    @HunterDebugImpl
     @Override
     protected void onStart() {
         super.onStart();
     }
 
-    @HunterDebugImpl
     @Override
     protected void onResume() {
         super.onResume();
     }
 
-    @HunterDebugImpl
     @Override
     protected void onPause() {
         super.onPause();
     }
 
-    @HunterDebugImpl
     @Override
     protected void onStop() {
         super.onStop();
     }
 
-    @HunterDebugImpl
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         saveState(outState);
         super.onSaveInstanceState(outState);
     }
 
-    @HunterDebugImpl
     @Override
     protected void onDestroy() {
         super.onDestroy();
