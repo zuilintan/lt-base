@@ -52,6 +52,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private static final int VIEW_TYPE_ENTITY = 1003;
     private static final int VIEW_TYPE_EXTRAS = 1004;
     private static final int VIEW_TYPE_FOOTER = 1005;
+    private final List<DS> mEntityList;
     private RecyclerView mRecyclerView;
     private OnHeaderClickListener mOnHeaderClickListener;
     private OnHeaderLongClickListener mOnHeaderLongClickListener;
@@ -71,7 +72,6 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private int mStatusId = -1;
     private int mExtrasId = -1;
     private int mFooterId = -1;
-    private final List<DS> mEntityList;
 
     public BaseAdapter() {
         this(null);
@@ -283,12 +283,13 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private boolean clickEntity(int rawEntityPosition) {
         boolean result;
         RecyclerView.ViewHolder viewHolder = mRecyclerView.findViewHolderForAdapterPosition(rawEntityPosition);
-        if (Objects.nonNull(viewHolder)) {
+        if (Objects.isNull(viewHolder)) {
+            result = false;
+        }//表示通知数据源更新后(eg: notifyDataSetChanged()), RecyclerView尚未计算完成的布局, 此时position是未知的
+        else {
             viewHolder.itemView.callOnClick();
             result = true;
-        } else {
-            result = false;
-        }//若ViewHolder不为null, 则表示RecyclerView布局完成; 反之, 则为未完成
+        }//布局计算完成
         return result;
     }
 
@@ -453,15 +454,15 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
                 mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
+                        mRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);//移除监听, 避免反复回调重复执行clickEntity()
                         clickEntity(rawEntityPosition);
-                        mRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);//移除监听, 避免反复回调重复点击
-                    }
-                });//注册RecyclerView布局完成监听器
+                    }//当布局可视时回调
+                });//注册RecyclerView视图的可视状态变化监听器
             }
         } else {
             LogUtil.w("position = " + position + ", out of bounds");
         }
-    }//编程式点击Item(无Beep音), 需要在setAdapter()后调用
+    }//编程式点击Item(无Beep音), 需要在setAdapter()及添加数据源后(eg: notifyEntityRefAll())调用
 
     public DS getEntity(int position) {
         return mEntityList.get(position);
