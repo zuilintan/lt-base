@@ -53,7 +53,6 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
         initView();
         initData();
         initEvent();
-        showView();
     }
 
     @Override
