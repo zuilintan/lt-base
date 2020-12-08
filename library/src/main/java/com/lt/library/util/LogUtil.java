@@ -19,6 +19,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LogUtil {
     private static final AtomicBoolean sIsEnabled = new AtomicBoolean(true);//默认启用
+    private static final String PROCESS_NAME = Application.getProcessName();
+    private static final String CLASS_NAME = LogUtil.class.getName();
 
     private LogUtil() {
         throw new UnsupportedOperationException("cannot be instantiated");
@@ -172,18 +174,30 @@ public class LogUtil {
 
     private static String genStdTag(String customTag) {
         String result;
-        String processName = Application.getProcessName();
-        StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[5];
-        String fileName = stackTraceElement.getFileName();
-        int lineNumber = stackTraceElement.getLineNumber();
-        String methodName = stackTraceElement.getMethodName();
+        String fileName = "<unknown>";
+        int lineNumber = -1;
+        String methodName = "<unknown>";
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        for (int i = 2; i < stackTraceElements.length; i++) {
+            String className = stackTraceElements[i].getClassName();
+            if (!className.equals(LogUtil.CLASS_NAME)) {
+                fileName = stackTraceElements[i].getFileName();
+                lineNumber = stackTraceElements[i].getLineNumber();
+                methodName = stackTraceElements[i].getMethodName();
+                int index = methodName.indexOf('$');
+                if (index > -1) {
+                    methodName = methodName.substring(0, index + 1);
+                }
+                break;
+            }
+        }
         String tagFormat;
         if (TextUtils.isEmpty(customTag)) {
             tagFormat = "%s:(%s:%d).%s()";//进程名:(文件名:行号).方法名()
-            result = String.format(Locale.getDefault(), tagFormat, processName, fileName, lineNumber, methodName);
+            result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, fileName, lineNumber, methodName);
         } else {
             tagFormat = "%s:(%s:%d).%s():%s";//进程名:(文件名:行号).方法名():自定义Tag
-            result = String.format(Locale.getDefault(), tagFormat, processName, fileName, lineNumber, methodName, customTag);
+            result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, fileName, lineNumber, methodName, customTag);
         }
         return result;
     }
