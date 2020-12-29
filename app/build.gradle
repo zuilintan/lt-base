@@ -23,14 +23,40 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    /**
+     * Module Lib
+     */
+    implementation fileTree(dir: 'libs', include: ['*.jar','*.aar'])
+
+    /**
+     * Project Lib
+     */
     implementation project(path: ':library')
+    //compileOnly files('../extras/xxx')
+
+    /**
+     * Android Lib
+     */
     implementation 'com.android.support:appcompat-v7:' + rootProject.ext.dependencies.supportLib
+    implementation 'com.android.support:recyclerview-v7:' + rootProject.ext.dependencies.supportLib
     implementation 'com.android.support.constraint:constraint-layout:latest.release'
     testImplementation 'junit:junit:latest.release'
     androidTestImplementation 'com.android.support.test:runner:latest.release'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:latest.release'
+
+    /**
+     * CPY Maven Lib
+     */
+    //compileOnly 'com.xxx.source:car:latest.release'
+
+    //Third Party Lib
+    implementation 'com.google.code.gson:gson:latest.release'
+    implementation 'com.alibaba:fastjson:latest.release'
+    implementation 'com.kyleduo.switchbutton:library:latest.release'
 }

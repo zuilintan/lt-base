@@ -26,9 +26,29 @@ android {
 }
 
 dependencies {
+    /**
+     * Module Lib
+     */
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+
+    /**
+     * Project Lib
+     */
+    //compileOnly files('../extras/xxx')
+
+    /**
+     * Android Lib
+     */
     compileOnly 'com.android.support:appcompat-v7:' + rootProject.ext.dependencies.supportLib
     compileOnly 'com.android.support:recyclerview-v7:' + rootProject.ext.dependencies.supportLib
+
+    /**
+     * CPY Maven Lib
+     */
+    //compileOnly 'com.xxx.source:car:latest.release'
+
+    //Third Party Lib
     compileOnly 'com.squareup.okhttp3:okhttp:latest.release'
     compileOnly 'com.google.code.gson:gson:latest.release'
+    compileOnly 'com.alibaba:fastjson:latest.release'
 }
