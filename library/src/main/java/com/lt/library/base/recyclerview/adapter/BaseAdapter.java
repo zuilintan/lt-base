@@ -187,7 +187,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     @Override
     public void onViewRecycled(@NonNull BaseViewHolder viewHolder) {
         super.onViewRecycled(viewHolder);
-        onRecycledView(viewHolder);
+        onRecycledView(viewHolder, viewHolder.getItemViewType());
     }//Item回收时回调
 
     @Override
@@ -546,6 +546,6 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     protected void onBindFooterView(FooterViewHolder viewHolder) {
     }
 
-    protected void onRecycledView(BaseViewHolder viewHolder) {
+    protected void onRecycledView(BaseViewHolder viewHolder, int viewType) {
     }
 }
