@@ -20,7 +20,7 @@ public class CastUtil {
     public static <T> T obj2Obj(Object obj, Class<T> cls) {
         T result = null;
         if (cls.isInstance(obj)) {
-            cls.cast(obj);
+            result = cls.cast(obj);
         }
         return result;
     }
