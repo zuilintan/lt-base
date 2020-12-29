@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="128dp"
-    android:clickable="true"
     android:foreground="?attr/selectableItemBackground"
     android:paddingHorizontal="32dp">
 
@@ -36,6 +35,7 @@
         android:layout_height="wrap_content"
         android:max="10"
         android:min="0"
+        android:paddingVertical="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tv_item_title"

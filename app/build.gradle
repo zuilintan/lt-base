@@ -32,7 +32,7 @@ dependencies {
     /**
      * Module Lib
      */
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar','*.aar'])
 
     /**
      * Project Lib
@@ -56,5 +56,7 @@ dependencies {
     //compileOnly 'com.xxx.source:car:latest.release'
 
     //Third Party Lib
+    implementation 'com.google.code.gson:gson:latest.release'
+    implementation 'com.alibaba:fastjson:latest.release'
     implementation 'com.kyleduo.switchbutton:library:latest.release'
 }
