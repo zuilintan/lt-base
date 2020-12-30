@@ -120,6 +120,6 @@ public class GsonUtil {
                 }
             }
         }
-        return new GsonBuilder().registerTypeAdapter(type, sTypeAdapter);
+        return sGsonBuilder.registerTypeAdapter(type, sTypeAdapter);
     }
 }

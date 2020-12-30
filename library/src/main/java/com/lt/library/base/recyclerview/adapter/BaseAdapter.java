@@ -64,14 +64,8 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private OnExtrasLongClickListener mOnExtrasLongClickListener;
     private OnFooterClickListener mOnFooterClickListener;
     private OnFooterLongClickListener mOnFooterLongClickListener;
-    private int mHeaderCount = 0;
-    private int mStatusCount = 0;
-    private int mExtrasCount = 0;
-    private int mFooterCount = 0;
-    private int mHeaderId = -1;
-    private int mStatusId = -1;
-    private int mExtrasId = -1;
-    private int mFooterId = -1;
+    private int mHeaderCount, mStatusCount, mExtrasCount, mFooterCount = 0;
+    private int mHeaderId, mStatusId, mExtrasId, mFooterId = -1;
 
     public BaseAdapter() {
         this(null);
@@ -432,6 +426,11 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
         mEntityList.set(position, dataSource);
         notifyItemChanged(mHeaderCount + mStatusCount + position);
     }//刷新数据源, 并更新item
+
+    public void notifyEntityRef(DS dataSource, int position, Object payload) {
+        mEntityList.set(position, dataSource);
+        notifyItemChanged(mHeaderCount + mStatusCount + position, payload);
+    }//刷新数据源, 并更新item中的View(局部刷新)
 
     public void notifyEntityDel(int position) {
         int entityViewCount = getEntityListSize();

@@ -1,6 +1,7 @@
 package com.lt.library.util.fragment;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -32,13 +33,21 @@ public class FragmentUtil {
     }
 
     public void switchFragment(String fragmentTag, int[] hideParentIds, Integer showParentId, FragmentManager supportFragmentManager) {
+        switchFragment(fragmentTag, hideParentIds, showParentId, supportFragmentManager, FragmentTransaction.TRANSIT_NONE);
+    }
+
+    public void switchFragment(String fragmentTag, int[] hideParentIds, Integer showParentId, FragmentManager supportFragmentManager, int transitionEffect) {
         Fragment fragment = getFragment(fragmentTag, supportFragmentManager);
         FragmentTransaction fragmentTransaction = supportFragmentManager.beginTransaction();
         hideFragmentForParent(fragment, supportFragmentManager.getFragments(), IntStream.of(hideParentIds).boxed().collect(Collectors.toList()), fragmentTransaction);
-        showFragmentForTarget(fragment, fragmentTag, showParentId, fragmentTransaction);
-        fragmentTransaction.commit();
+        if (Objects.nonNull(fragment)) {
+            showFragmentForTarget(fragment, fragmentTag, showParentId, fragmentTransaction);
+        }
+        fragmentTransaction.setTransition(transitionEffect)
+                           .commit();
     }
 
+    @Nullable
     private Fragment getFragment(String fragmentTag, FragmentManager supportFragmentManager) {
         Fragment fragment = supportFragmentManager.findFragmentByTag(fragmentTag);
         if (Objects.isNull(fragment)) {
@@ -47,7 +56,7 @@ public class FragmentUtil {
         return fragment;
     }
 
-    private void hideFragmentForParent(@NonNull Fragment fragment, List<Fragment> addedFragmentList, List<Integer> hideParentIdList, FragmentTransaction fragmentTransaction) {
+    private void hideFragmentForParent(@Nullable Fragment fragment, List<Fragment> addedFragmentList, List<Integer> hideParentIdList, FragmentTransaction fragmentTransaction) {
         for (Fragment addedFragment : addedFragmentList) {
             if (Objects.equals(addedFragment, fragment)) {
                 continue;
