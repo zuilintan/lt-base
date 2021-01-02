@@ -18,6 +18,24 @@ public class ReflectionUtil {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 
+    private static Object get(Class<?> cls, Object obj, String filedName) throws NoSuchFieldException, IllegalAccessException {
+        Field field = cls.getDeclaredField(filedName);
+        field.setAccessible(true);
+        return field.get(obj);
+    }
+
+    private static void set(Class<?> cls, Object obj, String filedName, Object filedValue) throws NoSuchFieldException, IllegalAccessException {
+        Field field = cls.getDeclaredField(filedName);
+        field.setAccessible(true);
+        field.set(obj, filedValue);
+    }
+
+    private static Object invoke(Class<?> cls, Object obj, String methodName, Class[] paramsTypes, Object[] paramsValues) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Method method = cls.getDeclaredMethod(methodName, paramsTypes);
+        method.setAccessible(true);
+        return method.invoke(obj, paramsValues);
+    }
+
     public static Object getField(String className, String filedName) {
         try {
             Class<?> cls = Class.forName(className);
@@ -157,22 +175,4 @@ public class ReflectionUtil {
         }
         return null;
     }//调用方法(有参), 根据类类型与对象, 适用于obj不是cls实例的场景; eg: RecyclerView的ScrollBar与View
-
-    private static Object get(Class<?> cls, Object obj, String filedName) throws NoSuchFieldException, IllegalAccessException {
-        Field field = cls.getDeclaredField(filedName);
-        field.setAccessible(true);
-        return field.get(obj);
-    }
-
-    private static void set(Class<?> cls, Object obj, String filedName, Object filedValue) throws NoSuchFieldException, IllegalAccessException {
-        Field field = cls.getDeclaredField(filedName);
-        field.setAccessible(true);
-        field.set(obj, filedValue);
-    }
-
-    private static Object invoke(Class<?> cls, Object obj, String methodName, Class[] paramsTypes, Object[] paramsValues) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Method method = cls.getDeclaredMethod(methodName, paramsTypes);
-        method.setAccessible(true);
-        return method.invoke(obj, paramsValues);
-    }
 }

@@ -1,10 +1,11 @@
-package com.lt.library.base.recyclerview.viewholder;
+package com.lt.library.base.recyclerview.viewholder.sub;
 
 import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.lt.library.base.recyclerview.listener.OnFooterClickListener;
 import com.lt.library.base.recyclerview.listener.OnFooterLongClickListener;
+import com.lt.library.base.recyclerview.viewholder.BaseViewHolder;
 
 public class FooterViewHolder extends BaseViewHolder {
 

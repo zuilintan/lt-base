@@ -29,6 +29,36 @@ public class ToastUtil {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 
+    private static Toast genStdToast(Object object, @GravityDef int gravity, @DurationDef int duration) {
+        String text = null;
+        String typeName = object.getClass().getSimpleName();
+        switch (typeName) {
+            case "String":
+                text = (String) object;
+                break;
+            case "Integer":
+                text = ContextUtil.getInstance().getApplicationContext().getString((Integer) object);
+                break;
+            default:
+                break;
+        }
+        if (Objects.isNull(text)) {
+            text = "";
+        }
+        cancel();//如果当前Toast没有消失，则取消该Toast
+        sToast = Toast.makeText(ContextUtil.getInstance().getApplicationContext(), text, duration);
+        sToast.setGravity(gravity, 0, 0);//仅初次创建时有效
+        return sToast;
+    }
+
+    public static boolean isEnable() {
+        return sIsEnabled.get();
+    }
+
+    public static void setEnable(boolean isEnabled) {
+        sIsEnabled.set(isEnabled);
+    }
+
     public static void show(@StringRes int stringId) {
         if (isEnable()) {
             genStdToast(stringId, Gravity.CENTER, Toast.LENGTH_SHORT).show();
@@ -70,36 +100,6 @@ public class ToastUtil {
             sToast.cancel();
             sToast = null;
         }
-    }
-
-    public static boolean isEnable() {
-        return sIsEnabled.get();
-    }
-
-    public static void setEnable(boolean isEnabled) {
-        sIsEnabled.set(isEnabled);
-    }
-
-    private static Toast genStdToast(Object object, @GravityDef int gravity, @DurationDef int duration) {
-        String text = null;
-        String typeName = object.getClass().getSimpleName();
-        switch (typeName) {
-            case "String":
-                text = (String) object;
-                break;
-            case "Integer":
-                text = ContextUtil.getInstance().getApplicationContext().getString((Integer) object);
-                break;
-            default:
-                break;
-        }
-        if (Objects.isNull(text)) {
-            text = "";
-        }
-        cancel();//如果当前Toast没有消失，则取消该Toast
-        sToast = Toast.makeText(ContextUtil.getInstance().getApplicationContext(), text, duration);
-        sToast.setGravity(gravity, 0, 0);//仅初次创建时有效
-        return sToast;
     }
 
     @IntDef({Gravity.CENTER, Gravity.TOP, Gravity.BOTTOM})
