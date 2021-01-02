@@ -5,5 +5,6 @@ import android.support.v4.app.Fragment;
 
 public interface IFragmentFactory {
 
-    Fragment createProduct(@NonNull String prodType);
+    Fragment createProduct(@NonNull String productType);
+
 }
