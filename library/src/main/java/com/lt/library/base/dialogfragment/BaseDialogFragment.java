@@ -242,19 +242,19 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
 
     protected void callOnPositiveButtonClick(View view, Object object) {
         if (Objects.nonNull(mOnPositiveButtonClickListener)) {
-            mOnPositiveButtonClickListener.onPositiveButtonClick(view, object);
+            mOnPositiveButtonClickListener.onPositiveButtonClick(this, view, object);
         }
     }
 
     protected void callOnNegativeButtonClick(View view, Object object) {
         if (Objects.nonNull(mOnNegativeButtonClickListener)) {
-            mOnNegativeButtonClickListener.onNegativeButtonClick(view, object);
+            mOnNegativeButtonClickListener.onNegativeButtonClick(this, view, object);
         }
     }
 
     protected void callOnNeutralButtonClick(View view, Object object) {
         if (Objects.nonNull(mOnNeutralButtonClickListener)) {
-            mOnNeutralButtonClickListener.onNeutralButtonClick(view, object);
+            mOnNeutralButtonClickListener.onNeutralButtonClick(this, view, object);
         }
     }
 
