@@ -12,6 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
+import com.lt.library.base.recyclerview.holder.BaseViewHolder;
+import com.lt.library.base.recyclerview.holder.sub.EntityViewHolder;
+import com.lt.library.base.recyclerview.holder.sub.ExtrasViewHolder;
+import com.lt.library.base.recyclerview.holder.sub.FooterViewHolder;
+import com.lt.library.base.recyclerview.holder.sub.HeaderViewHolder;
+import com.lt.library.base.recyclerview.holder.sub.StatusViewHolder;
 import com.lt.library.base.recyclerview.listener.OnEntityItemClickListener;
 import com.lt.library.base.recyclerview.listener.OnEntityItemLongClickListener;
 import com.lt.library.base.recyclerview.listener.OnExtrasItemClickListener;
@@ -22,12 +28,6 @@ import com.lt.library.base.recyclerview.listener.OnHeaderItemClickListener;
 import com.lt.library.base.recyclerview.listener.OnHeaderItemLongClickListener;
 import com.lt.library.base.recyclerview.listener.OnStatusItemClickListener;
 import com.lt.library.base.recyclerview.listener.OnStatusItemLongClickListener;
-import com.lt.library.base.recyclerview.viewholder.BaseViewHolder;
-import com.lt.library.base.recyclerview.viewholder.sub.EntityViewHolder;
-import com.lt.library.base.recyclerview.viewholder.sub.ExtrasViewHolder;
-import com.lt.library.base.recyclerview.viewholder.sub.FooterViewHolder;
-import com.lt.library.base.recyclerview.viewholder.sub.HeaderViewHolder;
-import com.lt.library.base.recyclerview.viewholder.sub.StatusViewHolder;
 import com.lt.library.util.LogUtil;
 import com.lt.library.util.context.ContextUtil;
 
