@@ -9,13 +9,14 @@ import android.widget.TextView;
 import com.kyleduo.switchbutton.SwitchButton;
 import com.lt.library.base.recyclerview.adapter.BaseAdapter;
 import com.lt.library.base.recyclerview.viewholder.BaseViewHolder;
-import com.lt.library.base.recyclerview.viewholder.EntityViewHolder;
+import com.lt.library.base.recyclerview.viewholder.sub.EntityViewHolder;
 import com.lt.library.util.LogUtil;
 import com.lt.library.util.ToastUtil;
 import com.lt.person_baseutil.R;
 import com.lt.person_baseutil.model.entity.TestBean;
 
 import java.util.List;
+import java.util.Objects;
 
 public class TestAdapter extends BaseAdapter<TestBean> {
     private CompoundButton.OnCheckedChangeListener mOnCheckedChangeListener = (buttonView, isChecked) -> {
@@ -71,7 +72,8 @@ public class TestAdapter extends BaseAdapter<TestBean> {
     protected void onBindEntityView(EntityViewHolder viewHolder, TestBean dataSource, int position, int viewType) {
         super.onBindEntityView(viewHolder, dataSource, position, viewType);
         viewHolder.setImageDrawable(R.id.iv_item_ico, Integer.parseInt(dataSource.getIco()))
-                  .setText(R.id.tv_item_title, dataSource.getTitle());
+                  .setText(R.id.tv_item_title, dataSource.getTitle())
+                  .setBackground(R.id.csl_item_root, dataSource.isSelect() ? android.R.color.holo_purple : android.R.color.white);
         switch (viewType) {
             case TestBean.ITEM_TYPE_CONTENT:
                 TextView textView = viewHolder.findViewById(R.id.tv_item_content);
@@ -125,5 +127,24 @@ public class TestAdapter extends BaseAdapter<TestBean> {
         LogUtil.w("GG");
         mOnCheckedChangeListener = null;
         mOnSeekBarChangeListener = null;
+    }
+
+    public void notifyDataPositionSelected(int newSelectedPosition) {
+        TestBean newListBean = getEntity(newSelectedPosition);
+        if (newListBean.isSelect()) {
+            return;
+        }
+        for (int i = 0; i < getEntityList().size(); i++) {
+            TestBean listBean = getEntity(i);
+            if (Objects.equals(listBean, newListBean)) {
+                continue;
+            }
+            if (listBean.isSelect()) {
+                listBean.setSelect(false);
+                notifyEntityRef(listBean, i);
+            }
+        }
+        newListBean.setSelect(true);
+        notifyEntityRef(newListBean, newSelectedPosition);
     }
 }

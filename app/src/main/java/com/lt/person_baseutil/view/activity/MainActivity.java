@@ -3,6 +3,7 @@ package com.lt.person_baseutil.view.activity;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.Gravity;
 import android.view.View;
 
 import com.kyleduo.switchbutton.SwitchButton;
@@ -14,6 +15,7 @@ import com.lt.person_baseutil.R;
 import com.lt.person_baseutil.databinding.ActivityMainBinding;
 import com.lt.person_baseutil.model.repo.DataRepo;
 import com.lt.person_baseutil.view.adapter.TestAdapter;
+import com.lt.person_baseutil.view.dialog.TestDialog;
 
 import java.util.Objects;
 
@@ -33,6 +35,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements
         mViewBinding.rcvMainTest.setLayoutManager(new LinearLayoutManager(this));
         mViewBinding.rcvMainTest.setAdapter(mTestAdapter);
         mViewBinding.rcvMainTest.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        mViewBinding.rcvMainTest.getItemAnimator().setChangeDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
     }
 
     @Override
@@ -67,7 +70,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements
             test(1.0);
         } else {
             test("GG");
+            TestDialog.newInstance("GG")
+                      .setDimAmount(0.5F)
+                      .setGravity(Gravity.CENTER)
+                      .setOutCancel(true)
+                      .show(getSupportFragmentManager(), "");
         }
+        mTestAdapter.notifyDataPositionSelected(position);
     }
 
     private void test(Object object) {
