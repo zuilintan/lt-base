@@ -8,8 +8,8 @@ import android.widget.TextView;
 
 import com.kyleduo.switchbutton.SwitchButton;
 import com.lt.library.base.recyclerview.adapter.BaseAdapter;
-import com.lt.library.base.recyclerview.viewholder.BaseViewHolder;
-import com.lt.library.base.recyclerview.viewholder.sub.EntityViewHolder;
+import com.lt.library.base.recyclerview.holder.BaseViewHolder;
+import com.lt.library.base.recyclerview.holder.sub.EntityViewHolder;
 import com.lt.library.util.LogUtil;
 import com.lt.library.util.ToastUtil;
 import com.lt.person_baseutil.R;

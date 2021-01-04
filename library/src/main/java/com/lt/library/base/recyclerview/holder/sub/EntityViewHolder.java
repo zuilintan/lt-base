@@ -1,12 +1,12 @@
-package com.lt.library.base.recyclerview.viewholder.sub;
+package com.lt.library.base.recyclerview.holder.sub;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.lt.library.base.recyclerview.holder.BaseViewHolder;
 import com.lt.library.base.recyclerview.listener.OnEntityItemClickListener;
 import com.lt.library.base.recyclerview.listener.OnEntityItemLongClickListener;
-import com.lt.library.base.recyclerview.viewholder.BaseViewHolder;
 import com.lt.library.util.LogUtil;
 
 public class EntityViewHolder extends BaseViewHolder {
