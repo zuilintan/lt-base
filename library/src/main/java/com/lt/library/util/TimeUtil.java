@@ -108,7 +108,7 @@ public class TimeUtil {
     }//获取该分钟的秒数
 
     @IntDef({HOUR_MODE_12, HOUR_MODE_24})//限定取值范围
-    @Retention(RetentionPolicy.SOURCE)//限制注解仅存在源码中, Class中不会包括
-    public @interface HourMode {
+    @Retention(RetentionPolicy.SOURCE)
+    @interface HourMode {
     }
 }

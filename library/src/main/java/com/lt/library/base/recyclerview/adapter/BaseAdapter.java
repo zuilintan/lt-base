@@ -23,11 +23,11 @@ import com.lt.library.base.recyclerview.listener.OnHeaderLongClickListener;
 import com.lt.library.base.recyclerview.listener.OnStatusClickListener;
 import com.lt.library.base.recyclerview.listener.OnStatusLongClickListener;
 import com.lt.library.base.recyclerview.viewholder.BaseViewHolder;
-import com.lt.library.base.recyclerview.viewholder.EntityViewHolder;
-import com.lt.library.base.recyclerview.viewholder.ExtrasViewHolder;
-import com.lt.library.base.recyclerview.viewholder.FooterViewHolder;
-import com.lt.library.base.recyclerview.viewholder.HeaderViewHolder;
-import com.lt.library.base.recyclerview.viewholder.StatusViewHolder;
+import com.lt.library.base.recyclerview.viewholder.sub.EntityViewHolder;
+import com.lt.library.base.recyclerview.viewholder.sub.ExtrasViewHolder;
+import com.lt.library.base.recyclerview.viewholder.sub.FooterViewHolder;
+import com.lt.library.base.recyclerview.viewholder.sub.HeaderViewHolder;
+import com.lt.library.base.recyclerview.viewholder.sub.StatusViewHolder;
 import com.lt.library.util.LogUtil;
 import com.lt.library.util.context.ContextUtil;
 
@@ -53,7 +53,6 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private static final int VIEW_TYPE_EXTRAS = 1004;
     private static final int VIEW_TYPE_FOOTER = 1005;
     private final List<DS> mEntityList;
-    private RecyclerView mRecyclerView;
     private OnHeaderClickListener mOnHeaderClickListener;
     private OnHeaderLongClickListener mOnHeaderLongClickListener;
     private OnStatusClickListener mOnStatusClickListener;
@@ -64,6 +63,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private OnExtrasLongClickListener mOnExtrasLongClickListener;
     private OnFooterClickListener mOnFooterClickListener;
     private OnFooterLongClickListener mOnFooterLongClickListener;
+    private RecyclerView mRecyclerView;
     private int mHeaderCount, mStatusCount, mExtrasCount, mFooterCount = 0;
     private int mHeaderId, mStatusId, mExtrasId, mFooterId = -1;
 
@@ -285,6 +285,39 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
             result = true;
         }//布局计算完成
         return result;
+    }
+
+    protected Context getAppContext() {
+        return ContextUtil.getInstance().getApplicationContext();
+    }
+
+    @IntRange(from = 0)
+    protected int getEntityViewType(int position) {
+        return VIEW_TYPE_ENTITY;
+    }
+
+    @LayoutRes
+    protected abstract int getEntityLayoutRes(int viewType);
+
+    protected void onBindHeaderView(HeaderViewHolder viewHolder) {
+    }
+
+    protected void onBindStatusView(StatusViewHolder viewHolder) {
+    }
+
+    protected void onBindEntityView(EntityViewHolder viewHolder, DS dataSource, int position, int viewType) {
+    }
+
+    protected void onBindEntityView(EntityViewHolder viewHolder, DS dataSource, int position, int viewType, List<Object> payloads) {
+    }
+
+    protected void onBindExtrasView(ExtrasViewHolder viewHolder) {
+    }
+
+    protected void onBindFooterView(FooterViewHolder viewHolder) {
+    }
+
+    protected void onRecycledView(BaseViewHolder viewHolder, int viewType) {
     }
 
     public void setHeader(@LayoutRes int layoutResId) {
@@ -513,38 +546,5 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
 
     public void setOnFooterLongClickListener(OnFooterLongClickListener onFooterLongClickListener) {
         mOnFooterLongClickListener = onFooterLongClickListener;
-    }
-
-    protected Context getAppContext() {
-        return ContextUtil.getInstance().getApplicationContext();
-    }
-
-    @IntRange(from = 0)
-    protected int getEntityViewType(int position) {
-        return VIEW_TYPE_ENTITY;
-    }
-
-    @LayoutRes
-    protected abstract int getEntityLayoutRes(int viewType);
-
-    protected void onBindHeaderView(HeaderViewHolder viewHolder) {
-    }
-
-    protected void onBindStatusView(StatusViewHolder viewHolder) {
-    }
-
-    protected void onBindEntityView(EntityViewHolder viewHolder, DS dataSource, int position, int viewType) {
-    }
-
-    protected void onBindEntityView(EntityViewHolder viewHolder, DS dataSource, int position, int viewType, List<Object> payloads) {
-    }
-
-    protected void onBindExtrasView(ExtrasViewHolder viewHolder) {
-    }
-
-    protected void onBindFooterView(FooterViewHolder viewHolder) {
-    }
-
-    protected void onRecycledView(BaseViewHolder viewHolder, int viewType) {
     }
 }

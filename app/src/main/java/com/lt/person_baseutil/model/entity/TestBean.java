@@ -8,6 +8,7 @@ public class TestBean {
     private String title;
     private int itemType;
     private String itemValue;
+    private boolean isSelect;
 
     private TestBean() {
     }
@@ -17,6 +18,7 @@ public class TestBean {
         this.title = builder.title;
         this.itemType = builder.itemType;
         this.itemValue = builder.itemValue;
+        this.isSelect = builder.isSelect;
     }
 
     public static Builder create() {
@@ -55,11 +57,20 @@ public class TestBean {
         this.itemValue = itemValue;
     }
 
+    public boolean isSelect() {
+        return isSelect;
+    }
+
+    public void setSelect(boolean select) {
+        isSelect = select;
+    }
+
     public static class Builder {
         private String ico;
         private String title;
         private int itemType;
         private String itemValue;
+        private boolean isSelect;
 
         private Builder() {
         }
@@ -81,6 +92,11 @@ public class TestBean {
 
         public Builder setItemValue(String itemValue) {
             this.itemValue = itemValue;
+            return this;
+        }
+
+        public Builder setSelect(boolean select) {
+            isSelect = select;
             return this;
         }
 

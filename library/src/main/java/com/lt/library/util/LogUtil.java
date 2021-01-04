@@ -26,6 +26,44 @@ public class LogUtil {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 
+    private static String genStdTag(String customTag) {
+        String result;
+        String fileName = "<unknown>";
+        int lineNumber = -1;
+        String methodName = "<unknown>";
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        for (int i = 2; i < stackTraceElements.length; i++) {
+            String className = stackTraceElements[i].getClassName();
+            if (!className.equals(LogUtil.CLASS_NAME)) {
+                fileName = stackTraceElements[i].getFileName();
+                lineNumber = stackTraceElements[i].getLineNumber();
+                methodName = stackTraceElements[i].getMethodName();
+                int index = methodName.indexOf('$');
+                if (index > -1) {
+                    methodName = methodName.substring(0, index + 1);
+                }
+                break;
+            }
+        }
+        String tagFormat;
+        if (TextUtils.isEmpty(customTag)) {
+            tagFormat = "%s:(%s:%d).%s()";//进程名:(文件名:行号).方法名()
+            result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, fileName, lineNumber, methodName);
+        } else {
+            tagFormat = "%s:(%s:%d).%s():%s";//进程名:(文件名:行号).方法名():自定义Tag
+            result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, fileName, lineNumber, methodName, customTag);
+        }
+        return result;
+    }
+
+    public static boolean isEnable() {
+        return sIsEnabled.get();
+    }
+
+    public static void setEnable(boolean isEnabled) {
+        sIsEnabled.set(isEnabled);
+    }
+
     public static void v(String msg) {
         v(null, msg, null);
     }
@@ -162,43 +200,5 @@ public class LogUtil {
                 Log.wtf(tag, msg, tr);
             }
         }
-    }
-
-    public static boolean isEnable() {
-        return sIsEnabled.get();
-    }
-
-    public static void setEnable(boolean isEnabled) {
-        sIsEnabled.set(isEnabled);
-    }
-
-    private static String genStdTag(String customTag) {
-        String result;
-        String fileName = "<unknown>";
-        int lineNumber = -1;
-        String methodName = "<unknown>";
-        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        for (int i = 2; i < stackTraceElements.length; i++) {
-            String className = stackTraceElements[i].getClassName();
-            if (!className.equals(LogUtil.CLASS_NAME)) {
-                fileName = stackTraceElements[i].getFileName();
-                lineNumber = stackTraceElements[i].getLineNumber();
-                methodName = stackTraceElements[i].getMethodName();
-                int index = methodName.indexOf('$');
-                if (index > -1) {
-                    methodName = methodName.substring(0, index + 1);
-                }
-                break;
-            }
-        }
-        String tagFormat;
-        if (TextUtils.isEmpty(customTag)) {
-            tagFormat = "%s:(%s:%d).%s()";//进程名:(文件名:行号).方法名()
-            result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, fileName, lineNumber, methodName);
-        } else {
-            tagFormat = "%s:(%s:%d).%s():%s";//进程名:(文件名:行号).方法名():自定义Tag
-            result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, fileName, lineNumber, methodName, customTag);
-        }
-        return result;
     }
 }

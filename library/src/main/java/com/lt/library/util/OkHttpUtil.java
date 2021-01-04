@@ -31,7 +31,6 @@ import okhttp3.ResponseBody;
  */
 
 public class OkHttpUtil {
-    private static OkHttpUtil sOkHttpUtil;
     private static OkHttpClient sOkHttpClient;
     private final Handler mHandler;
 
@@ -44,12 +43,9 @@ public class OkHttpUtil {
         mHandler = new Handler(Looper.getMainLooper());//切换主线程执行handleMessage()
     }
 
-    private static OkHttpUtil getInstance() {
-        if (sOkHttpUtil == null) {
-            sOkHttpUtil = new OkHttpUtil();
-        }
-        return sOkHttpUtil;
-    }//单例模式，获取OkHttpUtil实例
+    public static OkHttpUtil getInstance() {
+        return OkHttpUtilHolder.INSTANCE;
+    }
 
     private static String jointUrl(String url, Map<String, String> params) {
         StringBuilder endUrl = new StringBuilder(url);
@@ -68,21 +64,6 @@ public class OkHttpUtil {
         }
         return endUrl.toString();
     }
-
-    public static void getFormRequest(String url, Map<String, String> params,
-                                      DataCallBack callBack) {
-        getInstance().getFormAsync(url, params, callBack);
-    }//get异步请求(Form)，对外提供
-
-    public static void postFormRequest(String url, Map<String, String> params,
-                                       DataCallBack callBack) {
-        getInstance().postFormAsync(url, params, callBack);
-    }//post异步请求(Form)，对外提供
-
-    public static void postJsonRequest(String url, String params,
-                                       DataCallBack callBack) {
-        getInstance().postJsonAsync(url, params, callBack);
-    }//post异步请求(Json)，对外提供
 
     private void getFormAsync(String url, Map<String, String> params, final DataCallBack callBack) {
         if (params == null) {
@@ -214,9 +195,28 @@ public class OkHttpUtil {
         });//异步处理
     }
 
+    public static void getFormRequest(String url, Map<String, String> params,
+                                      DataCallBack callBack) {
+        getInstance().getFormAsync(url, params, callBack);
+    }//get异步请求(Form)，对外提供
+
+    public static void postFormRequest(String url, Map<String, String> params,
+                                       DataCallBack callBack) {
+        getInstance().postFormAsync(url, params, callBack);
+    }//post异步请求(Form)，对外提供
+
+    public static void postJsonRequest(String url, String params,
+                                       DataCallBack callBack) {
+        getInstance().postJsonAsync(url, params, callBack);
+    }//post异步请求(Json)，对外提供
+
     public interface DataCallBack {
         void onRequestSuccess(String result) throws Exception;
 
         void onRequestFailure(Request request, IOException e);
+    }
+
+    private static class OkHttpUtilHolder {
+        private static final OkHttpUtil INSTANCE = new OkHttpUtil();
     }
 }

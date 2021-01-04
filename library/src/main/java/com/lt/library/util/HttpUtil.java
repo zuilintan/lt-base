@@ -25,36 +25,6 @@ public class HttpUtil {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 
-    public static void doGetAsync(final String urlStr, final CallBack callBack) {
-        new Thread() {
-            public void run() {
-                try {
-                    String result = doGet(urlStr);
-                    if (callBack != null) {
-                        callBack.onRequestComplete(result);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }//异步的Get请求
-
-    public static void doPostAsync(final String urlStr, final String params, final CallBack callBack) {
-        new Thread() {
-            public void run() {
-                try {
-                    String result = doPost(urlStr, params);
-                    if (callBack != null) {
-                        callBack.onRequestComplete(result);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }//异步的Post请求
-
     private static String doGet(String stringURL) {
         URL url;
         HttpURLConnection httpURLConnection = null;
@@ -149,6 +119,32 @@ public class HttpUtil {
         }//使用finally块来关闭输出流、输入流
         return result.toString();
     }//Post请求，获得返回数据
+
+    public static void doGetAsync(final String urlStr, final CallBack callBack) {
+        new Thread(() -> {
+            try {
+                String result = doGet(urlStr);
+                if (callBack != null) {
+                    callBack.onRequestComplete(result);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }//异步的Get请求
+
+    public static void doPostAsync(final String urlStr, final String params, final CallBack callBack) {
+        new Thread(() -> {
+            try {
+                String result = doPost(urlStr, params);
+                if (callBack != null) {
+                    callBack.onRequestComplete(result);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }//异步的Post请求
 
     public interface CallBack {
         void onRequestComplete(String result);

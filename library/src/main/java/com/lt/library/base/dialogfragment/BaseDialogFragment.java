@@ -1,4 +1,4 @@
-package com.lt.library.base;
+package com.lt.library.base.dialogfragment;
 
 import android.annotation.TargetApi;
 import android.app.Dialog;
@@ -22,11 +22,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.viewbinding.ViewBinding;
 
-import com.lt.library.base.recyclerview.viewholder.BaseViewHolder;
+import com.lt.library.base.dialogfragment.listenter.OnNegativeButtonClickListener;
+import com.lt.library.base.dialogfragment.listenter.OnNeutralButtonClickListener;
+import com.lt.library.base.dialogfragment.listenter.OnPositiveButtonClickListener;
 import com.lt.library.util.DensityUtil;
 import com.lt.library.util.LogUtil;
 import com.lt.library.util.ScreenUtil;
+import com.lt.library.util.ToastUtil;
 import com.lt.library.util.context.ContextUtil;
 
 import java.util.Objects;
@@ -41,8 +45,12 @@ import java.util.Objects;
  * implementation 'com.android.support:recyclerview-v7:28.0.0'
  */
 
-public abstract class BaseDialogFragment extends DialogFragment {
+public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFragment {
+    protected V mViewBinding;
     protected FragmentActivity mActivity;
+    protected OnPositiveButtonClickListener mOnPositiveButtonClickListener;
+    protected OnNegativeButtonClickListener mOnNegativeButtonClickListener;
+    protected OnNeutralButtonClickListener mOnNeutralButtonClickListener;
     private Integer mLayoutWidth;
     private Integer mLayoutHeight;
     private Integer mOffsetX;
@@ -74,7 +82,8 @@ public abstract class BaseDialogFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(bindView(), container, false);
+        mViewBinding = bindView(inflater, container);
+        return mViewBinding.getRoot();
     }//Plan B, 推荐, 一般用于创建复杂内容弹窗, 全屏展示效果, 或有网络请求等异步操作的场景, UI复杂, 功能繁多
 
     @Override
@@ -85,8 +94,9 @@ public abstract class BaseDialogFragment extends DialogFragment {
         if (Objects.nonNull(mIsOutCancel)) {
             getDialog().setCanceledOnTouchOutside(mIsOutCancel);
         }
-        initView(new BaseViewHolder(view));
+        initView();
         initData();
+        initEvent();
     }
 
     @Override
@@ -135,8 +145,10 @@ public abstract class BaseDialogFragment extends DialogFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        freeEvent();
         freeData();
         freeView();
+        mViewBinding = null;
     }
 
     @Override
@@ -151,13 +163,13 @@ public abstract class BaseDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onDismiss(DialogInterface dialog) {
-        super.onDismiss(dialog);
+    public void onCancel(DialogInterface dialog) {
+        super.onCancel(dialog);
     }
 
     @Override
-    public void onCancel(DialogInterface dialog) {
-        super.onCancel(dialog);
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
     }
 
     @Override
@@ -186,8 +198,12 @@ public abstract class BaseDialogFragment extends DialogFragment {
             dW.setLayout(DensityUtil.dp2px(mLayoutWidth),
                          DensityUtil.dp2px(mLayoutHeight));
         } else {
-            dW.setLayout((int) (ScreenUtil.getScreenWidth() * 0.75),
-                         (int) (ScreenUtil.getScreenHeight() * 0.50));
+            int screenWidth = ScreenUtil.getScreenWidth();
+            int screenHeight = ScreenUtil.getScreenHeight();
+            boolean b = screenHeight > screenWidth;
+            dW.setLayout((int) (b ? screenWidth * 0.75 : screenWidth * 0.50),
+                         (int) (b ? screenHeight * 0.25 : screenHeight * 0.50));
+            ToastUtil.show("b = " + b + ", screenWidth = " + screenWidth + ", screenHeight = " + screenHeight);
         }
         if (Objects.nonNull(mOffsetX)) {
             final WindowManager.LayoutParams attrs = dW.getAttributes();
@@ -224,68 +240,89 @@ public abstract class BaseDialogFragment extends DialogFragment {
         }//super.onStart()后, 以Activity为准, 统一SystemUiVisibility, 并取回焦点
     }//焦点变更时保持SystemUi状态
 
-    public BaseDialogFragment setLayout(@Dimension(unit = Dimension.DP) int width, int height) {
-        mLayoutWidth = width;
-        mLayoutHeight = height;
-        return this;
-    }//设置布局大小
-
-    public BaseDialogFragment setOffsetX(@Dimension(unit = Dimension.DP) int x) {
-        mOffsetX = x;
-        return this;
-    }//设置X轴偏移量
-
-    public BaseDialogFragment setOffsetY(@Dimension(unit = Dimension.DP) int y) {
-        mOffsetY = y;
-        return this;
-    }//设置Y轴偏移量
-
-    public BaseDialogFragment setGravity(int gravity) {
-        mGravity = gravity;
-        return this;
-    }//设置显示位置
-
-    public BaseDialogFragment setWindowAnimation(@StyleRes int windowAnimation) {
-        mWindowAnimation = windowAnimation;
-        return this;
-    }//设置过场动画
-
-    public BaseDialogFragment setDimAmount(@FloatRange(from = 0, to = 1) float dimAmount) {
-        mDimAmount = dimAmount;
-        return this;
-    }//设置外围暗度
-
-    public BaseDialogFragment setOutCancel(boolean isOutCancel) {
-        mIsOutCancel = isOutCancel;
-        return this;
-    }//设置外部取消
-
-    public BaseDialogFragment setKeepSystemUiState(boolean isKeepSystemUiState) {
-        mIsKeepSystemUiState = isKeepSystemUiState;
-        return this;
-    }//设置保持SystemUi状态
-
     protected Context getAppContext() {
         return ContextUtil.getInstance().getApplicationContext();
     }
 
-    protected abstract int bindView();//绑定视图
+    protected abstract V bindView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container);
 
     protected void bindData(@Nullable Bundle arguments, @Nullable Bundle savedInstanceState) {
     }//绑定数据(eg: Bundle, SaveInstanceState, SharedPreferences)
 
-    protected void initView(BaseViewHolder viewHolder) {
+    protected void initView() {
     }//初始化视图
 
     protected void initData() {
     }//初始化数据
 
+    protected void initEvent() {
+    }//初始化事件(eg: OnClickListener)
+
     protected void saveState(@NonNull Bundle outState) {
     }//存储临时数据(eg: SaveInstanceState)
+
+    protected void freeEvent() {
+    }//释放事件(eg: OnClickListener)
 
     protected void freeData() {
     }//释放数据
 
     protected void freeView() {
     }//释放视图
+
+    public BaseDialogFragment<V> setLayout(@Dimension(unit = Dimension.DP) int width, int height) {
+        mLayoutWidth = width;
+        mLayoutHeight = height;
+        return this;
+    }//设置布局大小
+
+    public BaseDialogFragment<V> setOffsetX(@Dimension(unit = Dimension.DP) int x) {
+        mOffsetX = x;
+        return this;
+    }//设置X轴偏移量
+
+    public BaseDialogFragment<V> setOffsetY(@Dimension(unit = Dimension.DP) int y) {
+        mOffsetY = y;
+        return this;
+    }//设置Y轴偏移量
+
+    public BaseDialogFragment<V> setGravity(int gravity) {
+        mGravity = gravity;
+        return this;
+    }//设置显示位置
+
+    public BaseDialogFragment<V> setWindowAnimation(@StyleRes int windowAnimation) {
+        mWindowAnimation = windowAnimation;
+        return this;
+    }//设置过场动画
+
+    public BaseDialogFragment<V> setDimAmount(@FloatRange(from = 0, to = 1) float dimAmount) {
+        mDimAmount = dimAmount;
+        return this;
+    }//设置外围暗度
+
+    public BaseDialogFragment<V> setOutCancel(boolean isOutCancel) {
+        mIsOutCancel = isOutCancel;
+        return this;
+    }//设置外部取消
+
+    public BaseDialogFragment<V> setKeepSystemUiState(boolean isKeepSystemUiState) {
+        mIsKeepSystemUiState = isKeepSystemUiState;
+        return this;
+    }//设置保持SystemUi状态
+
+    public BaseDialogFragment<V> setOnPositiveButtonClickListener(int viewId, OnPositiveButtonClickListener onPositiveButtonClickListener) {
+        mOnPositiveButtonClickListener = onPositiveButtonClickListener;
+        return this;
+    }
+
+    public BaseDialogFragment<V> setOnNegativeButtonClickListener(int viewId, OnNegativeButtonClickListener onNegativeButtonClickListener) {
+        mOnNegativeButtonClickListener = onNegativeButtonClickListener;
+        return this;
+    }
+
+    public BaseDialogFragment<V> setOnNeutralButtonClickListener(int viewId, OnNeutralButtonClickListener onNeutralButtonClickListener) {
+        mOnNeutralButtonClickListener = onNeutralButtonClickListener;
+        return this;
+    }
 }

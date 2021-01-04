@@ -20,6 +20,20 @@ public class KeyboardUtil {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 
+    private static void postDelayed(EditText editText, long delayMillis, InputMethodManager inputMethodManager) {
+        sRunnable = () -> {
+            editText.requestFocus();
+            inputMethodManager.showSoftInput(editText, 0);
+            postRemoved(editText);
+        };
+        editText.postDelayed(sRunnable, delayMillis);
+    }
+
+    private static void postRemoved(EditText editText) {
+        editText.removeCallbacks(sRunnable);
+        sRunnable = null;
+    }
+
     /**
      * 显示键盘
      *
@@ -67,19 +81,5 @@ public class KeyboardUtil {
                                                                                 .getApplicationContext()
                                                                                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInput(0, 0);
-    }
-
-    private static void postDelayed(EditText editText, long delayMillis, InputMethodManager inputMethodManager) {
-        sRunnable = () -> {
-            editText.requestFocus();
-            inputMethodManager.showSoftInput(editText, 0);
-            postRemoved(editText);
-        };
-        editText.postDelayed(sRunnable, delayMillis);
-    }
-
-    private static void postRemoved(EditText editText) {
-        editText.removeCallbacks(sRunnable);
-        sRunnable = null;
     }
 }
