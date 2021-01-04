@@ -240,6 +240,24 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
         }//super.onStart()后, 以Activity为准, 统一SystemUiVisibility, 并取回焦点
     }//焦点变更时保持SystemUi状态
 
+    protected void callOnPositiveButtonClick(View view, Object object) {
+        if (Objects.nonNull(mOnPositiveButtonClickListener)) {
+            mOnPositiveButtonClickListener.onPositiveButtonClick(view, object);
+        }
+    }
+
+    protected void callOnNegativeButtonClick(View view, Object object) {
+        if (Objects.nonNull(mOnNegativeButtonClickListener)) {
+            mOnNegativeButtonClickListener.onNegativeButtonClick(view, object);
+        }
+    }
+
+    protected void callOnNeutralButtonClick(View view, Object object) {
+        if (Objects.nonNull(mOnNeutralButtonClickListener)) {
+            mOnNeutralButtonClickListener.onNeutralButtonClick(view, object);
+        }
+    }
+
     protected Context getAppContext() {
         return ContextUtil.getInstance().getApplicationContext();
     }
@@ -311,17 +329,17 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
         return this;
     }//设置保持SystemUi状态
 
-    public BaseDialogFragment<V> setOnPositiveButtonClickListener(int viewId, OnPositiveButtonClickListener onPositiveButtonClickListener) {
+    public BaseDialogFragment<V> setOnPositiveButtonClickListener(OnPositiveButtonClickListener onPositiveButtonClickListener) {
         mOnPositiveButtonClickListener = onPositiveButtonClickListener;
         return this;
     }
 
-    public BaseDialogFragment<V> setOnNegativeButtonClickListener(int viewId, OnNegativeButtonClickListener onNegativeButtonClickListener) {
+    public BaseDialogFragment<V> setOnNegativeButtonClickListener(OnNegativeButtonClickListener onNegativeButtonClickListener) {
         mOnNegativeButtonClickListener = onNegativeButtonClickListener;
         return this;
     }
 
-    public BaseDialogFragment<V> setOnNeutralButtonClickListener(int viewId, OnNeutralButtonClickListener onNeutralButtonClickListener) {
+    public BaseDialogFragment<V> setOnNeutralButtonClickListener(OnNeutralButtonClickListener onNeutralButtonClickListener) {
         mOnNeutralButtonClickListener = onNeutralButtonClickListener;
         return this;
     }
