@@ -2,6 +2,6 @@ package com.lt.library.base.recyclerview.listener;
 
 import android.view.View;
 
-public interface OnHeaderClickListener {
-    void onHeaderClick(View view);
+public interface OnFooterItemClickListener {
+    void onFooterClick(View view);
 }
