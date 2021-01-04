@@ -12,16 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
-import com.lt.library.base.recyclerview.listener.OnEntityClickListener;
-import com.lt.library.base.recyclerview.listener.OnEntityLongClickListener;
-import com.lt.library.base.recyclerview.listener.OnExtrasClickListener;
-import com.lt.library.base.recyclerview.listener.OnExtrasLongClickListener;
-import com.lt.library.base.recyclerview.listener.OnFooterClickListener;
-import com.lt.library.base.recyclerview.listener.OnFooterLongClickListener;
-import com.lt.library.base.recyclerview.listener.OnHeaderClickListener;
-import com.lt.library.base.recyclerview.listener.OnHeaderLongClickListener;
-import com.lt.library.base.recyclerview.listener.OnStatusClickListener;
-import com.lt.library.base.recyclerview.listener.OnStatusLongClickListener;
+import com.lt.library.base.recyclerview.listener.OnEntityItemClickListener;
+import com.lt.library.base.recyclerview.listener.OnEntityItemLongClickListener;
+import com.lt.library.base.recyclerview.listener.OnExtrasItemClickListener;
+import com.lt.library.base.recyclerview.listener.OnExtrasItemLongClickListener;
+import com.lt.library.base.recyclerview.listener.OnFooterItemClickListener;
+import com.lt.library.base.recyclerview.listener.OnFooterItemLongClickListener;
+import com.lt.library.base.recyclerview.listener.OnHeaderItemClickListener;
+import com.lt.library.base.recyclerview.listener.OnHeaderItemLongClickListener;
+import com.lt.library.base.recyclerview.listener.OnStatusItemClickListener;
+import com.lt.library.base.recyclerview.listener.OnStatusItemLongClickListener;
 import com.lt.library.base.recyclerview.viewholder.BaseViewHolder;
 import com.lt.library.base.recyclerview.viewholder.sub.EntityViewHolder;
 import com.lt.library.base.recyclerview.viewholder.sub.ExtrasViewHolder;
@@ -47,25 +47,25 @@ import java.util.Objects;
  */
 
 public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolder> {
-    private static final int VIEW_TYPE_HEADER = 1001;
-    private static final int VIEW_TYPE_STATUS = 1002;
-    private static final int VIEW_TYPE_ENTITY = 1003;
-    private static final int VIEW_TYPE_EXTRAS = 1004;
-    private static final int VIEW_TYPE_FOOTER = 1005;
+    private static final int ITEM_TYPE_HEADER = 1001;
+    private static final int ITEM_TYPE_STATUS = 1002;
+    private static final int ITEM_TYPE_ENTITY = 1003;
+    private static final int ITEM_TYPE_EXTRAS = 1004;
+    private static final int ITEM_TYPE_FOOTER = 1005;
     private final List<DS> mEntityList;
-    private OnHeaderClickListener mOnHeaderClickListener;
-    private OnHeaderLongClickListener mOnHeaderLongClickListener;
-    private OnStatusClickListener mOnStatusClickListener;
-    private OnStatusLongClickListener mOnStatusLongClickListener;
-    private OnEntityClickListener mOnEntityClickListener;
-    private OnEntityLongClickListener mOnEntityLongClickListener;
-    private OnExtrasClickListener mOnExtrasClickListener;
-    private OnExtrasLongClickListener mOnExtrasLongClickListener;
-    private OnFooterClickListener mOnFooterClickListener;
-    private OnFooterLongClickListener mOnFooterLongClickListener;
+    private OnHeaderItemClickListener mOnHeaderItemClickListener;
+    private OnHeaderItemLongClickListener mOnHeaderItemLongClickListener;
+    private OnStatusItemClickListener mOnStatusItemClickListener;
+    private OnStatusItemLongClickListener mOnStatusItemLongClickListener;
+    private OnEntityItemClickListener mOnEntityItemClickListener;
+    private OnEntityItemLongClickListener mOnEntityItemLongClickListener;
+    private OnExtrasItemClickListener mOnExtrasItemClickListener;
+    private OnExtrasItemLongClickListener mOnExtrasItemLongClickListener;
+    private OnFooterItemClickListener mOnFooterItemClickListener;
+    private OnFooterItemLongClickListener mOnFooterItemLongClickListener;
     private RecyclerView mRecyclerView;
     private int mHeaderCount, mStatusCount, mExtrasCount, mFooterCount = 0;
-    private int mHeaderId, mStatusId, mExtrasId, mFooterId = -1;
+    private int mHeaderViewId, mStatusViewId, mExtrasViewId, mFooterViewId = -1;
 
     public BaseAdapter() {
         this(null);
@@ -87,26 +87,26 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
             throw new IllegalArgumentException("viewType = " + viewType + ", invalid");
         }
         switch (viewType) {
-            case VIEW_TYPE_HEADER:
-                view = LayoutInflater.from(viewGroup.getContext()).inflate(mHeaderId, viewGroup, false);
-                viewHolder = new HeaderViewHolder(view, mOnHeaderClickListener, mOnHeaderLongClickListener);
+            case ITEM_TYPE_HEADER:
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(mHeaderViewId, viewGroup, false);
+                viewHolder = new HeaderViewHolder(view, mOnHeaderItemClickListener, mOnHeaderItemLongClickListener);
                 break;
-            case VIEW_TYPE_STATUS:
-                view = LayoutInflater.from(viewGroup.getContext()).inflate(mStatusId, viewGroup, false);
-                viewHolder = new StatusViewHolder(view, mOnStatusClickListener, mOnStatusLongClickListener);
+            case ITEM_TYPE_STATUS:
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(mStatusViewId, viewGroup, false);
+                viewHolder = new StatusViewHolder(view, mOnStatusItemClickListener, mOnStatusItemLongClickListener);
                 break;
-            case VIEW_TYPE_EXTRAS:
-                view = LayoutInflater.from(viewGroup.getContext()).inflate(mExtrasId, viewGroup, false);
-                viewHolder = new ExtrasViewHolder(view, mOnExtrasClickListener, mOnExtrasLongClickListener);
+            case ITEM_TYPE_EXTRAS:
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(mExtrasViewId, viewGroup, false);
+                viewHolder = new ExtrasViewHolder(view, mOnExtrasItemClickListener, mOnExtrasItemLongClickListener);
                 break;
-            case VIEW_TYPE_FOOTER:
-                view = LayoutInflater.from(viewGroup.getContext()).inflate(mFooterId, viewGroup, false);
-                viewHolder = new FooterViewHolder(view, mOnFooterClickListener, mOnFooterLongClickListener);
+            case ITEM_TYPE_FOOTER:
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(mFooterViewId, viewGroup, false);
+                viewHolder = new FooterViewHolder(view, mOnFooterItemClickListener, mOnFooterItemLongClickListener);
                 break;
-            case VIEW_TYPE_ENTITY:
+            case ITEM_TYPE_ENTITY:
             default:
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(getEntityLayoutRes(viewType), viewGroup, false);
-                viewHolder = new EntityViewHolder(view, mOnEntityClickListener, mOnEntityLongClickListener);
+                viewHolder = new EntityViewHolder(view, mOnEntityItemClickListener, mOnEntityItemLongClickListener);
                 break;
         }
         return viewHolder;
@@ -146,15 +146,15 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     public int getItemViewType(int position) {
         int result;
         if (isHeader(position)) {
-            result = VIEW_TYPE_HEADER;
+            result = ITEM_TYPE_HEADER;
         } else if (isStatus(position)) {
-            result = VIEW_TYPE_STATUS;
+            result = ITEM_TYPE_STATUS;
         } else if (isEntity(position)) {
             result = getEntityViewType(getFixEntityPosition(position));
         } else if (isExtras(position)) {
-            result = VIEW_TYPE_EXTRAS;
+            result = ITEM_TYPE_EXTRAS;
         } else if (isFooter(position)) {
-            result = VIEW_TYPE_FOOTER;
+            result = ITEM_TYPE_FOOTER;
         } else {
             result = RecyclerView.INVALID_TYPE;
         }
@@ -293,7 +293,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
 
     @IntRange(from = 0)
     protected int getEntityViewType(int position) {
-        return VIEW_TYPE_ENTITY;
+        return ITEM_TYPE_ENTITY;
     }
 
     @LayoutRes
@@ -326,21 +326,21 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     }//设置HeaderView
 
     public void delHeader() {
-        if (mHeaderId == -1 || mHeaderCount == 0) {
-            LogUtil.w("headerView not added, headerViewId = " + mHeaderId + ", headerViewCount = " + mHeaderCount);
+        if (mHeaderViewId == -1 || mHeaderCount == 0) {
+            LogUtil.w("headerView not added, headerViewId = " + mHeaderViewId + ", headerViewCount = " + mHeaderCount);
             return;
         }
-        mHeaderId = -1;
+        mHeaderViewId = -1;
         mHeaderCount = 0;
         notifyItemRemoved(0);
     }//移除HeaderView
 
     public void addHeader(@LayoutRes int layoutResId) {
-        if (mHeaderId != -1 || mHeaderCount != 0) {
-            LogUtil.w("headerView not deleted, headerViewId = " + mHeaderId + ", headerViewCount = " + mHeaderCount);
+        if (mHeaderViewId != -1 || mHeaderCount != 0) {
+            LogUtil.w("headerView not deleted, headerViewId = " + mHeaderViewId + ", headerViewCount = " + mHeaderCount);
             return;
         }
-        mHeaderId = layoutResId;
+        mHeaderViewId = layoutResId;
         mHeaderCount = 1;
         notifyItemInserted(0);
     }//添加HeaderView
@@ -351,21 +351,21 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     }//设置StatusView
 
     public void delStatus() {
-        if (mStatusId == -1 || mStatusCount == 0) {
-            LogUtil.w("statusView not added, statusViewId = " + mStatusId + ", statusViewCount = " + mStatusCount);
+        if (mStatusViewId == -1 || mStatusCount == 0) {
+            LogUtil.w("statusView not added, statusViewId = " + mStatusViewId + ", statusViewCount = " + mStatusCount);
             return;
         }
-        mStatusId = -1;
+        mStatusViewId = -1;
         mStatusCount = 0;
         notifyItemRemoved(mHeaderCount);
     }//移除StatusView
 
     public void addStatus(@LayoutRes int layoutResId) {
-        if (mStatusId != -1 || mStatusCount != 0) {
-            LogUtil.w("statusView not deleted, statusViewId = " + mStatusId + ", statusViewCount = " + mStatusCount);
+        if (mStatusViewId != -1 || mStatusCount != 0) {
+            LogUtil.w("statusView not deleted, statusViewId = " + mStatusViewId + ", statusViewCount = " + mStatusCount);
             return;
         }
-        mStatusId = layoutResId;
+        mStatusViewId = layoutResId;
         mStatusCount = 1;
         notifyItemInserted(mHeaderCount);
     }//添加StatusView
@@ -376,22 +376,22 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     }//设置ExtrasView
 
     public void delExtras() {
-        if (mExtrasId == -1 || mExtrasCount == 0) {
-            LogUtil.w("extrasView not added, extrasViewId = " + mExtrasId + ", extrasViewCount = " + mExtrasCount);
+        if (mExtrasViewId == -1 || mExtrasCount == 0) {
+            LogUtil.w("extrasView not added, extrasViewId = " + mExtrasViewId + ", extrasViewCount = " + mExtrasCount);
             return;
         }
-        mExtrasId = -1;
+        mExtrasViewId = -1;
         mExtrasCount = 0;
         int entityViewCount = getEntityListSize();
         notifyItemRemoved(mHeaderCount + mStatusCount + entityViewCount);
     }//移除ExtrasView
 
     public void addExtras(@LayoutRes int layoutResId) {
-        if (mExtrasId != -1 || mExtrasCount != 0) {
-            LogUtil.w("extrasView not deleted, extrasViewId = " + mExtrasId + ", extrasViewCount = " + mExtrasCount);
+        if (mExtrasViewId != -1 || mExtrasCount != 0) {
+            LogUtil.w("extrasView not deleted, extrasViewId = " + mExtrasViewId + ", extrasViewCount = " + mExtrasCount);
             return;
         }
-        mExtrasId = layoutResId;
+        mExtrasViewId = layoutResId;
         mExtrasCount = 1;
         int entityViewCount = getEntityListSize();
         notifyItemInserted(mHeaderCount + mStatusCount + entityViewCount);
@@ -403,22 +403,22 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     }//设置FooterView
 
     public void delFooter() {
-        if (mFooterId == -1 || mFooterCount == 0) {
-            LogUtil.w("footerView not added, footerViewId = " + mFooterId + ", footerViewCount = " + mFooterCount);
+        if (mFooterViewId == -1 || mFooterCount == 0) {
+            LogUtil.w("footerView not added, footerViewId = " + mFooterViewId + ", footerViewCount = " + mFooterCount);
             return;
         }
-        mFooterId = -1;
+        mFooterViewId = -1;
         mFooterCount = 0;
         int entityViewCount = getEntityListSize();
         notifyItemRemoved(mHeaderCount + mStatusCount + entityViewCount + mExtrasCount + mFooterCount);
     }//移除FooterView
 
     public void addFooter(@LayoutRes int layoutResId) {
-        if (mFooterId != -1 || mFooterCount != 0) {
-            LogUtil.w("footerView not deleted, footerViewId = " + mFooterId + ", footerViewCount = " + mFooterCount);
+        if (mFooterViewId != -1 || mFooterCount != 0) {
+            LogUtil.w("footerView not deleted, footerViewId = " + mFooterViewId + ", footerViewCount = " + mFooterCount);
             return;
         }
-        mFooterId = layoutResId;
+        mFooterViewId = layoutResId;
         mFooterCount = 1;
         int entityViewCount = getEntityListSize();
         notifyItemInserted(mHeaderCount + mStatusCount + entityViewCount + mExtrasCount + mFooterCount);
@@ -508,43 +508,43 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
         return mEntityList.size();
     }//获取数据源集合大小
 
-    public void setOnHeaderClickListener(OnHeaderClickListener onHeaderClickListener) {
-        mOnHeaderClickListener = onHeaderClickListener;
+    public void setOnHeaderItemClickListener(OnHeaderItemClickListener onHeaderItemClickListener) {
+        mOnHeaderItemClickListener = onHeaderItemClickListener;
     }
 
-    public void setOnHeaderLongClickListener(OnHeaderLongClickListener onHeaderLongClickListener) {
-        mOnHeaderLongClickListener = onHeaderLongClickListener;
+    public void setOnHeaderItemLongClickListener(OnHeaderItemLongClickListener onHeaderItemLongClickListener) {
+        mOnHeaderItemLongClickListener = onHeaderItemLongClickListener;
     }
 
-    public void setOnStatusClickListener(OnStatusClickListener onStatusClickListener) {
-        mOnStatusClickListener = onStatusClickListener;
+    public void setOnStatusItemClickListener(OnStatusItemClickListener onStatusItemClickListener) {
+        mOnStatusItemClickListener = onStatusItemClickListener;
     }
 
-    public void setOnStatusLongClickListener(OnStatusLongClickListener onStatusLongClickListener) {
-        mOnStatusLongClickListener = onStatusLongClickListener;
+    public void setOnStatusItemLongClickListener(OnStatusItemLongClickListener onStatusItemLongClickListener) {
+        mOnStatusItemLongClickListener = onStatusItemLongClickListener;
     }
 
-    public void setOnEntityClickListener(OnEntityClickListener onEntityClickListener) {
-        mOnEntityClickListener = onEntityClickListener;
+    public void setOnEntityItemClickListener(OnEntityItemClickListener onEntityItemClickListener) {
+        mOnEntityItemClickListener = onEntityItemClickListener;
     }
 
-    public void setOnEntityLongClickListener(OnEntityLongClickListener onEntityLongClickListener) {
-        mOnEntityLongClickListener = onEntityLongClickListener;
+    public void setOnEntityItemLongClickListener(OnEntityItemLongClickListener onEntityItemLongClickListener) {
+        mOnEntityItemLongClickListener = onEntityItemLongClickListener;
     }
 
-    public void setOnExtrasClickListener(OnExtrasClickListener onExtrasClickListener) {
-        mOnExtrasClickListener = onExtrasClickListener;
+    public void setOnExtrasItemClickListener(OnExtrasItemClickListener onExtrasItemClickListener) {
+        mOnExtrasItemClickListener = onExtrasItemClickListener;
     }
 
-    public void setOnExtrasLongClickListener(OnExtrasLongClickListener onExtrasLongClickListener) {
-        mOnExtrasLongClickListener = onExtrasLongClickListener;
+    public void setOnExtrasItemLongClickListener(OnExtrasItemLongClickListener onExtrasItemLongClickListener) {
+        mOnExtrasItemLongClickListener = onExtrasItemLongClickListener;
     }
 
-    public void setOnFooterClickListener(OnFooterClickListener onFooterClickListener) {
-        mOnFooterClickListener = onFooterClickListener;
+    public void setOnFooterItemClickListener(OnFooterItemClickListener onFooterItemClickListener) {
+        mOnFooterItemClickListener = onFooterItemClickListener;
     }
 
-    public void setOnFooterLongClickListener(OnFooterLongClickListener onFooterLongClickListener) {
-        mOnFooterLongClickListener = onFooterLongClickListener;
+    public void setOnFooterItemLongClickListener(OnFooterItemLongClickListener onFooterItemLongClickListener) {
+        mOnFooterItemLongClickListener = onFooterItemLongClickListener;
     }
 }
