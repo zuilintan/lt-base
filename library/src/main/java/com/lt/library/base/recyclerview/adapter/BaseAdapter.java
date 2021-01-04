@@ -53,7 +53,6 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private static final int VIEW_TYPE_EXTRAS = 1004;
     private static final int VIEW_TYPE_FOOTER = 1005;
     private final List<DS> mEntityList;
-    private RecyclerView mRecyclerView;
     private OnHeaderClickListener mOnHeaderClickListener;
     private OnHeaderLongClickListener mOnHeaderLongClickListener;
     private OnStatusClickListener mOnStatusClickListener;
@@ -64,6 +63,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private OnExtrasLongClickListener mOnExtrasLongClickListener;
     private OnFooterClickListener mOnFooterClickListener;
     private OnFooterLongClickListener mOnFooterLongClickListener;
+    private RecyclerView mRecyclerView;
     private int mHeaderCount, mStatusCount, mExtrasCount, mFooterCount = 0;
     private int mHeaderId, mStatusId, mExtrasId, mFooterId = -1;
 
