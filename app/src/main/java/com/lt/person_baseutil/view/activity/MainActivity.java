@@ -8,7 +8,7 @@ import android.view.View;
 
 import com.kyleduo.switchbutton.SwitchButton;
 import com.lt.library.base.BaseActivity;
-import com.lt.library.base.recyclerview.listener.OnEntityClickListener;
+import com.lt.library.base.recyclerview.listener.OnEntityItemClickListener;
 import com.lt.library.util.CastUtil;
 import com.lt.library.util.LogUtil;
 import com.lt.person_baseutil.R;
@@ -20,7 +20,7 @@ import com.lt.person_baseutil.view.dialog.TestDialog;
 import java.util.Objects;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements
-        OnEntityClickListener {
+        OnEntityItemClickListener {
     private TestAdapter mTestAdapter;
 
     @Override
@@ -41,13 +41,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements
     @Override
     protected void initEvent() {
         super.initEvent();
-        mTestAdapter.setOnEntityClickListener(this);
+        mTestAdapter.setOnEntityItemClickListener(this);
     }
 
     @Override
     protected void freeEvent() {
         super.freeEvent();
-        mTestAdapter.setOnEntityClickListener(null);
+        mTestAdapter.setOnEntityItemClickListener(null);
     }
 
     @Override
