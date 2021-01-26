@@ -1,13 +1,10 @@
 package com.lt.library.util.json.gson;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
 
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.lt.library.util.json.gson.TypeFactory.$list;
 import static com.lt.library.util.json.gson.TypeFactory.$map;
@@ -24,21 +21,22 @@ import static com.lt.library.util.json.gson.TypeFactory.$map;
  */
 
 public class GsonUtil {
-    private volatile static GsonBuilder sGsonBuilder = null;
-    private volatile static TypeAdapter<Object> sTypeAdapter;
+    private Gson mGson;
 
     private GsonUtil() {
-        throw new UnsupportedOperationException("cannot be instantiated");
+        mGson = new Gson();
+    }
+
+    public static GsonUtil getInstance() {
+        return GsonUtilHolder.INSTANCE;
     }
 
     public static <T> String objectToJson(T obj) {
-        Gson gson = new Gson();
-        return gson.toJson(obj);
+        return getInstance().mGson.toJson(obj);
     }
 
     public static <T> T jsonToObject(String json, Class<T> cls) {
-        Gson gson = new Gson();
-        return gson.fromJson(json, cls);
+        return getInstance().mGson.fromJson(json, cls);
     }
 
     public static List<Object> jsonToList(String json) {
@@ -47,8 +45,7 @@ public class GsonUtil {
 
     public static <T> List<T> jsonToList(String json, Class<T> cls) {
         Type type = $list(cls);
-        Gson gson = getGson(type);
-        return gson.fromJson(json, type);
+        return getInstance().mGson.fromJson(json, type);
     }
 
     public static Map<String, Object> jsonToMap(String json) {
@@ -57,8 +54,7 @@ public class GsonUtil {
 
     public static <T> Map<String, T> jsonToMap(String json, Class<T> cls) {
         Type type = $map(cls);
-        Gson gson = getGson(type);
-        return gson.fromJson(json, type);
+        return getInstance().mGson.fromJson(json, type);
     }
 
     public static List<List<Object>> jsonToListList(String json) {
@@ -67,8 +63,7 @@ public class GsonUtil {
 
     public static <T> List<List<T>> jsonToListList(String json, Class<T> cls) {
         Type type = $list($list(cls));
-        Gson gson = getGson(type);
-        return gson.fromJson(json, type);
+        return getInstance().mGson.fromJson(json, type);
     }
 
     public static List<Map<String, Object>> jsonToListMap(String json) {
@@ -77,8 +72,7 @@ public class GsonUtil {
 
     public static <T> List<Map<String, T>> jsonToListMap(String json, Class<T> cls) {
         Type type = $list($map(String.class, cls));
-        Gson gson = getGson(type);
-        return gson.fromJson(json, type);
+        return getInstance().mGson.fromJson(json, type);
     }
 
     public static Map<String, List<Object>> jsonToMapList(String json) {
@@ -87,8 +81,7 @@ public class GsonUtil {
 
     public static <T> Map<String, List<T>> jsonToMapList(String json, Class<T> cls) {
         Type type = $map(String.class, $list(cls));
-        Gson gson = getGson(type);
-        return gson.fromJson(json, type);
+        return getInstance().mGson.fromJson(json, type);
     }
 
     public static Map<String, Map<String, Object>> jsonToMapMap(String json) {
@@ -97,29 +90,10 @@ public class GsonUtil {
 
     public static <T> Map<String, Map<String, T>> jsonToMapMap(String json, Class<T> cls) {
         Type type = $map(String.class, $map(String.class, cls));
-        Gson gson = getGson(type);
-        return gson.fromJson(json, type);
+        return getInstance().mGson.fromJson(json, type);
     }
 
-    private static Gson getGson(Type type) {
-        return getBuilder(type).create();
-    }
-
-    private static GsonBuilder getBuilder(Type type) {
-        if (Objects.isNull(sGsonBuilder)) {
-            synchronized (GsonUtil.class) {
-                if (Objects.isNull(sGsonBuilder)) {
-                    sGsonBuilder = new GsonBuilder();
-                }
-            }
-        }
-        if (Objects.isNull(sTypeAdapter)) {
-            synchronized (GsonUtil.class) {
-                if (Objects.isNull(sTypeAdapter)) {
-                    sTypeAdapter = new NumberTypeAdapter();
-                }
-            }
-        }
-        return sGsonBuilder.registerTypeAdapter(type, sTypeAdapter);
+    private static class GsonUtilHolder {
+        private static final GsonUtil INSTANCE = new GsonUtil();
     }
 }

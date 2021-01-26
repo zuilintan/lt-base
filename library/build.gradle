@@ -47,8 +47,11 @@ dependencies {
      */
     //compileOnly 'com.xxx.source:car:latest.release'
 
-    //Third Party Lib
+    /**
+     * Third Party Lib
+     */
     compileOnly 'com.squareup.okhttp3:okhttp:latest.release'
     compileOnly 'com.google.code.gson:gson:latest.release'
     compileOnly 'com.alibaba:fastjson:latest.release'
+    compileOnly 'com.tencent:mmkv:1.0.19'
 }

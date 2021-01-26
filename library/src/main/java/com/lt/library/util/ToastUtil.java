@@ -1,5 +1,7 @@
 package com.lt.library.util;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.support.annotation.IntDef;
 import android.support.annotation.StringRes;
 import android.view.Gravity;
@@ -25,30 +27,26 @@ public class ToastUtil {
     private static final AtomicBoolean sIsEnabled = new AtomicBoolean(true);//默认启用
     private static Toast sToast;
 
-    private ToastUtil() {
-        throw new UnsupportedOperationException("cannot be instantiated");
-    }
-
-    private static Toast genStdToast(Object object, @GravityDef int gravity, @DurationDef int duration) {
+    @SuppressLint("ShowToast")
+    private static Toast createStdToast(Object content, @DurationDef int duration, @GravityDef int gravity) {
         String text = null;
-        String typeName = object.getClass().getSimpleName();
-        switch (typeName) {
-            case "String":
-                text = (String) object;
-                break;
-            case "Integer":
-                text = ContextUtil.getInstance().getApplicationContext().getString((Integer) object);
-                break;
-            default:
-                break;
+        Context context = ContextUtil.getInstance().getApplicationContext();
+        if (content instanceof Integer) {
+            text = context.getString((Integer) content);
+        } else if (content instanceof String) {
+            text = (String) content;
         }
-        if (Objects.isNull(text)) {
-            text = "";
-        }
-        cancel();//如果当前Toast没有消失，则取消该Toast
-        sToast = Toast.makeText(ContextUtil.getInstance().getApplicationContext(), text, duration);
+        sToast = Toast.makeText(context, text, duration);
         sToast.setGravity(gravity, 0, 0);//仅初次创建时有效
         return sToast;
+    }
+
+    private static void cancel() {
+        if (Objects.isNull(sToast)) {
+            return;
+        }
+        sToast.cancel();
+        sToast = null;
     }
 
     public static boolean isEnable() {
@@ -60,46 +58,63 @@ public class ToastUtil {
     }
 
     public static void show(@StringRes int stringId) {
-        if (isEnable()) {
-            genStdToast(stringId, Gravity.CENTER, Toast.LENGTH_SHORT).show();
-        }
+        show(stringId, false);
     }
 
-    public static void show(String string) {
-        if (isEnable()) {
-            genStdToast(string, Gravity.CENTER, Toast.LENGTH_SHORT).show();
-        }
+    public static void show(@StringRes int stringId, boolean isImmediate) {
+        show(stringId, Toast.LENGTH_SHORT, isImmediate);
     }
 
-    public static void show(@StringRes int stringId, @GravityDef int gravity) {
-        if (isEnable()) {
-            genStdToast(stringId, gravity, Toast.LENGTH_SHORT).show();
-        }
+    public static void show(String text) {
+        show(text, false);
     }
 
-    public static void show(String string, @GravityDef int gravity) {
-        if (isEnable()) {
-            genStdToast(string, gravity, Toast.LENGTH_SHORT).show();
-        }
+    public static void show(String text, boolean isImmediate) {
+        show(text, Toast.LENGTH_SHORT, isImmediate);
     }
 
-    public static void show(@StringRes int stringId, @GravityDef int gravity, @DurationDef int duration) {
-        if (isEnable()) {
-            genStdToast(stringId, gravity, duration).show();
-        }
+    public static void show(@StringRes int stringId, @DurationDef int duration) {
+        show(stringId, duration, false);
     }
 
-    public static void show(String string, @GravityDef int gravity, @DurationDef int duration) {
-        if (isEnable()) {
-            genStdToast(string, gravity, duration).show();
-        }
+    public static void show(@StringRes int stringId, @DurationDef int duration, boolean isImmediate) {
+        show(stringId, duration, Gravity.CENTER, isImmediate);
     }
 
-    public static void cancel() {
-        if (isEnable() && Objects.nonNull(sToast)) {
-            sToast.cancel();
-            sToast = null;
+    public static void show(String text, @DurationDef int duration) {
+        show(text, duration, false);
+    }
+
+    public static void show(String text, @DurationDef int duration, boolean isImmediate) {
+        show(text, duration, Gravity.CENTER, isImmediate);
+    }
+
+    public static void show(@StringRes int stringId, @DurationDef int duration, @GravityDef int gravity) {
+        show(stringId, duration, gravity, false);
+    }
+
+    public static void show(@StringRes int stringId, @DurationDef int duration, @GravityDef int gravity, boolean isImmediate) {
+        if (!isEnable()) {
+            return;
         }
+        if (isImmediate) {
+            cancel();//如果当前Toast没有消失，则取消该Toast
+        }
+        createStdToast(stringId, duration, gravity).show();
+    }
+
+    public static void show(String text, @DurationDef int duration, @GravityDef int gravity) {
+        show(text, duration, gravity, false);
+    }
+
+    public static void show(String text, @DurationDef int duration, @GravityDef int gravity, boolean isImmediate) {
+        if (!isEnable()) {
+            return;
+        }
+        if (isImmediate) {
+            cancel();//如果当前Toast没有消失，则取消该Toast
+        }
+        createStdToast(text, duration, gravity).show();
     }
 
     @IntDef({Gravity.CENTER, Gravity.TOP, Gravity.BOTTOM})

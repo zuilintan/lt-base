@@ -21,16 +21,20 @@ public class LogUtil {
     private static final AtomicBoolean sIsEnabled = new AtomicBoolean(true);//默认启用
     private static final String PROCESS_NAME = Application.getProcessName();
     private static final String CLASS_NAME = LogUtil.class.getName();
+    private static final String UNK_FLAG = "<unk>";
+    private static final String NULL_FLAG = "<null>";
+    private static final String EMPTY_FLAG = "<empty>";
+    private static final String METHOD_FLAG = "<method>";
 
     private LogUtil() {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 
-    private static String genStdTag(String customTag) {
+    private static String createStdTag(String customTag) {
         String result;
-        String fileName = "<unknown>";
+        String fileName = UNK_FLAG;
         int lineNumber = -1;
-        String methodName = "<unknown>";
+        String methodName = UNK_FLAG;
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
         for (int i = 2; i < stackTraceElements.length; i++) {
             String className = stackTraceElements[i].getClassName();
@@ -54,7 +58,19 @@ public class LogUtil {
             result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, fileName, lineNumber, methodName, customTag);
         }
         return result;
-    }
+    }//注意: tag最大字节数为128字节
+
+    private static String createStdMsg(String msg) {
+        String result;
+        if (Objects.isNull(msg)) {
+            result = NULL_FLAG;
+        } else if (msg.isEmpty()) {
+            result = EMPTY_FLAG;
+        } else {
+            result = msg;
+        }
+        return result;
+    }//注意: msg最大字节数为4008byte
 
     public static boolean isEnable() {
         return sIsEnabled.get();
@@ -62,6 +78,10 @@ public class LogUtil {
 
     public static void setEnable(boolean isEnabled) {
         sIsEnabled.set(isEnabled);
+    }
+
+    public static void v() {
+        v(null, METHOD_FLAG, null);
     }
 
     public static void v(String msg) {
@@ -77,14 +97,19 @@ public class LogUtil {
     }
 
     public static void v(String tag, String msg, Throwable tr) {
-        if (isEnable()) {
-            tag = genStdTag(tag);
-            if (Objects.isNull(tr)) {
-                Log.v(tag, msg);
-            } else {
-                Log.v(tag, msg, tr);
-            }
+        if (!isEnable()) {
+            return;
         }
+        tag = createStdTag(tag);
+        if (Objects.isNull(tr)) {
+            Log.v(tag, createStdMsg(msg));
+        } else {
+            Log.v(tag, createStdMsg(msg), tr);
+        }
+    }
+
+    public static void d() {
+        d(null, METHOD_FLAG, null);
     }
 
     public static void d(String msg) {
@@ -100,14 +125,19 @@ public class LogUtil {
     }
 
     public static void d(String tag, String msg, Throwable tr) {
-        if (isEnable()) {
-            tag = genStdTag(tag);
-            if (Objects.isNull(tr)) {
-                Log.d(tag, msg);
-            } else {
-                Log.d(tag, msg, tr);
-            }
+        if (!isEnable()) {
+            return;
         }
+        tag = createStdTag(tag);
+        if (Objects.isNull(tr)) {
+            Log.d(tag, createStdMsg(msg));
+        } else {
+            Log.d(tag, createStdMsg(msg), tr);
+        }
+    }
+
+    public static void i() {
+        i(null, METHOD_FLAG, null);
     }
 
     public static void i(String msg) {
@@ -123,14 +153,19 @@ public class LogUtil {
     }
 
     public static void i(String tag, String msg, Throwable tr) {
-        if (isEnable()) {
-            tag = genStdTag(tag);
-            if (Objects.isNull(tr)) {
-                Log.i(tag, msg);
-            } else {
-                Log.i(tag, msg, tr);
-            }
+        if (!isEnable()) {
+            return;
         }
+        tag = createStdTag(tag);
+        if (Objects.isNull(tr)) {
+            Log.i(tag, createStdMsg(msg));
+        } else {
+            Log.i(tag, createStdMsg(msg), tr);
+        }
+    }
+
+    public static void w() {
+        w(null, METHOD_FLAG, null);
     }
 
     public static void w(String msg) {
@@ -146,14 +181,19 @@ public class LogUtil {
     }
 
     public static void w(String tag, String msg, Throwable tr) {
-        if (isEnable()) {
-            tag = genStdTag(tag);
-            if (Objects.isNull(tr)) {
-                Log.w(tag, msg);
-            } else {
-                Log.w(tag, msg, tr);
-            }
+        if (!isEnable()) {
+            return;
         }
+        tag = createStdTag(tag);
+        if (Objects.isNull(tr)) {
+            Log.w(tag, createStdMsg(msg));
+        } else {
+            Log.w(tag, createStdMsg(msg), tr);
+        }
+    }
+
+    public static void e() {
+        e(null, METHOD_FLAG, null);
     }
 
     public static void e(String msg) {
@@ -169,14 +209,19 @@ public class LogUtil {
     }
 
     public static void e(String tag, String msg, Throwable tr) {
-        if (isEnable()) {
-            tag = genStdTag(tag);
-            if (Objects.isNull(tr)) {
-                Log.e(tag, msg);
-            } else {
-                Log.e(tag, msg, tr);
-            }
+        if (!isEnable()) {
+            return;
         }
+        tag = createStdTag(tag);
+        if (Objects.isNull(tr)) {
+            Log.e(tag, createStdMsg(msg));
+        } else {
+            Log.e(tag, createStdMsg(msg), tr);
+        }
+    }
+
+    public static void wtf() {
+        wtf(null, METHOD_FLAG, null);
     }
 
     public static void wtf(String msg) {
@@ -192,13 +237,14 @@ public class LogUtil {
     }
 
     public static void wtf(String tag, String msg, Throwable tr) {
-        if (isEnable()) {
-            tag = genStdTag(tag);
-            if (Objects.isNull(tr)) {
-                Log.wtf(tag, msg);
-            } else {
-                Log.wtf(tag, msg, tr);
-            }
+        if (!isEnable()) {
+            return;
+        }
+        tag = createStdTag(tag);
+        if (Objects.isNull(tr)) {
+            Log.wtf(tag, createStdMsg(msg));
+        } else {
+            Log.wtf(tag, createStdMsg(msg), tr);
         }
     }
 }
