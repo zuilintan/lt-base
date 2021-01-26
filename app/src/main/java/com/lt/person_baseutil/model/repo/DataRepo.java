@@ -1,9 +1,5 @@
 package com.lt.person_baseutil.model.repo;
 
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProviderInfo;
-
-import com.lt.library.util.context.ContextUtil;
 import com.lt.person_baseutil.R;
 import com.lt.person_baseutil.model.entity.TestBean;
 
@@ -40,23 +36,6 @@ public class DataRepo {
                              .build());
         }
         return list;
-    }
-
-    public List<AppWidgetProviderInfo> getAddedAppWidgetList() {
-        List<AppWidgetProviderInfo> result = null;
-        return result;
-    }
-
-    public List<AppWidgetProviderInfo> getPreviewAppWidgetList() {
-        List<AppWidgetProviderInfo> result = null;
-        boolean isSaved = false;// TODO: 2021/1/7
-        if (isSaved) {
-            // TODO: 2021/1/7
-        } else {
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(ContextUtil.getInstance().getApplicationContext());
-            result = appWidgetManager.getInstalledProviders();
-        }
-        return result;
     }
 
     private static class DataRepoHolder {
