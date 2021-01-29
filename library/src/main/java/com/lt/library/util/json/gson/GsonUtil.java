@@ -53,7 +53,7 @@ public class GsonUtil {
     }
 
     public static <T> Map<String, T> jsonToMap(String json, Class<T> cls) {
-        Type type = $map(cls);
+        Type type = $map(String.class, cls);
         return getInstance().mGson.fromJson(json, type);
     }
 
