@@ -24,6 +24,8 @@ import com.lt.library.util.context.ContextUtil;
  */
 
 public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
+    protected static final String BDL_KEY_PARAM1 = "param1";
+    protected static final String BDL_KEY_PARAM2 = "param2";
     protected V mViewBinding;
     protected FragmentActivity mActivity;
 

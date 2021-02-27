@@ -34,10 +34,10 @@ public class FragmentUtil {
     }
 
     @Nullable
-    private static Fragment getFragment(String fragmentTag, FragmentManager fragmentManager) {
+    private static Fragment getFragment(String fragmentTag, String param1, String param2, FragmentManager fragmentManager) {
         Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
         if (Objects.isNull(fragment)) {
-            fragment = getInstance().mFragmentFactory.createProduct(fragmentTag);
+            fragment = getInstance().mFragmentFactory.createProduct(fragmentTag, param1, param2);
         }
         return fragment;
     }
@@ -85,40 +85,72 @@ public class FragmentUtil {
     /**
      * 切换Fragment
      *
-     * @param fragmentTag     准备显示的Fragment的tag
-     * @param hideHostIds     准备隐藏的Fragment所在容器Id(可能有多个)
-     * @param showHostId      准备显示的Fragment所在容器Id(仅支持一个)
+     * @param fragmentTag     将显的Fragment的tag
+     * @param hideHostIds     将隐的Fragment所在容器Id(可能有多个)
+     * @param showHostId      将显的Fragment所在容器Id(仅支持一个)
      * @param fragmentManager FragmentManager的实例
      */
     public static void switchFragment(String fragmentTag, int[] hideHostIds, Integer showHostId, FragmentManager fragmentManager) {
-        switchFragment(fragmentTag, hideHostIds, showHostId, null, fragmentManager);
+        switchFragment(fragmentTag, null, null, hideHostIds, showHostId, null, fragmentManager);
     }
 
     /**
      * 切换Fragment
      *
-     * @param fragmentTag     准备显示的Fragment的tag
-     * @param hideHostIds     准备隐藏的Fragment所在容器Id(可能有多个)
-     * @param showHostId      准备显示的Fragment所在容器Id(仅支持一个)
+     * @param fragmentTag     将显的Fragment的tag
+     * @param param1          将显的Fragment的param1
+     * @param param2          将显的Fragment的param2
+     * @param hideHostIds     将隐的Fragment所在容器Id(可能有多个)
+     * @param showHostId      将显的Fragment所在容器Id(仅支持一个)
+     * @param fragmentManager FragmentManager的实例
+     */
+    public static void switchFragment(String fragmentTag, String param1, String param2, int[] hideHostIds, Integer showHostId, FragmentManager fragmentManager) {
+        switchFragment(fragmentTag, param1, param2, hideHostIds, showHostId, null, fragmentManager);
+    }
+
+    /**
+     * 切换Fragment
+     *
+     * @param fragmentTag     将显的Fragment的tag
+     * @param hideHostIds     将隐的Fragment所在容器Id(可能有多个)
+     * @param showHostId      将显的Fragment所在容器Id(仅支持一个)
      * @param animations      Fragment hide and show 动画{@link FragmentTransaction#setCustomAnimations}
      * @param fragmentManager FragmentManager的实例
      */
     public static void switchFragment(String fragmentTag, int[] hideHostIds, Integer showHostId, int[] animations, FragmentManager fragmentManager) {
-        switchFragment(fragmentTag, hideHostIds, showHostId, animations, animations, fragmentManager);
+        switchFragment(fragmentTag, null, null, hideHostIds, showHostId, animations, animations, fragmentManager);
     }
 
     /**
      * 切换Fragment
      *
-     * @param fragmentTag     准备显示的Fragment的tag
-     * @param hideHostIds     准备隐藏的Fragment所在容器Id(可能有多个)
-     * @param showHostId      准备显示的Fragment所在容器Id(仅支持一个)
+     * @param fragmentTag     将显的Fragment的tag
+     * @param param1          将显的Fragment的param1
+     * @param param2          将显的Fragment的param2
+     * @param hideHostIds     将隐的Fragment所在容器Id(可能有多个)
+     * @param showHostId      将显的Fragment所在容器Id(仅支持一个)
+     * @param animations      Fragment hide and show 动画{@link FragmentTransaction#setCustomAnimations}
+     * @param fragmentManager FragmentManager的实例
+     */
+    public static void switchFragment(String fragmentTag, String param1, String param2, int[] hideHostIds, Integer showHostId, int[] animations, FragmentManager fragmentManager) {
+        switchFragment(fragmentTag, param1, param2, hideHostIds, showHostId, animations, animations, fragmentManager);
+    }
+
+    /**
+     * 切换Fragment
+     *
+     * @param fragmentTag     将显的Fragment的tag
+     * @param param1          将显的Fragment的param1
+     * @param param2          将显的Fragment的param2
+     * @param hideHostIds     将隐的Fragment所在容器Id(可能有多个)
+     * @param showHostId      将显的Fragment所在容器Id(仅支持一个)
      * @param hideAnimations  Fragment hide 动画{@link FragmentTransaction#setCustomAnimations}
      * @param showAnimations  Fragment show 动画{@link FragmentTransaction#setCustomAnimations}
      * @param fragmentManager FragmentManager的实例
      */
-    public static void switchFragment(String fragmentTag, int[] hideHostIds, Integer showHostId, int[] hideAnimations, int[] showAnimations, FragmentManager fragmentManager) {
-        Fragment fragment = getFragment(fragmentTag, fragmentManager);
+    public static void switchFragment(String fragmentTag, String param1, String param2, int[] hideHostIds, Integer showHostId, int[] hideAnimations, int[] showAnimations, FragmentManager fragmentManager) {
+        Fragment fragment = getFragment(fragmentTag, param1, param2, fragmentManager);
+        LogUtil.d("fragment = " + fragment);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         setFragmentAnimations(hideAnimations, fragmentTransaction);
         hideFragmentForParent(fragment, fragmentManager.getFragments(), IntStream.of(hideHostIds).boxed().collect(Collectors.toList()), fragmentTransaction);
