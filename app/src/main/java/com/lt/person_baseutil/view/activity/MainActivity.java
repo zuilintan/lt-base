@@ -1,6 +1,5 @@
 package com.lt.person_baseutil.view.activity;
 
-import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -66,9 +65,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements
         }
         if ((position & 1) == 1) {
         } else {
-        }
-        if (position == 0) {
-            startActivity(new Intent(this, LauncherActivity.class));
         }
     }
 }

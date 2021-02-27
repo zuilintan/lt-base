@@ -85,8 +85,6 @@ public class TestAdapter extends BaseAdapter<TestBean> {
                 switchButton.setChecked(Boolean.parseBoolean(dataSource.getItemValue()));
                 if ((position & 1) == 1) {
                     switchButton.setTag("sBtn_tag");
-                } else {
-                    switchButton.setTag(null);
                 }
                 switchButton.setOnCheckedChangeListener(mOnCheckedChangeListener);
                 break;
@@ -96,8 +94,6 @@ public class TestAdapter extends BaseAdapter<TestBean> {
                 seekBar.setProgress(Integer.parseInt(dataSource.getItemValue()));
                 if ((position & 1) == 1) {
                     seekBar.setTag("sb_tag");
-                } else {
-                    seekBar.setTag(null);
                 }
                 seekBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
                 break;
@@ -111,10 +107,12 @@ public class TestAdapter extends BaseAdapter<TestBean> {
             case TestBean.ITEM_TYPE_SWITCH:
                 SwitchButton switchButton = viewHolder.findViewById(R.id.sBtn_item_switch);
                 switchButton.setOnCheckedChangeListener(null);
+                switchButton.setTag(null);
                 break;
             case TestBean.ITEM_TYPE_SLIDE:
                 SeekBar seekBar = viewHolder.findViewById(R.id.sb_item_slide);
                 seekBar.setOnSeekBarChangeListener(null);
+                seekBar.setTag(null);
                 break;
             default:
                 break;
