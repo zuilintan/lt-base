@@ -51,6 +51,7 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
     protected OnPositiveButtonClickListener mOnPositiveButtonClickListener;
     protected OnNegativeButtonClickListener mOnNegativeButtonClickListener;
     protected OnNeutralButtonClickListener mOnNeutralButtonClickListener;
+    private Integer mWindowType;
     private Integer mLayoutWidth;
     private Integer mLayoutHeight;
     private Integer mOffsetX;
@@ -194,6 +195,9 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
 
     private void initParam(@NonNull Window dW) {
         dW.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        if (Objects.nonNull(mWindowType)) {
+            dW.setType(mWindowType);
+        }
         if (Objects.nonNull(mLayoutWidth) && Objects.nonNull(mLayoutHeight)) {
             dW.setLayout(DensityUtil.dp2px(mLayoutWidth),
                          DensityUtil.dp2px(mLayoutHeight));
@@ -287,6 +291,11 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
 
     protected void freeView() {
     }//释放视图
+
+    public BaseDialogFragment<V> setWindowType(Integer windowType) {
+        mWindowType = windowType;
+        return this;
+    }//设置窗口类型(eg: WindowManager.LayoutParams.TYPE_SYSTEM_ERROR)
 
     public BaseDialogFragment<V> setLayout(@Dimension(unit = Dimension.DP) int width, int height) {
         mLayoutWidth = width;
