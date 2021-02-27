@@ -29,67 +29,20 @@ public class FragmentUtil {
     private FragmentUtil() {
     }
 
-    public static FragmentUtil getInstance() {
+    private static FragmentUtil getInstance() {
         return FragmentUtilHolder.INSTANCE;
     }
 
-    /**
-     * 切换Fragment
-     *
-     * @param fragmentTag     准备显示的Fragment的tag
-     * @param hideHostIds     准备隐藏的Fragment所在容器Id(可能有多个)
-     * @param showHostId      准备显示的Fragment所在容器Id(仅支持一个)
-     * @param fragmentManager FragmentManager的实例
-     */
-    public void switchFragment(String fragmentTag, int[] hideHostIds, Integer showHostId, FragmentManager fragmentManager) {
-        switchFragment(fragmentTag, hideHostIds, showHostId, null, fragmentManager);
-    }
-
-    /**
-     * 切换Fragment
-     *
-     * @param fragmentTag     准备显示的Fragment的tag
-     * @param hideHostIds     准备隐藏的Fragment所在容器Id(可能有多个)
-     * @param showHostId      准备显示的Fragment所在容器Id(仅支持一个)
-     * @param animations      Fragment hide and show 动画{@link FragmentTransaction#setCustomAnimations}
-     * @param fragmentManager FragmentManager的实例
-     */
-    public void switchFragment(String fragmentTag, int[] hideHostIds, Integer showHostId, int[] animations, FragmentManager fragmentManager) {
-        switchFragment(fragmentTag, hideHostIds, showHostId, animations, animations, fragmentManager);
-    }
-
-    /**
-     * 切换Fragment
-     *
-     * @param fragmentTag     准备显示的Fragment的tag
-     * @param hideHostIds     准备隐藏的Fragment所在容器Id(可能有多个)
-     * @param showHostId      准备显示的Fragment所在容器Id(仅支持一个)
-     * @param hideAnimations  Fragment hide 动画{@link FragmentTransaction#setCustomAnimations}
-     * @param showAnimations  Fragment show 动画{@link FragmentTransaction#setCustomAnimations}
-     * @param fragmentManager FragmentManager的实例
-     */
-    public void switchFragment(String fragmentTag, int[] hideHostIds, Integer showHostId, int[] hideAnimations, int[] showAnimations, FragmentManager fragmentManager) {
-        Fragment fragment = getFragment(fragmentTag, fragmentManager);
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        setFragmentAnimations(hideAnimations, fragmentTransaction);
-        hideFragmentForParent(fragment, fragmentManager.getFragments(), IntStream.of(hideHostIds).boxed().collect(Collectors.toList()), fragmentTransaction);
-        if (Objects.nonNull(fragment)) {
-            setFragmentAnimations(showAnimations, fragmentTransaction);
-            showFragmentForTarget(fragment, fragmentTag, showHostId, fragmentTransaction);
-        }
-        fragmentTransaction.commit();
-    }
-
     @Nullable
-    private Fragment getFragment(String fragmentTag, FragmentManager fragmentManager) {
+    private static Fragment getFragment(String fragmentTag, FragmentManager fragmentManager) {
         Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
         if (Objects.isNull(fragment)) {
-            fragment = mFragmentFactory.createProduct(fragmentTag);
+            fragment = getInstance().mFragmentFactory.createProduct(fragmentTag);
         }
         return fragment;
     }
 
-    private void setFragmentAnimations(@NonNull int[] animations, FragmentTransaction fragmentTransaction) {
+    private static void setFragmentAnimations(@NonNull int[] animations, FragmentTransaction fragmentTransaction) {
         if (Objects.isNull(animations)) {
             return;
         }
@@ -102,7 +55,7 @@ public class FragmentUtil {
         }
     }
 
-    private void hideFragmentForParent(@Nullable Fragment fragment, List<Fragment> addedFragmentList, List<Integer> hideParentIdList, FragmentTransaction fragmentTransaction) {
+    private static void hideFragmentForParent(@Nullable Fragment fragment, List<Fragment> addedFragmentList, List<Integer> hideParentIdList, FragmentTransaction fragmentTransaction) {
         for (Fragment addedFragment : addedFragmentList) {
             if (Objects.equals(addedFragment, fragment)) {
                 continue;
@@ -118,7 +71,7 @@ public class FragmentUtil {
         }
     }
 
-    private void showFragmentForTarget(@NonNull Fragment fragment, String fragmentTag, Integer showParentId, FragmentTransaction fragmentTransaction) {
+    private static void showFragmentForTarget(@NonNull Fragment fragment, String fragmentTag, Integer showParentId, FragmentTransaction fragmentTransaction) {
         if (!fragment.isAdded()) {
             fragmentTransaction.add(showParentId, fragment, fragmentTag);
             LogUtil.d(fragment + " will add");
@@ -129,8 +82,55 @@ public class FragmentUtil {
         }//若已Add, 未Show, 则Show
     }
 
-    public void setFragmentFactory(IFragmentFactory fragmentFactory) {
-        mFragmentFactory = fragmentFactory;
+    /**
+     * 切换Fragment
+     *
+     * @param fragmentTag     准备显示的Fragment的tag
+     * @param hideHostIds     准备隐藏的Fragment所在容器Id(可能有多个)
+     * @param showHostId      准备显示的Fragment所在容器Id(仅支持一个)
+     * @param fragmentManager FragmentManager的实例
+     */
+    public static void switchFragment(String fragmentTag, int[] hideHostIds, Integer showHostId, FragmentManager fragmentManager) {
+        switchFragment(fragmentTag, hideHostIds, showHostId, null, fragmentManager);
+    }
+
+    /**
+     * 切换Fragment
+     *
+     * @param fragmentTag     准备显示的Fragment的tag
+     * @param hideHostIds     准备隐藏的Fragment所在容器Id(可能有多个)
+     * @param showHostId      准备显示的Fragment所在容器Id(仅支持一个)
+     * @param animations      Fragment hide and show 动画{@link FragmentTransaction#setCustomAnimations}
+     * @param fragmentManager FragmentManager的实例
+     */
+    public static void switchFragment(String fragmentTag, int[] hideHostIds, Integer showHostId, int[] animations, FragmentManager fragmentManager) {
+        switchFragment(fragmentTag, hideHostIds, showHostId, animations, animations, fragmentManager);
+    }
+
+    /**
+     * 切换Fragment
+     *
+     * @param fragmentTag     准备显示的Fragment的tag
+     * @param hideHostIds     准备隐藏的Fragment所在容器Id(可能有多个)
+     * @param showHostId      准备显示的Fragment所在容器Id(仅支持一个)
+     * @param hideAnimations  Fragment hide 动画{@link FragmentTransaction#setCustomAnimations}
+     * @param showAnimations  Fragment show 动画{@link FragmentTransaction#setCustomAnimations}
+     * @param fragmentManager FragmentManager的实例
+     */
+    public static void switchFragment(String fragmentTag, int[] hideHostIds, Integer showHostId, int[] hideAnimations, int[] showAnimations, FragmentManager fragmentManager) {
+        Fragment fragment = getFragment(fragmentTag, fragmentManager);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        setFragmentAnimations(hideAnimations, fragmentTransaction);
+        hideFragmentForParent(fragment, fragmentManager.getFragments(), IntStream.of(hideHostIds).boxed().collect(Collectors.toList()), fragmentTransaction);
+        if (Objects.nonNull(fragment)) {
+            setFragmentAnimations(showAnimations, fragmentTransaction);
+            showFragmentForTarget(fragment, fragmentTag, showHostId, fragmentTransaction);
+        }
+        fragmentTransaction.commit();
+    }
+
+    public static void setFragmentFactory(IFragmentFactory fragmentFactory) {
+        getInstance().mFragmentFactory = fragmentFactory;
     }
 
     private static class FragmentUtilHolder {

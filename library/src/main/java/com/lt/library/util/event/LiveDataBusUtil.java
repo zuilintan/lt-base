@@ -22,70 +22,70 @@ public class LiveDataBusUtil {
         mLiveDataMap = new ConcurrentHashMap<>();
     }
 
-    public static LiveDataBusUtil getInstance() {
+    private static LiveDataBusUtil getInstance() {
         return LiveDataBusHolder.INSTANCE;
     }
 
-    public LiveData<Object> with(int tag) {
+    public static LiveData<Object> with(int tag) {
         return with(String.valueOf(tag));
     }
 
-    public LiveData<Object> with(String tag) {
+    public static LiveData<Object> with(String tag) {
         MutableLiveData<Object> mutableLiveData = new MutableLiveData<>();
-        mLiveDataMap.put(tag, mutableLiveData);
+        getInstance().mLiveDataMap.put(tag, mutableLiveData);
         return mutableLiveData;
     }
 
-    public LiveDataSticky withStick(int tag) {
+    public static LiveDataSticky withStick(int tag) {
         return withStick(String.valueOf(tag));
     }
 
-    public LiveDataSticky withStick(String tag) {
-        return new LiveDataSticky(tag, mLiveDataMap);
+    public static LiveDataSticky withStick(String tag) {
+        return new LiveDataSticky(tag, getInstance().mLiveDataMap);
     }
 
-    public <T> void send(int tag, T t) {
+    public static <T> void send(int tag, T t) {
         send(String.valueOf(tag), t);
     }
 
-    public <T> void send(String tag, T t) {
-        if (!mLiveDataMap.containsKey(tag) || Objects.isNull(mLiveDataMap.get(tag))) {
+    public static <T> void send(String tag, T t) {
+        if (!getInstance().mLiveDataMap.containsKey(tag) || Objects.isNull(getInstance().mLiveDataMap.get(tag))) {
             return;
         }
-        Objects.requireNonNull(mLiveDataMap.get(tag)).setValue(t);
+        Objects.requireNonNull(getInstance().mLiveDataMap.get(tag)).setValue(t);
     }
 
-    public <T> void sendPost(int tag, T t) {
+    public static <T> void sendPost(int tag, T t) {
         sendPost(String.valueOf(tag), t);
     }
 
-    public <T> void sendPost(String tag, T t) {
-        if (!mLiveDataMap.containsKey(tag) || Objects.isNull(mLiveDataMap.get(tag))) {
+    public static <T> void sendPost(String tag, T t) {
+        if (!getInstance().mLiveDataMap.containsKey(tag) || Objects.isNull(getInstance().mLiveDataMap.get(tag))) {
             return;
         }
-        Objects.requireNonNull(mLiveDataMap.get(tag)).postValue(t);
+        Objects.requireNonNull(getInstance().mLiveDataMap.get(tag)).postValue(t);
     }
 
-    public <T> void sendStick(int tag, T t) {
+    public static <T> void sendStick(int tag, T t) {
         sendStick(String.valueOf(tag), t);
     }
 
-    public <T> void sendStick(String tag, T t) {
-        if (!mLiveDataMap.containsKey(tag) || Objects.isNull(mLiveDataMap.get(tag))) {
-            mLiveDataMap.put(tag, new MutableLiveData<>());
+    public static <T> void sendStick(String tag, T t) {
+        if (!getInstance().mLiveDataMap.containsKey(tag) || Objects.isNull(getInstance().mLiveDataMap.get(tag))) {
+            getInstance().mLiveDataMap.put(tag, new MutableLiveData<>());
         }
-        Objects.requireNonNull(mLiveDataMap.get(tag)).setValue(t);
+        Objects.requireNonNull(getInstance().mLiveDataMap.get(tag)).setValue(t);
     }
 
-    public <T> void sendStickPost(int tag, T t) {
+    public static <T> void sendStickPost(int tag, T t) {
         sendStickPost(String.valueOf(tag), t);
     }
 
-    public <T> void sendStickPost(String tag, T t) {
-        if (!mLiveDataMap.containsKey(tag) || Objects.isNull(mLiveDataMap.get(tag))) {
-            mLiveDataMap.put(tag, new MutableLiveData<>());
+    public static <T> void sendStickPost(String tag, T t) {
+        if (!getInstance().mLiveDataMap.containsKey(tag) || Objects.isNull(getInstance().mLiveDataMap.get(tag))) {
+            getInstance().mLiveDataMap.put(tag, new MutableLiveData<>());
         }
-        Objects.requireNonNull(mLiveDataMap.get(tag)).postValue(t);
+        Objects.requireNonNull(getInstance().mLiveDataMap.get(tag)).postValue(t);
     }
 
     private static class LiveDataBusHolder {
