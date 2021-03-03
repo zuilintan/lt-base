@@ -95,6 +95,9 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
         if (Objects.nonNull(mIsOutCancel)) {
             getDialog().setCanceledOnTouchOutside(mIsOutCancel);
         }
+        if (Objects.nonNull(mWindowType)) {
+            getDialog().getWindow().setType(mWindowType);
+        }
         initView();
         initData();
         initEvent();
@@ -195,9 +198,6 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
 
     private void initParam(@NonNull Window dW) {
         dW.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        if (Objects.nonNull(mWindowType)) {
-            dW.setType(mWindowType);
-        }
         if (Objects.nonNull(mLayoutWidth) && Objects.nonNull(mLayoutHeight)) {
             dW.setLayout(DensityUtil.dp2px(mLayoutWidth),
                          DensityUtil.dp2px(mLayoutHeight));
