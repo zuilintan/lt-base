@@ -33,7 +33,7 @@ public class LogUtil {
     private static String createStdTag(String customTag) {
         String result;
         String fileName = UNK_FLAG;
-        int lineNumber = -1;
+        int lineNumber = 0;
         String methodName = UNK_FLAG;
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
         for (int i = 2; i < stackTraceElements.length; i++) {
@@ -58,7 +58,7 @@ public class LogUtil {
             result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, fileName, lineNumber, methodName, customTag);
         }
         return result;
-    }//注意: tag最大字节数为128字节
+    }//注意: tag及时间, 进程, 线程号, 日志等级的字数阈值约为128byte, 超出部分不显示(但还是会占用该条Log的可显示字数, 即覆盖msg)
 
     private static String createStdMsg(String msg) {
         String result;
@@ -70,7 +70,7 @@ public class LogUtil {
             result = msg;
         }
         return result;
-    }//注意: msg最大字节数为4008byte
+    }//注意: Android未限制msg字数阈值, 但限制了一条Log的字数阈值约为4096byte
 
     public static boolean isEnable() {
         return sIsEnabled.get();

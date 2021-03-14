@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.lt.library.util.LogUtil;
@@ -61,9 +62,14 @@ public class FragmentUtil {
                 continue;
             }
             if (addedFragment.isHidden()) {
+                LogUtil.d(addedFragment + " may be hidden");
+            }
+            View fragmentView = addedFragment.getView();
+            if (Objects.isNull(fragmentView)) {
+                LogUtil.w("fragmentView = " + null);
                 continue;
             }
-            ViewGroup viewGroup = (ViewGroup) addedFragment.getView().getParent();
+            ViewGroup viewGroup = (ViewGroup) fragmentView.getParent();
             if (hideParentIdList.contains(viewGroup.getId())) {
                 fragmentTransaction.hide(addedFragment);
                 LogUtil.d(addedFragment + " will hide");
