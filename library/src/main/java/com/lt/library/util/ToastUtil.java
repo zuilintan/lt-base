@@ -101,6 +101,7 @@ public class ToastUtil {
             cancel();//如果当前Toast没有消失，则取消该Toast
         }
         createStdToast(stringId, duration, gravity).show();
+        sToast = null;
     }
 
     public static void show(String text, @DurationDef int duration, @GravityDef int gravity) {
@@ -115,6 +116,7 @@ public class ToastUtil {
             cancel();//如果当前Toast没有消失，则取消该Toast
         }
         createStdToast(text, duration, gravity).show();
+        sToast = null;
     }
 
     @IntDef({Gravity.CENTER, Gravity.TOP, Gravity.BOTTOM})

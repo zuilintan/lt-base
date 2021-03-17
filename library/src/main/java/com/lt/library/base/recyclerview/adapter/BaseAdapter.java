@@ -281,7 +281,9 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
             result = false;
         }//表示通知数据源更新后(eg: notifyDataSetChanged()), RecyclerView尚未计算完成的布局, 此时position是未知的
         else {
+            LogUtil.d("programmatic click execute start");
             viewHolder.itemView.callOnClick();
+            LogUtil.d("programmatic click execute end");
             result = true;
         }//布局计算完成
         return result;
@@ -483,9 +485,11 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
         int rawEntityPosition = getRawEntityPosition(position);
         if (isEntity(rawEntityPosition)) {
             if (!clickEntity(rawEntityPosition)) {
+                LogUtil.d("programmatic click no ready, the layout has not been calculated yet");
                 mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
+                        LogUtil.d("programmatic click is ready");
                         mRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);//移除监听, 避免反复回调重复执行clickEntity()
                         clickEntity(rawEntityPosition);
                     }//当布局可视时回调
