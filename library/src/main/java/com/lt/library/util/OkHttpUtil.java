@@ -31,19 +31,19 @@ import okhttp3.ResponseBody;
  */
 
 public class OkHttpUtil {
-    private static OkHttpClient sOkHttpClient;
+    private final OkHttpClient mOkHttpClient;
     private final Handler mHandler;
 
     private OkHttpUtil() {
-        sOkHttpClient = new OkHttpClient();//创建OkHttpClient对象
-        sOkHttpClient.newBuilder()
+        mOkHttpClient = new OkHttpClient();//创建OkHttpClient对象
+        mOkHttpClient.newBuilder()
                      .connectTimeout(10, TimeUnit.SECONDS)
                      .writeTimeout(10, TimeUnit.SECONDS)
                      .readTimeout(10, TimeUnit.SECONDS);
         mHandler = new Handler(Looper.getMainLooper());//切换主线程执行handleMessage()
     }
 
-    public static OkHttpUtil getInstance() {
+    private static OkHttpUtil getInstance() {
         return OkHttpUtilHolder.INSTANCE;
     }
 
@@ -65,6 +65,18 @@ public class OkHttpUtil {
         return endUrl.toString();
     }
 
+    public static void getFormRequest(String url, Map<String, String> params, DataCallBack callBack) {
+        getInstance().getFormAsync(url, params, callBack);
+    }//get异步请求(Form)，对外提供
+
+    public static void postFormRequest(String url, Map<String, String> params, DataCallBack callBack) {
+        getInstance().postFormAsync(url, params, callBack);
+    }//post异步请求(Form)，对外提供
+
+    public static void postJsonRequest(String url, String params, DataCallBack callBack) {
+        getInstance().postJsonAsync(url, params, callBack);
+    }//post异步请求(Json)，对外提供
+
     private void getFormAsync(String url, Map<String, String> params, final DataCallBack callBack) {
         if (params == null) {
             params = new HashMap<>();
@@ -73,7 +85,7 @@ public class OkHttpUtil {
         final Request request = new Request.Builder().get()
                                                      .url(doUrl)
                                                      .build();//创建请求
-        Call call = sOkHttpClient.newCall(request);//执行请求
+        Call call = mOkHttpClient.newCall(request);//执行请求
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -115,7 +127,7 @@ public class OkHttpUtil {
         final Request request = new Request.Builder().post(requestBody)
                                                      .url(url)
                                                      .build();//创建请求
-        Call call = sOkHttpClient.newCall(request);//执行请求
+        Call call = mOkHttpClient.newCall(request);//执行请求
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -140,12 +152,11 @@ public class OkHttpUtil {
     }
 
     private void postJsonAsync(String url, String params, final DataCallBack callBack) {
-        RequestBody requestBody = RequestBody.create(
-                MediaType.parse("application/json; charset=utf-8"), params);//创建请求体
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), params);//创建请求体
         final Request request = new Request.Builder().url(url)
                                                      .post(requestBody)
                                                      .build();//创建请求
-        Call call = sOkHttpClient.newCall(request);//执行请求
+        Call call = mOkHttpClient.newCall(request);//执行请求
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -194,21 +205,6 @@ public class OkHttpUtil {
             }
         });//异步处理
     }
-
-    public static void getFormRequest(String url, Map<String, String> params,
-                                      DataCallBack callBack) {
-        getInstance().getFormAsync(url, params, callBack);
-    }//get异步请求(Form)，对外提供
-
-    public static void postFormRequest(String url, Map<String, String> params,
-                                       DataCallBack callBack) {
-        getInstance().postFormAsync(url, params, callBack);
-    }//post异步请求(Form)，对外提供
-
-    public static void postJsonRequest(String url, String params,
-                                       DataCallBack callBack) {
-        getInstance().postJsonAsync(url, params, callBack);
-    }//post异步请求(Json)，对外提供
 
     public interface DataCallBack {
         void onRequestSuccess(String result) throws Exception;
