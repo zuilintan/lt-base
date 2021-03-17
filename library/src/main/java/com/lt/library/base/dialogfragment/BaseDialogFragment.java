@@ -30,7 +30,6 @@ import com.lt.library.base.dialogfragment.listenter.OnPositiveButtonClickListene
 import com.lt.library.util.DensityUtil;
 import com.lt.library.util.LogUtil;
 import com.lt.library.util.ScreenUtil;
-import com.lt.library.util.ToastUtil;
 import com.lt.library.util.context.ContextUtil;
 
 import java.util.Objects;
@@ -207,7 +206,6 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
             boolean b = screenHeight > screenWidth;
             dW.setLayout((int) (b ? screenWidth * 0.75 : screenWidth * 0.50),
                          (int) (b ? screenHeight * 0.25 : screenHeight * 0.50));
-            ToastUtil.show("b = " + b + ", screenWidth = " + screenWidth + ", screenHeight = " + screenHeight);
         }
         if (Objects.nonNull(mOffsetX)) {
             final WindowManager.LayoutParams attrs = dW.getAttributes();
