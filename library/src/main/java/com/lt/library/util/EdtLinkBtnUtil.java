@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @作者: LinTan
@@ -20,6 +21,7 @@ public class EdtLinkBtnUtil implements TextWatcher {
     private static final int ENABLE_MAX_LENGTH_INFINITE = -1;
     private final ArrayMap<EditText, int[]> mEditTextMap;
     private Button mButton;
+    private Float mButtonDisableAlpha;
 
     private EdtLinkBtnUtil() {
         mEditTextMap = new ArrayMap<>();
@@ -35,7 +37,17 @@ public class EdtLinkBtnUtil implements TextWatcher {
 
     @Override
     public void afterTextChanged(Editable s) {
-        mButton.setEnabled(checkLength());
+        changeBtnState();
+    }
+
+    private void changeBtnState() {
+        if (checkLength()) {
+            mButton.setAlpha(1);
+            mButton.setEnabled(true);
+        } else {
+            mButton.setAlpha(Objects.requireNonNull(mButtonDisableAlpha, "setButton() is not called"));
+            mButton.setEnabled(false);
+        }
     }
 
     private boolean checkLength() {
@@ -97,12 +109,23 @@ public class EdtLinkBtnUtil implements TextWatcher {
         }
 
         public Builder setButton(Button button) {
+            return setButton(button, 1);
+        }
+
+        public Builder setButton(Button button, float btnDisableAlpha) {
             mEdtLinkBtnUtil.mButton = button;
+            mEdtLinkBtnUtil.mButtonDisableAlpha = btnDisableAlpha;
             return this;
         }
 
         public EdtLinkBtnUtil build() {
-            mEdtLinkBtnUtil.mButton.setEnabled(mEdtLinkBtnUtil.checkLength());
+            if (mEdtLinkBtnUtil.mEditTextMap.isEmpty()) {
+                throw new NullPointerException("addEditText() is not called");
+            }
+            if (Objects.isNull(mEdtLinkBtnUtil.mButton)) {
+                throw new NullPointerException("setButton() is not called");
+            }
+            mEdtLinkBtnUtil.changeBtnState();
             return mEdtLinkBtnUtil;
         }
     }
