@@ -41,19 +41,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements
     }
 
     @Override
-    protected void freeEvent() {
-        super.freeEvent();
-        mTestAdapter.setOnEntityItemClickListener(null);
-    }
-
-    @Override
-    protected void freeView() {
-        super.freeView();
-        mViewBinding.rcvMainTest.setAdapter(null);
-        mTestAdapter = null;
-    }
-
-    @Override
     public void onEntityClick(View view, int position) {
         mTestAdapter.notifyDataPositionSelected(position);
         if (view instanceof ConstraintLayout) {
@@ -65,6 +52,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements
         }
         if ((position & 1) == 1) {
         } else {
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isTaskRoot()) {
+            finishAfterTransition();
+        } else {
+            super.onBackPressed();
         }
     }
 }

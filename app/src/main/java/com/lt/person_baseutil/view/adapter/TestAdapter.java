@@ -10,7 +10,6 @@ import com.kyleduo.switchbutton.SwitchButton;
 import com.lt.library.base.recyclerview.adapter.BaseAdapter;
 import com.lt.library.base.recyclerview.holder.BaseViewHolder;
 import com.lt.library.base.recyclerview.holder.sub.EntityViewHolder;
-import com.lt.library.util.LogUtil;
 import com.lt.library.util.ToastUtil;
 import com.lt.person_baseutil.R;
 import com.lt.person_baseutil.model.entity.TestBean;
@@ -122,7 +121,6 @@ public class TestAdapter extends BaseAdapter<TestBean> {
     @Override
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
-        LogUtil.w("GG");
         mOnCheckedChangeListener = null;
         mOnSeekBarChangeListener = null;
     }
