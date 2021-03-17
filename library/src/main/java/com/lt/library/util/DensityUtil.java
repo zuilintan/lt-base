@@ -14,6 +14,7 @@ import com.lt.library.util.context.ContextUtil;
  */
 
 public class DensityUtil {
+
     private DensityUtil() {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
