@@ -16,7 +16,6 @@ import com.lt.library.util.context.ContextUtil;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionUtil {
@@ -130,19 +129,19 @@ public class ConnectionUtil {
     }
 
     private void callOnNetworkConnectionListener(@NetworkDef int networkConnectionStatus) {
-        if (Objects.nonNull(mOnNetworkConnectionListener)) {
+        if (mOnNetworkConnectionListener != null) {
             mOnNetworkConnectionListener.onNetworkConnectionStatus(networkConnectionStatus);
         }
     }
 
     private void callOnCellularConnectionListener(@NetworkDef int cellularConnectionStatus) {
-        if (Objects.nonNull(mOnCellularNetworkConnectionListener)) {
+        if (mOnCellularNetworkConnectionListener != null) {
             mOnCellularNetworkConnectionListener.onCellularConnectionStatus(cellularConnectionStatus);
         }
     }
 
     private void callOnWifiConnectionListener(@NetworkDef int wifiConnectionStatus) {
-        if (Objects.nonNull(mOnWifiNetworkConnectionListener)) {
+        if (mOnWifiNetworkConnectionListener != null) {
             mOnWifiNetworkConnectionListener.onWifiConnectionStatus(wifiConnectionStatus);
         }
     }

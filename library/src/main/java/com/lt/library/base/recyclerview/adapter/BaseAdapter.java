@@ -33,7 +33,6 @@ import com.lt.library.util.context.ContextUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @作者: LinTan
@@ -73,7 +72,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
 
     public BaseAdapter(List<DS> entityList) {
         mEntityList = new ArrayList<>();
-        if (Objects.nonNull(entityList)) {
+        if (entityList != null) {
             mEntityList.addAll(entityList);
         }
     }

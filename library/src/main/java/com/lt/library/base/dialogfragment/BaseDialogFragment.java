@@ -32,8 +32,6 @@ import com.lt.library.util.LogUtil;
 import com.lt.library.util.ScreenUtil;
 import com.lt.library.util.context.ContextUtil;
 
-import java.util.Objects;
-
 /**
  * @作者: LinTan
  * @日期: 2019/5/15 10:23
@@ -91,10 +89,10 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
         super.onViewCreated(view, savedInstanceState);
         bindData(getArguments(), savedInstanceState);
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        if (Objects.nonNull(mIsOutCancel)) {
+        if (mIsOutCancel != null) {
             getDialog().setCanceledOnTouchOutside(mIsOutCancel);
         }
-        if (Objects.nonNull(mWindowType)) {
+        if (mWindowType != null) {
             getDialog().getWindow().setType(mWindowType);
         }
         initView();
@@ -111,7 +109,7 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
     public void onStart() {
         Window aW = mActivity.getWindow();
         Window dW = getDialog().getWindow();
-        if (Objects.nonNull(aW) && Objects.nonNull(dW)) {
+        if (aW != null && dW != null) {
             if (mIsKeepSystemUiState) {
                 keepSystemUiState(aW, dW);
             } else {
@@ -197,7 +195,7 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
 
     private void initParam(@NonNull Window dW) {
         dW.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        if (Objects.nonNull(mLayoutWidth) && Objects.nonNull(mLayoutHeight)) {
+        if (mLayoutWidth != null && mLayoutHeight != null) {
             dW.setLayout(DensityUtil.dp2px(mLayoutWidth),
                          DensityUtil.dp2px(mLayoutHeight));
         } else {
@@ -207,23 +205,23 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
             dW.setLayout((int) (b ? screenWidth * 0.75 : screenWidth * 0.50),
                          (int) (b ? screenHeight * 0.25 : screenHeight * 0.50));
         }
-        if (Objects.nonNull(mOffsetX)) {
+        if (mOffsetX != null) {
             final WindowManager.LayoutParams attrs = dW.getAttributes();
             attrs.x = DensityUtil.dp2px(mOffsetX);
             dW.setAttributes(attrs);
         }
-        if (Objects.nonNull(mOffsetY)) {
+        if (mOffsetY != null) {
             final WindowManager.LayoutParams attrs = dW.getAttributes();
             attrs.y = DensityUtil.dp2px(mOffsetY);
             dW.setAttributes(attrs);
         }
-        if (Objects.nonNull(mGravity)) {
+        if (mGravity != null) {
             dW.setGravity(mGravity);
         }
-        if (Objects.nonNull(mWindowAnimation)) {
+        if (mWindowAnimation != null) {
             dW.setWindowAnimations(mWindowAnimation);
         }
-        if (Objects.nonNull(mDimAmount)) {
+        if (mDimAmount != null) {
             dW.setDimAmount(mDimAmount);
         }
     }
@@ -243,19 +241,19 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
     }//焦点变更时保持SystemUi状态
 
     protected void callOnPositiveButtonClick(View view, Object object) {
-        if (Objects.nonNull(mOnPositiveButtonClickListener)) {
+        if (mOnPositiveButtonClickListener != null) {
             mOnPositiveButtonClickListener.onPositiveButtonClick(this, view, object);
         }
     }
 
     protected void callOnNegativeButtonClick(View view, Object object) {
-        if (Objects.nonNull(mOnNegativeButtonClickListener)) {
+        if (mOnNegativeButtonClickListener != null) {
             mOnNegativeButtonClickListener.onNegativeButtonClick(this, view, object);
         }
     }
 
     protected void callOnNeutralButtonClick(View view, Object object) {
-        if (Objects.nonNull(mOnNeutralButtonClickListener)) {
+        if (mOnNeutralButtonClickListener != null) {
             mOnNeutralButtonClickListener.onNeutralButtonClick(this, view, object);
         }
     }

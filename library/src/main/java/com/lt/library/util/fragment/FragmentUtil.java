@@ -160,7 +160,7 @@ public class FragmentUtil {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         setFragmentAnimations(hideAnimations, fragmentTransaction);
         hideFragmentForParent(fragment, fragmentManager.getFragments(), IntStream.of(hideHostIds).boxed().collect(Collectors.toList()), fragmentTransaction);
-        if (Objects.nonNull(fragment)) {
+        if (fragment != null) {
             setFragmentAnimations(showAnimations, fragmentTransaction);
             showFragmentForTarget(fragment, fragmentTag, showHostId, fragmentTransaction);
         }
