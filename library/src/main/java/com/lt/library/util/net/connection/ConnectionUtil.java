@@ -1,4 +1,4 @@
-package com.lt.library.util.net;
+package com.lt.library.util.net.connection;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -12,6 +12,9 @@ import android.support.annotation.IntDef;
 
 import com.lt.library.util.LogUtil;
 import com.lt.library.util.context.ContextUtil;
+import com.lt.library.util.net.connection.listener.OnCellularNetworkConnectionListener;
+import com.lt.library.util.net.connection.listener.OnNetworkConnectionListener;
+import com.lt.library.util.net.connection.listener.OnWifiNetworkConnectionListener;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -241,20 +244,8 @@ public class ConnectionUtil {
         mOnWifiNetworkConnectionListener = onWifiNetworkConnectionListener;
     }
 
-    public interface OnNetworkConnectionListener {
-        void onNetworkConnectionStatus(@NetworkDef int networkConnectionStatus);
-    }
-
-    public interface OnCellularNetworkConnectionListener {
-        void onCellularConnectionStatus(@NetworkDef int cellularConnectionStatus);
-    }
-
-    public interface OnWifiNetworkConnectionListener {
-        void onWifiConnectionStatus(@NetworkDef int wifiConnectionStatus);
-    }
-
     @IntDef({CONNECTION_STATUS_NOT_CONNECTED, CONNECTION_STATUS_CONNECTED, CONNECTION_STATUS_CONNECTED_VALIDATED})
     @Retention(RetentionPolicy.SOURCE)
-    private @interface NetworkDef {
+    public @interface NetworkDef {
     }
 }
