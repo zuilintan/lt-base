@@ -178,7 +178,7 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
     @Override
     public void show(FragmentManager manager, String tag) {
         Fragment fragment = manager.findFragmentByTag(tag);
-        if (Objects.isNull(fragment)) {
+        if (fragment == null) {
             super.show(manager, tag);
         }//规避并发点击时, IllegalStateException: Fragment already added
         else {

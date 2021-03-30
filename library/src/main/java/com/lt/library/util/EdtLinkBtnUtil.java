@@ -122,7 +122,7 @@ public class EdtLinkBtnUtil implements TextWatcher {
             if (mEdtLinkBtnUtil.mEditTextMap.isEmpty()) {
                 throw new NullPointerException("addEditText() is not called");
             }
-            if (Objects.isNull(mEdtLinkBtnUtil.mButton)) {
+            if (mEdtLinkBtnUtil.mButton == null) {
                 throw new NullPointerException("setButton() is not called");
             }
             mEdtLinkBtnUtil.changeBtnState();

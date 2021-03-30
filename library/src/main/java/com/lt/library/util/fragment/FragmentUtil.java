@@ -37,14 +37,14 @@ public class FragmentUtil {
     @Nullable
     private static Fragment getFragment(String fragmentTag, String param1, String param2, FragmentManager fragmentManager) {
         Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
-        if (Objects.isNull(fragment)) {
+        if (fragment == null) {
             fragment = getInstance().mFragmentFactory.createProduct(fragmentTag, param1, param2);
         }
         return fragment;
     }
 
-    private static void setFragmentAnimations(@NonNull int[] animations, FragmentTransaction fragmentTransaction) {
-        if (Objects.isNull(animations)) {
+    private static void setFragmentAnimations(int[] animations, FragmentTransaction fragmentTransaction) {
+        if (animations == null) {
             return;
         }
         if (animations.length == 2) {
@@ -65,7 +65,7 @@ public class FragmentUtil {
                 LogUtil.d(addedFragment + " may be hidden");
             }
             View fragmentView = addedFragment.getView();
-            if (Objects.isNull(fragmentView)) {
+            if (fragmentView == null) {
                 LogUtil.w("fragmentView = " + null);
                 continue;
             }

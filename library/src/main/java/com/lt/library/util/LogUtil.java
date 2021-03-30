@@ -5,7 +5,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.Locale;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -62,7 +61,7 @@ public class LogUtil {
 
     private static String createStdMsg(String msg) {
         String result;
-        if (Objects.isNull(msg)) {
+        if (msg == null) {
             result = NULL_FLAG;
         } else if (msg.isEmpty()) {
             result = EMPTY_FLAG;
@@ -101,7 +100,7 @@ public class LogUtil {
             return;
         }
         tag = createStdTag(tag);
-        if (Objects.isNull(tr)) {
+        if (tr == null) {
             Log.v(tag, createStdMsg(msg));
         } else {
             Log.v(tag, createStdMsg(msg), tr);
@@ -129,7 +128,7 @@ public class LogUtil {
             return;
         }
         tag = createStdTag(tag);
-        if (Objects.isNull(tr)) {
+        if (tr == null) {
             Log.d(tag, createStdMsg(msg));
         } else {
             Log.d(tag, createStdMsg(msg), tr);
@@ -157,7 +156,7 @@ public class LogUtil {
             return;
         }
         tag = createStdTag(tag);
-        if (Objects.isNull(tr)) {
+        if (tr == null) {
             Log.i(tag, createStdMsg(msg));
         } else {
             Log.i(tag, createStdMsg(msg), tr);
@@ -185,7 +184,7 @@ public class LogUtil {
             return;
         }
         tag = createStdTag(tag);
-        if (Objects.isNull(tr)) {
+        if (tr == null) {
             Log.w(tag, createStdMsg(msg));
         } else {
             Log.w(tag, createStdMsg(msg), tr);
@@ -213,7 +212,7 @@ public class LogUtil {
             return;
         }
         tag = createStdTag(tag);
-        if (Objects.isNull(tr)) {
+        if (tr == null) {
             Log.e(tag, createStdMsg(msg));
         } else {
             Log.e(tag, createStdMsg(msg), tr);
@@ -241,7 +240,7 @@ public class LogUtil {
             return;
         }
         tag = createStdTag(tag);
-        if (Objects.isNull(tr)) {
+        if (tr == null) {
             Log.wtf(tag, createStdMsg(msg));
         } else {
             Log.wtf(tag, createStdMsg(msg), tr);

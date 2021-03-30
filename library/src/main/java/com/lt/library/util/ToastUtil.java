@@ -11,7 +11,6 @@ import com.lt.library.util.context.ContextUtil;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -42,7 +41,7 @@ public class ToastUtil {
     }
 
     private static void cancel() {
-        if (Objects.isNull(sToast)) {
+        if (sToast == null) {
             return;
         }
         sToast.cancel();

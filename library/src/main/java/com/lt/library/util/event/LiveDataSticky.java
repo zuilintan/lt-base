@@ -24,7 +24,7 @@ public class LiveDataSticky {
     }
 
     public void observe(LifecycleOwner owner, Observer<Object> observer) {
-        if (!mLiveDataMap.containsKey(mTag) || Objects.isNull(mLiveDataMap.get(mTag))) {
+        if (!mLiveDataMap.containsKey(mTag) || mLiveDataMap.get(mTag) == null) {
             mLiveDataMap.put(mTag, new MutableLiveData<>());
         }
         Objects.requireNonNull(mLiveDataMap.get(mTag)).observe(owner, o -> {

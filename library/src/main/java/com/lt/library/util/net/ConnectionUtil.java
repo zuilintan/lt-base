@@ -114,7 +114,7 @@ public class ConnectionUtil {
 
     private void notifyNetworkLost(Network network) {
         Integer transport = mNetworkTransportMap.get(network.toString());
-        if (Objects.isNull(transport)) {
+        if (transport == null) {
             LogUtil.d("unknown transport");
             return;
         }

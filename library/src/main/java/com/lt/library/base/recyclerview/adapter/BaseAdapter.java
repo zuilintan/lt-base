@@ -277,7 +277,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private boolean clickEntity(int rawEntityPosition) {
         boolean result;
         RecyclerView.ViewHolder viewHolder = mRecyclerView.findViewHolderForAdapterPosition(rawEntityPosition);
-        if (Objects.isNull(viewHolder)) {
+        if (viewHolder == null) {
             result = false;
         }//表示通知数据源更新后(eg: notifyDataSetChanged()), RecyclerView尚未计算完成的布局, 此时position是未知的
         else {

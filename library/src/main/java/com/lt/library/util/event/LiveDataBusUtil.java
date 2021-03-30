@@ -49,7 +49,7 @@ public class LiveDataBusUtil {
     }
 
     public static <T> void send(String tag, T t) {
-        if (!getInstance().mLiveDataMap.containsKey(tag) || Objects.isNull(getInstance().mLiveDataMap.get(tag))) {
+        if (!getInstance().mLiveDataMap.containsKey(tag) || getInstance().mLiveDataMap.get(tag) == null) {
             return;
         }
         Objects.requireNonNull(getInstance().mLiveDataMap.get(tag)).setValue(t);
@@ -60,7 +60,7 @@ public class LiveDataBusUtil {
     }
 
     public static <T> void sendPost(String tag, T t) {
-        if (!getInstance().mLiveDataMap.containsKey(tag) || Objects.isNull(getInstance().mLiveDataMap.get(tag))) {
+        if (!getInstance().mLiveDataMap.containsKey(tag) || getInstance().mLiveDataMap.get(tag) == null) {
             return;
         }
         Objects.requireNonNull(getInstance().mLiveDataMap.get(tag)).postValue(t);
@@ -71,7 +71,7 @@ public class LiveDataBusUtil {
     }
 
     public static <T> void sendStick(String tag, T t) {
-        if (!getInstance().mLiveDataMap.containsKey(tag) || Objects.isNull(getInstance().mLiveDataMap.get(tag))) {
+        if (!getInstance().mLiveDataMap.containsKey(tag) || getInstance().mLiveDataMap.get(tag) == null) {
             getInstance().mLiveDataMap.put(tag, new MutableLiveData<>());
         }
         Objects.requireNonNull(getInstance().mLiveDataMap.get(tag)).setValue(t);
@@ -82,7 +82,7 @@ public class LiveDataBusUtil {
     }
 
     public static <T> void sendStickPost(String tag, T t) {
-        if (!getInstance().mLiveDataMap.containsKey(tag) || Objects.isNull(getInstance().mLiveDataMap.get(tag))) {
+        if (!getInstance().mLiveDataMap.containsKey(tag) || getInstance().mLiveDataMap.get(tag) == null) {
             getInstance().mLiveDataMap.put(tag, new MutableLiveData<>());
         }
         Objects.requireNonNull(getInstance().mLiveDataMap.get(tag)).postValue(t);

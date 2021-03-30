@@ -44,7 +44,7 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
     @SuppressWarnings("unchecked")
     public <T extends View> T findViewById(int viewId) {
         View view = mSparseArray.get(viewId);
-        if (Objects.isNull(view)) {
+        if (view == null) {
             view = itemView.findViewById(viewId);
             mSparseArray.put(viewId, view);
         }
