@@ -109,6 +109,6 @@ public class TimeUtil {
 
     @IntDef({HOUR_MODE_12, HOUR_MODE_24})//限定取值范围
     @Retention(RetentionPolicy.SOURCE)
-    private @interface HourMode {
+    public @interface HourMode {
     }
 }

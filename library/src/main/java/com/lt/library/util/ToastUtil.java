@@ -120,11 +120,11 @@ public class ToastUtil {
 
     @IntDef({Gravity.CENTER, Gravity.TOP, Gravity.BOTTOM})
     @Retention(RetentionPolicy.SOURCE)
-    private @interface GravityDef {
+    public @interface GravityDef {
     }
 
     @IntDef({Toast.LENGTH_SHORT, Toast.LENGTH_LONG})
     @Retention(RetentionPolicy.SOURCE)
-    private @interface DurationDef {
+    public @interface DurationDef {
     }
 }

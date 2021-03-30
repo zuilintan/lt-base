@@ -40,6 +40,6 @@ public class ScrollBarUtil {
 
     @IntDef({HORIZONTAL, VERTICAL})
     @Retention(RetentionPolicy.SOURCE)
-    private @interface OrientationDef {
+    public @interface OrientationDef {
     }
 }
