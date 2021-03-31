@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import com.lt.library.base.dialogfragment.BaseDialogFragment;
 import com.lt.person_baseutil.databinding.DlgTestBinding;
 
-import java.util.Objects;
-
 public class TestDialog extends BaseDialogFragment<DlgTestBinding> {
     private String mMsg;
 
@@ -30,7 +28,7 @@ public class TestDialog extends BaseDialogFragment<DlgTestBinding> {
     @Override
     protected void bindData(@Nullable Bundle arguments, @Nullable Bundle savedInstanceState) {
         super.bindData(arguments, savedInstanceState);
-        if (Objects.nonNull(arguments)) {
+        if (arguments != null) {
             mMsg = arguments.getString("arg1");
         }
     }
