@@ -237,6 +237,9 @@ public class ConnectionUtil {
 
     public void release() {
         delEvent();
+        mOnNetworkConnectionListener = null;
+        mOnCellularNetworkConnectionListener = null;
+        mOnWifiNetworkConnectionListener = null;
     }
 
     @IntDef({CONNECTION_STATUS_NOT_CONNECTED, CONNECTION_STATUS_CONNECTED, CONNECTION_STATUS_CONNECTED_VALIDATED})
