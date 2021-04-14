@@ -2,15 +2,19 @@ package com.lt.library.util;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.annotation.IntDef;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.StringRes;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lt.library.util.context.ContextUtil;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -23,108 +27,112 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 
 public class ToastUtil {
-    private static final AtomicBoolean sIsEnabled = new AtomicBoolean(true);//默认启用
-    private static Toast sToast;
+    private static final AtomicBoolean sEnable = new AtomicBoolean(true);//默认启用
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
+    private Toast mToast;
+    private String mText;
+    private Integer mDuration;
+    private Integer mGravity;
+    private Integer mOffsetX;
+    private Integer mOffsetY;
+    private Integer mLayoutRes;
+    private Integer mTextViewIdRes;
+
+    private ToastUtil() {
+    }
+
+    private ToastUtil(Builder builder) {
+        mText = builder.mText;
+        mDuration = builder.mDuration;
+        mGravity = builder.mGravity;
+        mOffsetX = builder.mOffsetX;
+        mOffsetY = builder.mOffsetY;
+        mLayoutRes = builder.mLayoutRes;
+        mTextViewIdRes = builder.mTextViewIdRes;
+    }
 
     @SuppressLint("ShowToast")
-    private static Toast createStdToast(Object content, @DurationDef int duration, @GravityDef int gravity) {
-        String text = null;
+    private void execShow() {
         Context context = ContextUtil.getInstance().getApplicationContext();
-        if (content instanceof Integer) {
-            text = context.getString((Integer) content);
-        } else if (content instanceof String) {
-            text = (String) content;
+        if (mToast == null) {
+            if (mLayoutRes == -1) {
+                mToast = Toast.makeText(context, mText, mDuration);
+            } else {
+                LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = layoutInflater.inflate(mLayoutRes, null);
+
+                TextView textView = view.findViewById(mTextViewIdRes);
+                textView.setText(mText);
+                mToast = new Toast(context);
+                mToast.setView(view);
+                mToast.setDuration(mDuration);
+            }
+            mToast.setGravity(mGravity, mOffsetX, mOffsetY);
         }
-        sToast = Toast.makeText(context, text, duration);
-        sToast.setGravity(gravity, 0, 0);//仅初次创建时有效
-        return sToast;
+        mToast.show();
     }
 
-    private static void cancel() {
-        if (sToast == null) {
-            return;
+    public ToastUtil show() {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            execShow();
+        } else {
+            mHandler.post(this::execShow);
         }
-        sToast.cancel();
-        sToast = null;
+        return this;
     }
 
-    public static boolean isEnable() {
-        return sIsEnabled.get();
-    }
-
-    public static void setEnable(boolean isEnabled) {
-        sIsEnabled.set(isEnabled);
-    }
-
-    public static void show(@StringRes int stringId) {
-        show(stringId, false);
-    }
-
-    public static void show(@StringRes int stringId, boolean isImmediate) {
-        show(stringId, Toast.LENGTH_SHORT, isImmediate);
-    }
-
-    public static void show(String text) {
-        show(text, false);
-    }
-
-    public static void show(String text, boolean isImmediate) {
-        show(text, Toast.LENGTH_SHORT, isImmediate);
-    }
-
-    public static void show(@StringRes int stringId, @DurationDef int duration) {
-        show(stringId, duration, false);
-    }
-
-    public static void show(@StringRes int stringId, @DurationDef int duration, boolean isImmediate) {
-        show(stringId, duration, Gravity.CENTER, isImmediate);
-    }
-
-    public static void show(String text, @DurationDef int duration) {
-        show(text, duration, false);
-    }
-
-    public static void show(String text, @DurationDef int duration, boolean isImmediate) {
-        show(text, duration, Gravity.CENTER, isImmediate);
-    }
-
-    public static void show(@StringRes int stringId, @DurationDef int duration, @GravityDef int gravity) {
-        show(stringId, duration, gravity, false);
-    }
-
-    public static void show(@StringRes int stringId, @DurationDef int duration, @GravityDef int gravity, boolean isImmediate) {
-        if (!isEnable()) {
-            return;
+    public ToastUtil cancel() {
+        if (mToast != null) {
+            mToast.cancel();
+            mToast = null;
         }
-        if (isImmediate) {
-            cancel();//如果当前Toast没有消失，则取消该Toast
+        return this;
+    }
+
+    public void release() {
+        mHandler.removeCallbacksAndMessages(null);
+        cancel();
+    }
+
+    public static class Builder {
+        private String mText;
+        private int mDuration = Toast.LENGTH_SHORT;
+        private int mGravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
+        private int mOffsetX = 0;
+        private int mOffsetY = 0;
+        private int mLayoutRes = -1;
+        private int mTextViewIdRes = -1;
+
+        public Builder setText(@StringRes int stringRes) {
+            mText = ContextUtil.getInstance().getApplicationContext().getString(stringRes);
+            return this;
         }
-        createStdToast(stringId, duration, gravity).show();
-        sToast = null;
-    }
 
-    public static void show(String text, @DurationDef int duration, @GravityDef int gravity) {
-        show(text, duration, gravity, false);
-    }
-
-    public static void show(String text, @DurationDef int duration, @GravityDef int gravity, boolean isImmediate) {
-        if (!isEnable()) {
-            return;
+        public Builder setText(String text) {
+            mText = text;
+            return this;
         }
-        if (isImmediate) {
-            cancel();//如果当前Toast没有消失，则取消该Toast
+
+        public Builder setDuration(int duration) {
+            mDuration = duration;
+            return this;
         }
-        createStdToast(text, duration, gravity).show();
-        sToast = null;
-    }
 
-    @IntDef({Gravity.CENTER, Gravity.TOP, Gravity.BOTTOM})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface GravityDef {
-    }
+        public Builder setGravity(int gravity, int offsetX, int offsetY) {
+            mGravity = gravity;
+            mOffsetX = offsetX;
+            mOffsetY = offsetY;
+            return this;
+        }
 
-    @IntDef({Toast.LENGTH_SHORT, Toast.LENGTH_LONG})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface DurationDef {
+        public Builder setLayout(@LayoutRes int layoutRes, @IdRes int textViewIdRes) {
+            mLayoutRes = layoutRes;
+            mTextViewIdRes = textViewIdRes;
+            return this;
+        }
+
+        public ToastUtil build() {
+            return new ToastUtil(this);
+        }
     }
 }
