@@ -1,4 +1,4 @@
-package com.lt.library.util.net.connection;
+package com.lt.library.util.net;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -11,9 +11,6 @@ import android.support.annotation.IntDef;
 
 import com.lt.library.util.LogUtil;
 import com.lt.library.util.context.ContextUtil;
-import com.lt.library.util.net.connection.listener.OnCellularNetworkConnectionListener;
-import com.lt.library.util.net.connection.listener.OnNetworkConnectionListener;
-import com.lt.library.util.net.connection.listener.OnWifiNetworkConnectionListener;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -30,9 +27,9 @@ public class ConnectionUtil {
     private final Handler mHandler;
     private final Map<String, Integer> mNetworkTransportMap;
     private final ConnectivityManager.NetworkCallback mNetworkCallback;
-    private OnNetworkConnectionListener mOnNetworkConnectionListener;
-    private OnCellularNetworkConnectionListener mOnCellularNetworkConnectionListener;
-    private OnWifiNetworkConnectionListener mOnWifiNetworkConnectionListener;
+    private OnNetworkListener mOnNetworkListener;
+    private OnNetworkListener mOnCellularNetworkListener;
+    private OnNetworkListener mOnWifiNetworkListener;
 
     private ConnectionUtil() {
         mHandler = new Handler(Looper.getMainLooper(), msg -> {
@@ -236,20 +233,20 @@ public class ConnectionUtil {
     }
 
     private void callOnNetworkConnectionListener(@NetworkDef int networkConnectionStatus) {
-        if (mOnNetworkConnectionListener != null) {
-            mOnNetworkConnectionListener.onNetworkConnectionStatus(networkConnectionStatus);
+        if (mOnNetworkListener != null) {
+            mOnNetworkListener.onConnectionStatusChanged(networkConnectionStatus);
         }
     }
 
     private void callOnCellularConnectionListener(@NetworkDef int cellularConnectionStatus) {
-        if (mOnCellularNetworkConnectionListener != null) {
-            mOnCellularNetworkConnectionListener.onCellularConnectionStatus(cellularConnectionStatus);
+        if (mOnCellularNetworkListener != null) {
+            mOnCellularNetworkListener.onConnectionStatusChanged(cellularConnectionStatus);
         }
     }
 
     private void callOnWifiConnectionListener(@NetworkDef int wifiConnectionStatus) {
-        if (mOnWifiNetworkConnectionListener != null) {
-            mOnWifiNetworkConnectionListener.onWifiConnectionStatus(wifiConnectionStatus);
+        if (mOnWifiNetworkListener != null) {
+            mOnWifiNetworkListener.onConnectionStatusChanged(wifiConnectionStatus);
         }
     }
 
@@ -265,9 +262,13 @@ public class ConnectionUtil {
 
     public void release() {
         delEvent();
-        mOnNetworkConnectionListener = null;
-        mOnCellularNetworkConnectionListener = null;
-        mOnWifiNetworkConnectionListener = null;
+        mOnNetworkListener = null;
+        mOnCellularNetworkListener = null;
+        mOnWifiNetworkListener = null;
+    }
+
+    public interface OnNetworkListener {
+        void onConnectionStatusChanged(@NetworkDef int connectionStatus);
     }
 
     @IntDef({CONNECTION_STATUS_NOT_CONNECTED, CONNECTION_STATUS_CONNECTED, CONNECTION_STATUS_CONNECTED_VALIDATED})
@@ -282,23 +283,23 @@ public class ConnectionUtil {
             mConnectionUtil = new ConnectionUtil();
         }
 
-        public Builder setOnNetworkConnectionListener(OnNetworkConnectionListener onNetworkConnectionListener) {
-            mConnectionUtil.mOnNetworkConnectionListener = onNetworkConnectionListener;
+        public Builder setOnNetworkListener(OnNetworkListener onNetworkListener) {
+            mConnectionUtil.mOnNetworkListener = onNetworkListener;
             return this;
         }
 
-        public Builder setOnCellularNetworkConnectionListener(OnCellularNetworkConnectionListener onCellularNetworkConnectionListener) {
-            mConnectionUtil.mOnCellularNetworkConnectionListener = onCellularNetworkConnectionListener;
+        public Builder setOnCellularNetworkListener(OnNetworkListener onCellularNetworkListener) {
+            mConnectionUtil.mOnCellularNetworkListener = onCellularNetworkListener;
             return this;
         }
 
-        public Builder setOnWifiNetworkConnectionListener(OnWifiNetworkConnectionListener onWifiNetworkConnectionListener) {
-            mConnectionUtil.mOnWifiNetworkConnectionListener = onWifiNetworkConnectionListener;
+        public Builder setOnWifiNetworkListener(OnNetworkListener onWifiNetworkListener) {
+            mConnectionUtil.mOnWifiNetworkListener = onWifiNetworkListener;
             return this;
         }
 
         public ConnectionUtil build() {
-            if (mConnectionUtil.mOnNetworkConnectionListener != null || mConnectionUtil.mOnCellularNetworkConnectionListener != null || mConnectionUtil.mOnWifiNetworkConnectionListener != null) {
+            if (mConnectionUtil.mOnNetworkListener != null || mConnectionUtil.mOnCellularNetworkListener != null || mConnectionUtil.mOnWifiNetworkListener != null) {
                 mConnectionUtil.addEvent();
             } else {
                 throw new NullPointerException("at least one setOnXxxNetworkConnectionListener() must be called");
