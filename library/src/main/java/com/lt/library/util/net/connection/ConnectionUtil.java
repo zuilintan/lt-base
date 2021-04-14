@@ -94,7 +94,35 @@ public class ConnectionUtil {
         };
     }
 
-    public static boolean isActiveNetworkValidated() {
+    public static boolean isActiveNetworkConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        Network network = connectivityManager.getActiveNetwork();
+        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
+        LogUtil.d("networkCapabilities = " + networkCapabilities);
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+    }
+
+    public static boolean isActiveNetworkConnected(int... excludeTransports) {
+        boolean result;
+        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        Network network = connectivityManager.getActiveNetwork();
+        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
+        LogUtil.d("networkCapabilities = " + networkCapabilities);
+        if (!networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+            result = false;
+        } else {
+            result = true;
+            for (int transport : excludeTransports) {
+                if (networkCapabilities.hasTransport(transport)) {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    public static boolean isActiveNetworkConnectedAndValidated() {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
         NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);

@@ -2,10 +2,9 @@ package com.lt.library.util;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -28,8 +27,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ToastUtil {
     private static final AtomicBoolean sEnable = new AtomicBoolean(true);//默认启用
-    private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private Toast mToast;
     private String mText;
     private Integer mDuration;
     private Integer mGravity;
@@ -41,7 +38,11 @@ public class ToastUtil {
     private ToastUtil() {
     }
 
-    private ToastUtil(Builder builder) {
+    private static ToastUtil getInstance() {
+        return ToastUtilHolder.INSTANCE;
+    }
+
+    private void setBuilder(Builder builder) {
         mText = builder.mText;
         mDuration = builder.mDuration;
         mGravity = builder.mGravity;
@@ -52,46 +53,57 @@ public class ToastUtil {
     }
 
     @SuppressLint("ShowToast")
-    private void execShow() {
+    private Toast make() {
+        if (!sEnable.get()) {
+            return null;
+        }
         Context context = ContextUtil.getInstance().getApplicationContext();
-        if (mToast == null) {
-            if (mLayoutRes == -1) {
-                mToast = Toast.makeText(context, mText, mDuration);
-            } else {
-                LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View view = layoutInflater.inflate(mLayoutRes, null);
-
-                TextView textView = view.findViewById(mTextViewIdRes);
-                textView.setText(mText);
-                mToast = new Toast(context);
-                mToast.setView(view);
-                mToast.setDuration(mDuration);
-            }
-            mToast.setGravity(mGravity, mOffsetX, mOffsetY);
-        }
-        mToast.show();
-    }
-
-    public ToastUtil show() {
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            execShow();
+        Toast toast;
+        if (mLayoutRes == -1) {
+            toast = Toast.makeText(context, mText, mDuration);
         } else {
-            mHandler.post(this::execShow);
+            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = layoutInflater.inflate(mLayoutRes, null);
+            TextView textView = view.findViewById(mTextViewIdRes);
+            textView.setText(mText);
+            toast = new Toast(context);
+            toast.setView(view);
+            toast.setDuration(mDuration);
         }
-        return this;
+        toast.setGravity(mGravity, mOffsetX, mOffsetY);
+        return toast;
     }
 
-    public ToastUtil cancel() {
-        if (mToast != null) {
-            mToast.cancel();
-            mToast = null;
+    public void show() {
+        if (!sEnable.get()) {
+            return;
         }
-        return this;
+        Toast make = make();
+        make.show();
     }
 
-    public void release() {
-        mHandler.removeCallbacksAndMessages(null);
-        cancel();
+    @Nullable
+    public Toast showNow(@Nullable Toast toast) {
+        if (!sEnable.get()) {
+            return null;
+        }
+        Toast make = make();
+        cancel(toast);
+        make.show();
+        return make;
+    }
+
+    public void cancel(@Nullable Toast toast) {
+        if (!sEnable.get()) {
+            return;
+        }
+        if (toast != null) {
+            toast.cancel();
+        }
+    }
+
+    private static class ToastUtilHolder {
+        private static final ToastUtil INSTANCE = new ToastUtil();
     }
 
     public static class Builder {
@@ -132,7 +144,9 @@ public class ToastUtil {
         }
 
         public ToastUtil build() {
-            return new ToastUtil(this);
+            ToastUtil toastUtil = ToastUtil.getInstance();
+            toastUtil.setBuilder(this);
+            return toastUtil;
         }
     }
 }
