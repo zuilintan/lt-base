@@ -27,12 +27,12 @@ public class ConnectionUtil {
     private static final int HANDLE_WHAT_NETWORK_CONNECTION_LISTENER = 0;
     private static final int HANDLE_WHAT_CELLULAR_CONNECTION_LISTENER = 1;
     private static final int HANDLE_WHAT_WIFI_CONNECTION_LISTENER = 2;
-    private OnNetworkConnectionListener mOnNetworkConnectionListener;
-    private OnCellularNetworkConnectionListener mOnCellularNetworkConnectionListener;
-    private OnWifiNetworkConnectionListener mOnWifiNetworkConnectionListener;
     private final Handler mHandler;
     private final Map<String, Integer> mNetworkTransportMap;
     private final ConnectivityManager.NetworkCallback mNetworkCallback;
+    private OnNetworkConnectionListener mOnNetworkConnectionListener;
+    private OnCellularNetworkConnectionListener mOnCellularNetworkConnectionListener;
+    private OnWifiNetworkConnectionListener mOnWifiNetworkConnectionListener;
 
     private ConnectionUtil() {
         mHandler = new Handler(Looper.getMainLooper(), msg -> {
@@ -94,7 +94,7 @@ public class ConnectionUtil {
         };
     }
 
-    public static boolean isActiveNetworkConnected() {
+    public static boolean isNetworkConnected() {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
         NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
@@ -102,7 +102,7 @@ public class ConnectionUtil {
         return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
     }
 
-    public static boolean isActiveNetworkConnected(int... excludeTransports) {
+    public static boolean isNetworkConnected(int... excludeTransports) {
         boolean result;
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
@@ -122,7 +122,7 @@ public class ConnectionUtil {
         return result;
     }
 
-    public static boolean isActiveNetworkConnectedAndValidated() {
+    public static boolean isNetworkConnectedAndValidated() {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
         NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
@@ -130,7 +130,7 @@ public class ConnectionUtil {
         return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
     }
 
-    public static boolean isActiveNetworkNotMetered() {
+    public static boolean isNetworkNotMetered() {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
         NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
@@ -138,7 +138,7 @@ public class ConnectionUtil {
         return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
     }
 
-    public static boolean isActiveNetworkBelongTransport(int transport) {
+    public static boolean isNetworkBelongTransport(int transport) {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
         NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
@@ -146,7 +146,7 @@ public class ConnectionUtil {
         return networkCapabilities.hasCapability(transport);
     }
 
-    public static int getActiveNetworkTransport() {
+    public static int getNetworkTransport() {
         int result = -1;
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
