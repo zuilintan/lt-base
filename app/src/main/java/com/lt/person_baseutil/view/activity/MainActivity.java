@@ -10,7 +10,7 @@ import com.kyleduo.switchbutton.SwitchButton;
 import com.lt.library.base.BaseActivity;
 import com.lt.library.base.recyclerview.listener.OnEntityItemClickListener;
 import com.lt.library.util.LogUtil;
-import com.lt.library.util.net.connection.ConnectionUtil;
+import com.lt.library.util.net.ConnectionUtil;
 import com.lt.person_baseutil.R;
 import com.lt.person_baseutil.databinding.ActivityMainBinding;
 import com.lt.person_baseutil.model.repo.DataRepo;
@@ -43,20 +43,22 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements
         super.initEvent();
         mTestAdapter.setOnEntityItemClickListener(this);
         mConnectionUtil = new ConnectionUtil.Builder()
-                .setOnNetworkConnectionListener(networkConnectionStatus -> {
+                .setOnNetworkListener(networkConnectionStatus -> {
                     LogUtil.d("networkConnectionStatus = " + networkConnectionStatus);
                 })
-                .setOnCellularNetworkConnectionListener(cellularConnectionStatus -> {
+                .setOnCellularNetworkListener(cellularConnectionStatus -> {
                     LogUtil.d("cellularConnectionStatus = " + cellularConnectionStatus);
                 })
-                .setOnWifiNetworkConnectionListener(wifiConnectionStatus -> {
+                .setOnWifiNetworkListener(wifiConnectionStatus -> {
                     LogUtil.d("wifiConnectionStatus = " + wifiConnectionStatus);
                 })
                 .build();
-        LogUtil.w("isActiveNetworkValidated = " + ConnectionUtil.isActiveNetworkValidated());
-        LogUtil.w("isActiveNetworkNotMetered = " + ConnectionUtil.isActiveNetworkNotMetered());
-        LogUtil.w("isActiveNetworkBelongTransport = " + ConnectionUtil.isActiveNetworkBelongTransport(NetworkCapabilities.TRANSPORT_VPN));
-        LogUtil.w("getActiveNetworkTransport = " + ConnectionUtil.getActiveNetworkTransport());
+        LogUtil.w("isActiveNetworkConnected = " + ConnectionUtil.isNetworkConnected());
+        LogUtil.w("isActiveNetworkConnected = " + ConnectionUtil.isNetworkConnected(NetworkCapabilities.TRANSPORT_WIFI) + ", excludeTransports = " + NetworkCapabilities.TRANSPORT_WIFI);
+        LogUtil.w("isActiveNetworkValidated = " + ConnectionUtil.isNetworkConnectedAndValidated());
+        LogUtil.w("isActiveNetworkNotMetered = " + ConnectionUtil.isNetworkNotMetered());
+        LogUtil.w("isActiveNetworkBelongTransport = " + ConnectionUtil.isNetworkBelongTransport(NetworkCapabilities.TRANSPORT_VPN));
+        LogUtil.w("getActiveNetworkTransport = " + ConnectionUtil.getNetworkTransport());
     }
 
     @Override

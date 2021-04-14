@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kyleduo.switchbutton.SwitchButton;
 import com.lt.library.base.recyclerview.adapter.BaseAdapter;
@@ -18,13 +19,24 @@ import java.util.List;
 import java.util.Objects;
 
 public class TestAdapter extends BaseAdapter<TestBean> {
+    private Toast mToast;
     private CompoundButton.OnCheckedChangeListener mOnCheckedChangeListener = (buttonView, isChecked) -> {
-        ToastUtil.show("tag = " + buttonView.getTag() + ", isChecked = " + isChecked + ", isPressed = " + buttonView.isPressed());
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        new ToastUtil.Builder()
+                .setText("tag = " + buttonView.getTag() + ", isChecked = " + isChecked + ", isPressed = " + buttonView.isPressed())
+                .setLayout(R.layout.toast_test, R.id.tv_test)
+                .build()
+                .show();
     };
     private SeekBar.OnSeekBarChangeListener mOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            ToastUtil.show("tag = " + seekBar.getTag() + ", progress = " + progress + ", isFromUser = " + fromUser);
+            mToast = new ToastUtil.Builder()
+                    .setText("tag = " + seekBar.getTag() + ", progress = " + progress + ", isFromUser = " + fromUser)
+                    .build()
+                    .showNow(mToast);
         }
 
         @Override
