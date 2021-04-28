@@ -7,7 +7,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.Map;
-import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @作者: LinTan
@@ -19,12 +20,19 @@ import java.util.Objects;
 
 public class EdtLinkBtnUtil implements TextWatcher {
     private static final int ENABLE_MAX_LENGTH_INFINITE = -1;
-    private final ArrayMap<EditText, int[]> mEditTextMap;
+    private ArrayMap<EditText, int[]> mEditTextMap;
     private Button mButton;
     private Float mButtonDisableAlpha;
+    private Boolean mDiffSbcCase;
 
     private EdtLinkBtnUtil() {
-        mEditTextMap = new ArrayMap<>();
+    }
+
+    private EdtLinkBtnUtil(Builder builder) {
+        mEditTextMap = builder.mEditTextMap;
+        mButton = builder.mButton;
+        mButtonDisableAlpha = builder.mButtonDisableAlpha;
+        mDiffSbcCase = builder.mDiffSbcCase;
     }
 
     @Override
@@ -45,7 +53,7 @@ public class EdtLinkBtnUtil implements TextWatcher {
             mButton.setAlpha(1);
             mButton.setEnabled(true);
         } else {
-            mButton.setAlpha(Objects.requireNonNull(mButtonDisableAlpha, "setButton() is not called"));
+            mButton.setAlpha(mButtonDisableAlpha);
             mButton.setEnabled(false);
         }
     }
@@ -54,10 +62,27 @@ public class EdtLinkBtnUtil implements TextWatcher {
         boolean isEnable = true;
         for (Map.Entry<EditText, int[]> entry : mEditTextMap.entrySet()) {
             EditText edt = entry.getKey();
-            int[] textProperty = entry.getValue();
-            int length = edt.getText().length();
-            int btnEnableMinLength = textProperty[0];
-            int btnEnableMaxLength = textProperty[1];
+            int[] btnEnableRange = entry.getValue();
+            Editable text = edt.getText();
+            int length;
+            if (mDiffSbcCase) {
+                length = 0;
+                String string = text.toString();
+                for (int i = 0; i < string.length(); i++) {
+                    char c = string.charAt(i);
+                    Pattern p = Pattern.compile("[^\\x00-\\xff]");
+                    Matcher m = p.matcher(String.valueOf(c));
+                    if (!m.matches()) {
+                        length++;
+                    } else {
+                        length += 2;
+                    }
+                }
+            } else {
+                length = text.length();
+            }
+            int btnEnableMinLength = btnEnableRange[0];
+            int btnEnableMaxLength = btnEnableRange[1];
             boolean isGeBtnEnableMinLength;
             boolean isLeBtnEnableMaxLength;
             isGeBtnEnableMinLength = length >= btnEnableMinLength;
@@ -89,11 +114,10 @@ public class EdtLinkBtnUtil implements TextWatcher {
     }
 
     public static class Builder {
-        private final EdtLinkBtnUtil mEdtLinkBtnUtil;
-
-        public Builder() {
-            mEdtLinkBtnUtil = new EdtLinkBtnUtil();
-        }
+        private ArrayMap<EditText, int[]> mEditTextMap;
+        private Button mButton;
+        private Float mButtonDisableAlpha;
+        private Boolean mDiffSbcCase = false;
 
         public Builder addEditText(EditText editText, int btnEnableLength) {
             return addEditText(editText, btnEnableLength, ENABLE_MAX_LENGTH_INFINITE);
@@ -101,10 +125,18 @@ public class EdtLinkBtnUtil implements TextWatcher {
 
         public Builder addEditText(EditText editText, int btnEnableMinLength, int btnEnableMaxLength) {
             if (btnEnableMinLength < btnEnableMaxLength || btnEnableMaxLength == ENABLE_MAX_LENGTH_INFINITE) {
-                mEdtLinkBtnUtil.mEditTextMap.put(editText, new int[]{btnEnableMinLength, btnEnableMaxLength});
+                if (mEditTextMap == null) {
+                    mEditTextMap = new ArrayMap<>();
+                }
+                mEditTextMap.put(editText, new int[]{btnEnableMinLength, btnEnableMaxLength});
             } else {
                 throw new IllegalArgumentException("btnEnableMinLength has to be less than btnEnableMaxLength, [" + btnEnableMinLength + ", " + btnEnableMaxLength + "]");
             }
+            return this;
+        }
+
+        public Builder diffSbc() {
+            mDiffSbcCase = true;
             return this;
         }
 
@@ -113,20 +145,21 @@ public class EdtLinkBtnUtil implements TextWatcher {
         }
 
         public Builder setButton(Button button, float btnDisableAlpha) {
-            mEdtLinkBtnUtil.mButton = button;
-            mEdtLinkBtnUtil.mButtonDisableAlpha = btnDisableAlpha;
+            mButton = button;
+            mButtonDisableAlpha = btnDisableAlpha;
             return this;
         }
 
         public EdtLinkBtnUtil build() {
-            if (mEdtLinkBtnUtil.mEditTextMap.isEmpty()) {
-                throw new NullPointerException("addEditText() is not called");
+            if (mEditTextMap == null || mEditTextMap.isEmpty()) {
+                throw new UnsupportedOperationException("addEditText() is not called");
             }
-            if (mEdtLinkBtnUtil.mButton == null) {
-                throw new NullPointerException("setButton() is not called");
+            if (mButton == null || mButtonDisableAlpha == null) {
+                throw new UnsupportedOperationException("setButton() is not called");
             }
-            mEdtLinkBtnUtil.changeBtnState();
-            return mEdtLinkBtnUtil;
+            EdtLinkBtnUtil edtLinkBtnUtil = new EdtLinkBtnUtil(this);
+            edtLinkBtnUtil.changeBtnState();
+            return edtLinkBtnUtil;
         }
     }
 }
