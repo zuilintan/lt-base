@@ -36,10 +36,8 @@ import com.lt.library.util.context.ContextUtil;
  * @作者: LinTan
  * @日期: 2019/5/15 10:23
  * @版本: 1.0
- * @描述: //BaseDialogFragment, 注意引入依赖
+ * @描述: //BaseDialogFragment
  * 1.0: Initial Commit
- * <p>
- * implementation 'com.android.support:recyclerview-v7:28.0.0'
  */
 
 public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFragment {
