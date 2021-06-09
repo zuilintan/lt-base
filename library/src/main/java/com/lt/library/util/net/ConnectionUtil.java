@@ -27,7 +27,6 @@ public class ConnectionUtil {
     public static final int CONNECTION_STATUS_CONNECTED_VALIDATED = 21;
     private static final String TRANSPORT_KEY_UNKNOWN = "UNKNOWN";
     private static final int TRANSPORT_VALUE_UNKNOWN = -1;
-    private final Handler mHandler = new Handler(Looper.getMainLooper());
     private final Map<Network, NetworkCapabilities> mNetworkMap = new ConcurrentHashMap<>();
     private final Map<Network, NetworkCapabilities> mExcludedTransportsNetworkMap = new ConcurrentHashMap<>();
     private final ConnectivityManager.NetworkCallback mNetworkCallback;
@@ -51,7 +50,7 @@ public class ConnectionUtil {
 
                 NetworkCapabilities oldValue = mNetworkMap.put(network, networkCapabilities);
                 if (oldValue != null) {
-                    LogUtil.d("networkMap value update, old value = " + oldValue);
+                    LogUtil.d("networkMap value updated, old value = " + oldValue);
                 }
                 if (isNeedExcludeTransport(networkCapabilities, mExcludeTransports)) {
                     return;
@@ -365,7 +364,10 @@ public class ConnectionUtil {
 
     private void addEvent() {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), mNetworkCallback, mHandler);
+        connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), mNetworkCallback, new Handler(Looper.getMainLooper()));
+        if (!isConnected()) {
+            callOnNetworkListener(CONNECTION_STATUS_NOT_CONNECTED);
+        }
     }
 
     private void delEvent() {
