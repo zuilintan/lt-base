@@ -25,23 +25,44 @@ public class ConnectionUtil {
     public static final int CONNECTION_STATUS_NOT_CONNECTED = 10;
     public static final int CONNECTION_STATUS_CONNECTED = 20;
     public static final int CONNECTION_STATUS_CONNECTED_VALIDATED = 21;
-    private static final int TRANSPORT_UNKNOWN = -1;
+    private static final String TRANSPORT_KEY_UNKNOWN = "UNKNOWN";
+    private static final int TRANSPORT_VALUE_UNKNOWN = -1;
     private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private final Map<Network, NetworkCapabilities> mActiveNetworkMap = new ConcurrentHashMap<>();
+    private final Map<Network, NetworkCapabilities> mNetworkMap = new ConcurrentHashMap<>();
+    private final Map<Network, NetworkCapabilities> mExcludedTransportsNetworkMap = new ConcurrentHashMap<>();
     private final ConnectivityManager.NetworkCallback mNetworkCallback;
-    private int[] mExcludeTransports;
+    private final int[] mExcludeTransports;
+    private OnConnectionListener mOnNetworkListener;
+    private OnConnectionListener mOnCellularNetworkListener;
+    private OnConnectionListener mOnWifiNetworkListener;
     private int mConnectionStatus = -1;
-    private OnActiveConnectionListener mOnActiveConnectionListener;
-    private OnActiveConnectionListener mOnActiveCellularNetworkListener;
-    private OnActiveConnectionListener mOnActiveWifiNetworkListener;
 
     {
         mNetworkCallback = new ConnectivityManager.NetworkCallback() {
             @Override
             public void onAvailable(Network network) {
                 super.onAvailable(network);
-                LogUtil.v("network = " + network);
-                notifyAvailable(network);
+                ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
+                LogUtil.d("network = " + network + ", networkCapabilities = " + networkCapabilities);
+                if (networkCapabilities == null) {
+                    return;
+                }
+
+                NetworkCapabilities oldValue = mNetworkMap.put(network, networkCapabilities);
+                if (oldValue != null) {
+                    LogUtil.d("networkMap value update, old value = " + oldValue);
+                }
+                if (isNeedExcludeTransport(networkCapabilities, mExcludeTransports)) {
+                    return;
+                }
+                boolean hasInternetCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+                if (!hasInternetCapability) {
+                    return;
+                }
+                int connectionStatus = CONNECTION_STATUS_CONNECTED;
+                LogUtil.d("connection status = " + connectionStatus);
+                checkAndCallListener(connectionStatus);
             }//当网络连接成功, 可以使用时
 
             @Override
@@ -53,8 +74,30 @@ public class ConnectionUtil {
             @Override
             public void onLost(Network network) {
                 super.onLost(network);
-                LogUtil.v("network = " + network);
-                notifyLost(network);
+                NetworkCapabilities networkCapabilities = mNetworkMap.get(network);
+                LogUtil.d("network = " + network + ", networkCapabilities = " + networkCapabilities);
+                if (networkCapabilities == null) {
+                    return;
+                }
+                mNetworkMap.remove(network);
+                mExcludedTransportsNetworkMap.putAll(mNetworkMap);
+                LogUtil.d("networkMap before exclusion = " + mNetworkMap);
+                Set<Map.Entry<Network, NetworkCapabilities>> entries = mExcludedTransportsNetworkMap.entrySet();
+                Iterator<Map.Entry<Network, NetworkCapabilities>> iterator = entries.iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<Network, NetworkCapabilities> entry = iterator.next();
+                    if (isNeedExcludeTransport(entry.getValue(), mExcludeTransports)) {
+                        iterator.remove();
+                    }
+                }
+                LogUtil.d("networkMap after exclusion = " + mExcludedTransportsNetworkMap);
+                if (mExcludedTransportsNetworkMap.isEmpty()) {
+                    int connectionStatus = CONNECTION_STATUS_NOT_CONNECTED;
+                    LogUtil.d("connection status = " + connectionStatus);
+                    checkAndCallListener(connectionStatus);
+                } else {
+                    mExcludedTransportsNetworkMap.clear();
+                }
             }//当网络连接已经断开
 
             @Override
@@ -66,8 +109,27 @@ public class ConnectionUtil {
             @Override
             public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) {
                 super.onCapabilitiesChanged(network, networkCapabilities);
-                LogUtil.v("network = " + network + ", networkCapabilities = " + networkCapabilities);
-                notifyCapabilitiesChanged(network, networkCapabilities);
+                LogUtil.d("network = " + network + ", networkCapabilities = " + networkCapabilities);
+                if (isNeedExcludeTransport(networkCapabilities, mExcludeTransports)) {
+                    return;
+                }
+                boolean hasInternetCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+                if (!hasInternetCapability) {
+                    int connectionStatus = CONNECTION_STATUS_NOT_CONNECTED;
+                    LogUtil.d("connection status = " + connectionStatus);
+                    checkAndCallListener(connectionStatus);
+                    return;
+                }
+                boolean hasValidatedCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+                if (!hasValidatedCapability) {
+                    int connectionStatus = CONNECTION_STATUS_CONNECTED;
+                    LogUtil.d("connection status = " + connectionStatus);
+                    checkAndCallListener(connectionStatus);
+                    return;
+                }
+                int connectionStatus = CONNECTION_STATUS_CONNECTED_VALIDATED;
+                LogUtil.d("connection status = " + connectionStatus);
+                checkAndCallListener(connectionStatus);
             }//当网络连接的状态变化, 但仍旧可用
 
             @Override
@@ -78,126 +140,181 @@ public class ConnectionUtil {
         };
     }
 
-    private ConnectionUtil() {
+    private ConnectionUtil(Builder builder) {
+        mExcludeTransports = builder.mExcludeTransports;
+        mOnNetworkListener = builder.mOnNetworkListener;
+        mOnCellularNetworkListener = builder.mOnCellularNetworkListener;
+        mOnWifiNetworkListener = builder.mOnWifiNetworkListener;
     }
 
-    public static boolean isConnected(int... excludeTransports) {
+    public static boolean isConnected(int... needExcludeTransports) {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        Network activeNetwork = connectivityManager.getActiveNetwork();
-        LogUtil.d("activeNetwork = " + activeNetwork);
-        if (activeNetwork == null) {
+        Network network = connectivityManager.getActiveNetwork();
+        LogUtil.d("network = " + network);
+        if (network == null) {
+            LogUtil.d("result = " + false);
             return false;
         }
-        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
+        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
         LogUtil.d("networkCapabilities = " + networkCapabilities);
         if (networkCapabilities == null) {
+            LogUtil.d("result = " + false);
             return false;
         }
         boolean hasInternetCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
         LogUtil.d("hasInternetCapability = " + hasInternetCapability);
         if (!hasInternetCapability) {
+            LogUtil.d("result = " + false);
             return false;
         }
-        boolean result = !isNeedExcludeTransport(networkCapabilities, excludeTransports);
+        boolean result = !isNeedExcludeTransport(networkCapabilities, needExcludeTransports);
         LogUtil.d("result = " + result);
         return result;
     }
 
-    public static boolean isConnectedAndValidated() {
+    public static boolean isConnectedAndValidated(int... needExcludeTransports) {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        Network activeNetwork = connectivityManager.getActiveNetwork();
-        LogUtil.d("activeNetwork = " + activeNetwork);
-        if (activeNetwork == null) {
+        Network network = connectivityManager.getActiveNetwork();
+        LogUtil.d("network = " + network);
+        if (network == null) {
+            LogUtil.d("result = " + false);
             return false;
         }
-        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
+        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
         LogUtil.d("networkCapabilities = " + networkCapabilities);
         if (networkCapabilities == null) {
+            LogUtil.d("result = " + false);
             return false;
         }
-        boolean result = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+        boolean hasInternetAndValidatedCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+        LogUtil.d("hasInternetAndValidatedCapability = " + hasInternetAndValidatedCapability);
+        if (!hasInternetAndValidatedCapability) {
+            LogUtil.d("result = " + false);
+            return false;
+        }
+        boolean result = !isNeedExcludeTransport(networkCapabilities, needExcludeTransports);
         LogUtil.d("result = " + result);
         return result;
     }
 
-    public static boolean isNotMetered() {
+    public static boolean isNotMetered(int... needExcludeTransports) {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        Network activeNetwork = connectivityManager.getActiveNetwork();
-        LogUtil.d("activeNetwork = " + activeNetwork);
-        if (activeNetwork == null) {
+        Network network = connectivityManager.getActiveNetwork();
+        LogUtil.d("network = " + network);
+        if (network == null) {
+            LogUtil.d("result = " + false);
             return false;
         }
-        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
+        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
         LogUtil.d("networkCapabilities = " + networkCapabilities);
         if (networkCapabilities == null) {
+            LogUtil.d("result = " + false);
             return false;
         }
-        boolean result = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
+        boolean hasNotMeteredCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED);
+        LogUtil.d("hasNotMeteredCapability = " + hasNotMeteredCapability);
+        if (!hasNotMeteredCapability) {
+            LogUtil.d("result = " + false);
+            return false;
+        }
+        boolean result = !isNeedExcludeTransport(networkCapabilities, needExcludeTransports);
         LogUtil.d("result = " + result);
         return result;
     }
 
     public static boolean isBelongTransport(int transport) {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        Network activeNetwork = connectivityManager.getActiveNetwork();
-        LogUtil.d("activeNetwork = " + activeNetwork);
-        if (activeNetwork == null) {
+        Network network = connectivityManager.getActiveNetwork();
+        LogUtil.d("network = " + network);
+        if (network == null) {
+            LogUtil.d("result = " + false);
             return false;
         }
-        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
+        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
         LogUtil.d("networkCapabilities = " + networkCapabilities);
         if (networkCapabilities == null) {
+            LogUtil.d("result = " + false);
             return false;
         }
-        boolean result = networkCapabilities.hasCapability(transport);
+        boolean result = networkCapabilities.hasTransport(transport);
         LogUtil.d("result = " + result);
         return result;
-    }
+    }// TODO: 2021/6/8
 
     public static int getTransport() {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        Network activeNetwork = connectivityManager.getActiveNetwork();
-        LogUtil.d("activeNetwork = " + activeNetwork);
-        if (activeNetwork == null) {
-            LogUtil.w("transport = TRANSPORT_UNKNOWN");
-            return TRANSPORT_UNKNOWN;
+        Network network = connectivityManager.getActiveNetwork();
+        LogUtil.d("network = " + network);
+        if (network == null) {
+            LogUtil.w("result = " + TRANSPORT_KEY_UNKNOWN);
+            return TRANSPORT_VALUE_UNKNOWN;
         }
-        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
+        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
         LogUtil.d("networkCapabilities = " + networkCapabilities);
         if (networkCapabilities == null) {
-            LogUtil.w("transport = TRANSPORT_UNKNOWN");
-            return TRANSPORT_UNKNOWN;
+            LogUtil.w("result = " + TRANSPORT_KEY_UNKNOWN);
+            return TRANSPORT_VALUE_UNKNOWN;
         }
         if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-            LogUtil.d("transport = TRANSPORT_CELLULAR");
+            LogUtil.d("result = TRANSPORT_CELLULAR");
             return NetworkCapabilities.TRANSPORT_CELLULAR;
         }
         if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            LogUtil.d("transport = TRANSPORT_WIFI");
+            LogUtil.d("result = TRANSPORT_WIFI");
             return NetworkCapabilities.TRANSPORT_WIFI;
         }
         if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH)) {
-            LogUtil.d("transport = TRANSPORT_BLUETOOTH");
+            LogUtil.d("result = TRANSPORT_BLUETOOTH");
             return NetworkCapabilities.TRANSPORT_BLUETOOTH;
         }
         if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-            LogUtil.d("transport = TRANSPORT_ETHERNET");
+            LogUtil.d("result = TRANSPORT_ETHERNET");
             return NetworkCapabilities.TRANSPORT_ETHERNET;
         }
         if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
-            LogUtil.d("transport = TRANSPORT_VPN");
+            LogUtil.d("result = TRANSPORT_VPN");
             return NetworkCapabilities.TRANSPORT_VPN;
         }
         if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI_AWARE)) {
-            LogUtil.d("transport = TRANSPORT_WIFI_AWARE");
+            LogUtil.d("result = TRANSPORT_WIFI_AWARE");
             return NetworkCapabilities.TRANSPORT_WIFI_AWARE;
         }
         if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_LOWPAN)) {
-            LogUtil.d("transport = TRANSPORT_LOWPAN");
+            LogUtil.d("result = TRANSPORT_LOWPAN");
             return NetworkCapabilities.TRANSPORT_LOWPAN;
         }
-        LogUtil.w("transport = TRANSPORT_UNKNOWN");
-        return TRANSPORT_UNKNOWN;
+        LogUtil.w("result = " + TRANSPORT_KEY_UNKNOWN);
+        return TRANSPORT_VALUE_UNKNOWN;
+    }// TODO: 2021/6/8
+
+    public static String getRawTransport() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        Network network = connectivityManager.getActiveNetwork();
+        LogUtil.d("network = " + network);
+        if (network == null) {
+            LogUtil.w("result = " + TRANSPORT_KEY_UNKNOWN);
+            return TRANSPORT_KEY_UNKNOWN;
+        }
+        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
+        LogUtil.d("networkCapabilities = " + networkCapabilities);
+        if (networkCapabilities == null) {
+            LogUtil.w("result = " + TRANSPORT_KEY_UNKNOWN);
+            return TRANSPORT_KEY_UNKNOWN;
+        }
+        String ncStr = networkCapabilities.toString();
+        String strStart = "Transports: ";
+        String strEnd = " Capabilities:";
+        int indexStart = ncStr.indexOf(strStart);
+        int indexEnd = ncStr.indexOf(strEnd);
+        String result;
+        try {
+            result = ncStr.substring(indexStart + strStart.length(), indexEnd);
+            LogUtil.d("result = " + result);
+        } catch (IndexOutOfBoundsException e) {
+            result = TRANSPORT_KEY_UNKNOWN;
+            LogUtil.w("result = " + result, "e = " + e.toString());
+        }
+        return result;
     }
 
     private static boolean isNeedExcludeTransport(NetworkCapabilities networkCapabilities, int[] excludeTransports) {
@@ -206,110 +323,49 @@ public class ConnectionUtil {
         }
         for (int excludeTransport : excludeTransports) {
             if (networkCapabilities.hasTransport(excludeTransport)) {
-                LogUtil.d("excludeTransports = " + Arrays.toString(excludeTransports) + ", need to be excluded");
+                LogUtil.d("transport = " + excludeTransport + ", excludeTransports = " + Arrays.toString(excludeTransports) + ", need to be excluded");
                 return true;
             }
         }
         return false;
     }
 
-    private void notifyAvailable(Network activeNetwork) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
-        LogUtil.d("activeNetwork = " + activeNetwork + ", networkCapabilities = " + networkCapabilities);
-        LogUtil.d("mActiveNetworkMap = " + mActiveNetworkMap);// TODO: 2021/4/28
-        if (networkCapabilities == null) {
+    private void checkAndCallListener(int newConnectionStatus) {
+        LogUtil.d("oldConnectionStatus= " + mConnectionStatus + ", newConnectionStatus = " + newConnectionStatus);
+        if (mConnectionStatus == newConnectionStatus) {
             return;
         }
-        NetworkCapabilities oldNetworkCapabilities = mActiveNetworkMap.put(activeNetwork, networkCapabilities);
-        if (oldNetworkCapabilities != null) {
-            LogUtil.d("networkCapabilities updated");
-        }// TODO: 2021/4/27
-        if (isNeedExcludeTransport(networkCapabilities, mExcludeTransports)) {
-            return;
-        }
-        boolean hasInternetCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
-        if (!hasInternetCapability) {
-            return;
-        }
-        LogUtil.d("sendMessage = " + CONNECTION_STATUS_CONNECTED);
-        callListener(CONNECTION_STATUS_CONNECTED);
+        callOnNetworkListener(newConnectionStatus);
+        mConnectionStatus = newConnectionStatus;
     }
 
-    private void notifyCapabilitiesChanged(Network activeNetwork, NetworkCapabilities networkCapabilities) {
-        LogUtil.d("activeNetwork = " + activeNetwork + ", networkCapabilities = " + networkCapabilities);
-        boolean hasInternetCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
-        if (!hasInternetCapability) {
-            callListener(CONNECTION_STATUS_NOT_CONNECTED);
-            return;
-        }
-        if (isNeedExcludeTransport(networkCapabilities, mExcludeTransports)) {
-            return;
-        }
-        boolean hasValidatedCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
-        if (!hasValidatedCapability) {
-            return;
-        }
-        LogUtil.d("sendMessage = " + CONNECTION_STATUS_CONNECTED_VALIDATED);
-        callListener(CONNECTION_STATUS_CONNECTED_VALIDATED);
-    }
-
-    private void notifyLost(Network activeNetwork) {
-        NetworkCapabilities networkCapabilities = mActiveNetworkMap.get(activeNetwork);
-        LogUtil.d("activeNetwork = " + activeNetwork + ", networkCapabilities = " + networkCapabilities);
-        LogUtil.i("mActiveNetworkMap = " + mActiveNetworkMap);// TODO: 2021/4/28
-        if (networkCapabilities == null) {
-            return;
-        }
-        mActiveNetworkMap.remove(activeNetwork);
-        Map<Network, NetworkCapabilities> activeNetworkMap = new ConcurrentHashMap<>(mActiveNetworkMap);
-        Set<Map.Entry<Network, NetworkCapabilities>> entries = activeNetworkMap.entrySet();
-        Iterator<Map.Entry<Network, NetworkCapabilities>> iterator = entries.iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Network, NetworkCapabilities> entry = iterator.next();
-            if (isNeedExcludeTransport(entry.getValue(), mExcludeTransports)) {
-                iterator.remove();
-            }
-        }
-        if (activeNetworkMap.isEmpty()) {
-            LogUtil.i("sendMessage = " + CONNECTION_STATUS_NOT_CONNECTED);
-            callListener(CONNECTION_STATUS_NOT_CONNECTED);
+    private void callOnNetworkListener(@NetworkDef int connectionStatus) {
+        if (mOnNetworkListener != null) {
+            LogUtil.d("call start");
+            mOnNetworkListener.onConnectionStatusChanged(connectionStatus);
+            LogUtil.d("call end");
         }
     }
 
-    private void callListener(int newStatus) {
-        LogUtil.d("oldStatus = " + mConnectionStatus + ", newStatus = " + newStatus);
-        if (mConnectionStatus == newStatus) {
-            LogUtil.d("call exclude");
-            return;
-        }
-        LogUtil.d("call execute");
-        callOnConnectionListener(newStatus);
-        mConnectionStatus = newStatus;
-    }
-
-    private void callOnConnectionListener(@NetworkDef int connectionStatus) {
-        if (mOnActiveConnectionListener != null) {
-            mOnActiveConnectionListener.onConnectionStatusChanged(connectionStatus);
+    private void callOnCellularNetworkListener(@NetworkDef int connectionStatus) {
+        if (mOnCellularNetworkListener != null) {
+            LogUtil.d("call start");
+            mOnCellularNetworkListener.onConnectionStatusChanged(connectionStatus);
+            LogUtil.d("call end");
         }
     }
 
-    private void callOnCellularConnectionListener(@NetworkDef int connectionStatus) {
-        if (mOnActiveCellularNetworkListener != null) {
-            mOnActiveCellularNetworkListener.onConnectionStatusChanged(connectionStatus);
-        }
-    }
-
-    private void callOnWifiConnectionListener(@NetworkDef int connectionStatus) {
-        if (mOnActiveWifiNetworkListener != null) {
-            mOnActiveWifiNetworkListener.onConnectionStatusChanged(connectionStatus);
+    private void callOnWifiNetworkListener(@NetworkDef int connectionStatus) {
+        if (mOnWifiNetworkListener != null) {
+            LogUtil.d("call start");
+            mOnWifiNetworkListener.onConnectionStatusChanged(connectionStatus);
+            LogUtil.d("call end");
         }
     }
 
     private void addEvent() {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkRequest networkRequest = new NetworkRequest.Builder().build();
-        connectivityManager.registerNetworkCallback(networkRequest, mNetworkCallback, mHandler);
+        connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), mNetworkCallback, mHandler);
     }
 
     private void delEvent() {
@@ -319,13 +375,14 @@ public class ConnectionUtil {
 
     public void release() {
         delEvent();
-        mOnActiveConnectionListener = null;
-        mOnActiveCellularNetworkListener = null;
-        mOnActiveWifiNetworkListener = null;
-        mActiveNetworkMap.clear();
+        mOnNetworkListener = null;
+        mOnCellularNetworkListener = null;
+        mOnWifiNetworkListener = null;
+        mNetworkMap.clear();
+        mExcludedTransportsNetworkMap.clear();
     }
 
-    public interface OnActiveConnectionListener {
+    public interface OnConnectionListener {
         void onConnectionStatusChanged(@NetworkDef int connectionStatus);
     }
 
@@ -335,35 +392,36 @@ public class ConnectionUtil {
     }
 
     public static class Builder {
-        private final ConnectionUtil mConnectionUtil;
+        private int[] mExcludeTransports;
+        private OnConnectionListener mOnNetworkListener;//optional (required or optional)
+        private OnConnectionListener mOnCellularNetworkListener;//optional
+        private OnConnectionListener mOnWifiNetworkListener;//optional
 
-        public Builder() {
-            mConnectionUtil = new ConnectionUtil();
-        }
-
-        public Builder setOnConnectionListener(OnActiveConnectionListener onActiveConnectionListener, int... excludeTransports) {
-            mConnectionUtil.mOnActiveConnectionListener = onActiveConnectionListener;
-            mConnectionUtil.mExcludeTransports = excludeTransports;
+        public Builder setOnNetworkListener(OnConnectionListener onConnectionListener, int... excludeTransports) {
+            mOnNetworkListener = onConnectionListener;
+            mExcludeTransports = excludeTransports;
             return this;
         }
 
-        public Builder setOnCellularConnectionListener(OnActiveConnectionListener onActiveConnectionListener) {
-            mConnectionUtil.mOnActiveCellularNetworkListener = onActiveConnectionListener;
+        public Builder setOnCellularNetworkListener(OnConnectionListener onConnectionListener) {
+            mOnCellularNetworkListener = onConnectionListener;
             return this;
         }
 
-        public Builder setOnWifiConnectionListener(OnActiveConnectionListener onActiveConnectionListener) {
-            mConnectionUtil.mOnActiveWifiNetworkListener = onActiveConnectionListener;
+        public Builder setOnWifiNetworkListener(OnConnectionListener onConnectionListener) {
+            mOnWifiNetworkListener = onConnectionListener;
             return this;
         }
 
         public ConnectionUtil build() {
-            if (mConnectionUtil.mOnActiveConnectionListener != null || mConnectionUtil.mOnActiveCellularNetworkListener != null || mConnectionUtil.mOnActiveWifiNetworkListener != null) {
-                mConnectionUtil.addEvent();
+            ConnectionUtil connectionUtil;
+            if (mOnNetworkListener != null || mOnCellularNetworkListener != null || mOnWifiNetworkListener != null) {
+                connectionUtil = new ConnectionUtil(this);
+                connectionUtil.addEvent();
             } else {
-                throw new NullPointerException("call at least one setOnXxxConnectionListener");
+                throw new RuntimeException("call at least one setOnXxxListener");
             }
-            return mConnectionUtil;
+            return connectionUtil;
         }
     }
 }
