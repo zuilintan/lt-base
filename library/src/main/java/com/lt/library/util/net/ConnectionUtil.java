@@ -6,8 +6,6 @@ import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.IntDef;
 
 import com.lt.library.util.LogUtil;
@@ -20,6 +18,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionUtil {
     public static final int CONNECTION_STATUS_NOT_CONNECTED = 10;
@@ -30,11 +29,13 @@ public class ConnectionUtil {
     private final Map<Network, NetworkCapabilities> mNetworkMap = new ConcurrentHashMap<>();
     private final Map<Network, NetworkCapabilities> mExcludedTransportsNetworkMap = new ConcurrentHashMap<>();
     private final ConnectivityManager.NetworkCallback mNetworkCallback;
-    private final int[] mExcludeTransports;
+    private final AtomicInteger mNetworkConnectionStatus = new AtomicInteger();
+    private final AtomicInteger mCellularNetworkConnectionStatus = new AtomicInteger();
+    private final AtomicInteger mWifiNetworkConnectionStatus = new AtomicInteger();
+    private final int[] mNeedExcludeTransports;
     private OnConnectionListener mOnNetworkListener;
     private OnConnectionListener mOnCellularNetworkListener;
     private OnConnectionListener mOnWifiNetworkListener;
-    private int mConnectionStatus = -1;
 
     {
         mNetworkCallback = new ConnectivityManager.NetworkCallback() {
@@ -47,21 +48,23 @@ public class ConnectionUtil {
                 if (networkCapabilities == null) {
                     return;
                 }
-
                 NetworkCapabilities oldValue = mNetworkMap.put(network, networkCapabilities);
                 if (oldValue != null) {
                     LogUtil.d("networkMap value updated, old value = " + oldValue);
-                }
-                if (isNeedExcludeTransport(networkCapabilities, mExcludeTransports)) {
-                    return;
                 }
                 boolean hasInternetCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
                 if (!hasInternetCapability) {
                     return;
                 }
                 int connectionStatus = CONNECTION_STATUS_CONNECTED;
-                LogUtil.d("connection status = " + connectionStatus);
-                checkAndCallListener(connectionStatus);
+                if (!isNeedExcludeTransport(networkCapabilities, mNeedExcludeTransports)) {
+                    checkAndCallNetworkListener(connectionStatus);
+                }
+                if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    checkAndCallCellularNetworkListener(connectionStatus);
+                } else if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    checkAndCallWifiNetworkListener(connectionStatus);
+                }
             }//当网络连接成功, 可以使用时
 
             @Override
@@ -85,17 +88,21 @@ public class ConnectionUtil {
                 Iterator<Map.Entry<Network, NetworkCapabilities>> iterator = entries.iterator();
                 while (iterator.hasNext()) {
                     Map.Entry<Network, NetworkCapabilities> entry = iterator.next();
-                    if (isNeedExcludeTransport(entry.getValue(), mExcludeTransports)) {
+                    if (isNeedExcludeTransport(entry.getValue(), mNeedExcludeTransports)) {
                         iterator.remove();
                     }
                 }
                 LogUtil.d("networkMap after exclusion = " + mExcludedTransportsNetworkMap);
+                int connectionStatus = CONNECTION_STATUS_NOT_CONNECTED;
                 if (mExcludedTransportsNetworkMap.isEmpty()) {
-                    int connectionStatus = CONNECTION_STATUS_NOT_CONNECTED;
-                    LogUtil.d("connection status = " + connectionStatus);
-                    checkAndCallListener(connectionStatus);
+                    checkAndCallNetworkListener(connectionStatus);
                 } else {
                     mExcludedTransportsNetworkMap.clear();
+                }
+                if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    checkAndCallCellularNetworkListener(connectionStatus);
+                } else if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    checkAndCallWifiNetworkListener(connectionStatus);
                 }
             }//当网络连接已经断开
 
@@ -109,26 +116,41 @@ public class ConnectionUtil {
             public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) {
                 super.onCapabilitiesChanged(network, networkCapabilities);
                 LogUtil.d("network = " + network + ", networkCapabilities = " + networkCapabilities);
-                if (isNeedExcludeTransport(networkCapabilities, mExcludeTransports)) {
-                    return;
-                }
                 boolean hasInternetCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
                 if (!hasInternetCapability) {
                     int connectionStatus = CONNECTION_STATUS_NOT_CONNECTED;
-                    LogUtil.d("connection status = " + connectionStatus);
-                    checkAndCallListener(connectionStatus);
+                    if (!isNeedExcludeTransport(networkCapabilities, mNeedExcludeTransports)) {
+                        checkAndCallNetworkListener(connectionStatus);
+                    }
+                    if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                        checkAndCallCellularNetworkListener(connectionStatus);
+                    } else if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        checkAndCallWifiNetworkListener(connectionStatus);
+                    }
                     return;
                 }
                 boolean hasValidatedCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
                 if (!hasValidatedCapability) {
                     int connectionStatus = CONNECTION_STATUS_CONNECTED;
-                    LogUtil.d("connection status = " + connectionStatus);
-                    checkAndCallListener(connectionStatus);
+                    if (!isNeedExcludeTransport(networkCapabilities, mNeedExcludeTransports)) {
+                        checkAndCallNetworkListener(connectionStatus);
+                    }
+                    if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                        checkAndCallCellularNetworkListener(connectionStatus);
+                    } else if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        checkAndCallWifiNetworkListener(connectionStatus);
+                    }
                     return;
                 }
                 int connectionStatus = CONNECTION_STATUS_CONNECTED_VALIDATED;
-                LogUtil.d("connection status = " + connectionStatus);
-                checkAndCallListener(connectionStatus);
+                if (!isNeedExcludeTransport(networkCapabilities, mNeedExcludeTransports)) {
+                    checkAndCallNetworkListener(connectionStatus);
+                }
+                if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    checkAndCallCellularNetworkListener(connectionStatus);
+                } else if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    checkAndCallWifiNetworkListener(connectionStatus);
+                }
             }//当网络连接的状态变化, 但仍旧可用
 
             @Override
@@ -140,7 +162,7 @@ public class ConnectionUtil {
     }
 
     private ConnectionUtil(Builder builder) {
-        mExcludeTransports = builder.mExcludeTransports;
+        mNeedExcludeTransports = builder.mNeedExcludeTransports;
         mOnNetworkListener = builder.mOnNetworkListener;
         mOnCellularNetworkListener = builder.mOnCellularNetworkListener;
         mOnWifiNetworkListener = builder.mOnWifiNetworkListener;
@@ -329,13 +351,34 @@ public class ConnectionUtil {
         return false;
     }
 
-    private void checkAndCallListener(int newConnectionStatus) {
-        LogUtil.d("oldConnectionStatus= " + mConnectionStatus + ", newConnectionStatus = " + newConnectionStatus);
-        if (mConnectionStatus == newConnectionStatus) {
+    private synchronized void checkAndCallNetworkListener(int newConnectionStatus) {
+        int oldConnectionStatus = mNetworkConnectionStatus.get();
+        LogUtil.d("oldConnectionStatus= " + oldConnectionStatus + ", newConnectionStatus = " + newConnectionStatus);
+        if (oldConnectionStatus == newConnectionStatus) {
             return;
         }
         callOnNetworkListener(newConnectionStatus);
-        mConnectionStatus = newConnectionStatus;
+        mNetworkConnectionStatus.set(newConnectionStatus);
+    }
+
+    private synchronized void checkAndCallCellularNetworkListener(int newConnectionStatus) {
+        int oldConnectionStatus = mCellularNetworkConnectionStatus.get();
+        LogUtil.d("oldConnectionStatus= " + oldConnectionStatus + ", newConnectionStatus = " + newConnectionStatus);
+        if (oldConnectionStatus == newConnectionStatus) {
+            return;
+        }
+        callOnCellularNetworkListener(newConnectionStatus);
+        mCellularNetworkConnectionStatus.set(newConnectionStatus);
+    }
+
+    private synchronized void checkAndCallWifiNetworkListener(int newConnectionStatus) {
+        int oldConnectionStatus = mWifiNetworkConnectionStatus.get();
+        LogUtil.d("oldConnectionStatus= " + oldConnectionStatus + ", newConnectionStatus = " + newConnectionStatus);
+        if (oldConnectionStatus == newConnectionStatus) {
+            return;
+        }
+        callOnWifiNetworkListener(newConnectionStatus);
+        mWifiNetworkConnectionStatus.set(newConnectionStatus);
     }
 
     private void callOnNetworkListener(@NetworkDef int connectionStatus) {
@@ -364,7 +407,7 @@ public class ConnectionUtil {
 
     private void addEvent() {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), mNetworkCallback, new Handler(Looper.getMainLooper()));
+        connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), mNetworkCallback);
         if (!isConnected()) {
             callOnNetworkListener(CONNECTION_STATUS_NOT_CONNECTED);
         }
@@ -394,14 +437,14 @@ public class ConnectionUtil {
     }
 
     public static class Builder {
-        private int[] mExcludeTransports;
+        private int[] mNeedExcludeTransports;
         private OnConnectionListener mOnNetworkListener;//optional (required or optional)
         private OnConnectionListener mOnCellularNetworkListener;//optional
         private OnConnectionListener mOnWifiNetworkListener;//optional
 
-        public Builder setOnNetworkListener(OnConnectionListener onConnectionListener, int... excludeTransports) {
+        public Builder setOnNetworkListener(OnConnectionListener onConnectionListener, int... needExcludeTransports) {
             mOnNetworkListener = onConnectionListener;
-            mExcludeTransports = excludeTransports;
+            mNeedExcludeTransports = needExcludeTransports;
             return this;
         }
 
