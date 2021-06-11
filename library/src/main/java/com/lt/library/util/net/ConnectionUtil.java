@@ -16,7 +16,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -84,8 +83,7 @@ public class ConnectionUtil {
                 mNetworkMap.remove(network);
                 mExcludedTransportsNetworkMap.putAll(mNetworkMap);
                 LogUtil.d("networkMap before exclusion = " + mNetworkMap);
-                Set<Map.Entry<Network, NetworkCapabilities>> entries = mExcludedTransportsNetworkMap.entrySet();
-                Iterator<Map.Entry<Network, NetworkCapabilities>> iterator = entries.iterator();
+                Iterator<Map.Entry<Network, NetworkCapabilities>> iterator = mExcludedTransportsNetworkMap.entrySet().iterator();
                 while (iterator.hasNext()) {
                     Map.Entry<Network, NetworkCapabilities> entry = iterator.next();
                     if (isNeedExcludeTransport(entry.getValue(), mNeedExcludeTransports)) {
@@ -118,31 +116,10 @@ public class ConnectionUtil {
                 LogUtil.d("network = " + network + ", networkCapabilities = " + networkCapabilities);
                 boolean hasInternetCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
                 if (!hasInternetCapability) {
-                    int connectionStatus = CONNECTION_STATUS_NOT_CONNECTED;
-                    if (!isNeedExcludeTransport(networkCapabilities, mNeedExcludeTransports)) {
-                        checkAndCallNetworkListener(connectionStatus);
-                    }
-                    if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                        checkAndCallCellularNetworkListener(connectionStatus);
-                    } else if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                        checkAndCallWifiNetworkListener(connectionStatus);
-                    }
                     return;
                 }
                 boolean hasValidatedCapability = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
-                if (!hasValidatedCapability) {
-                    int connectionStatus = CONNECTION_STATUS_CONNECTED;
-                    if (!isNeedExcludeTransport(networkCapabilities, mNeedExcludeTransports)) {
-                        checkAndCallNetworkListener(connectionStatus);
-                    }
-                    if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                        checkAndCallCellularNetworkListener(connectionStatus);
-                    } else if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                        checkAndCallWifiNetworkListener(connectionStatus);
-                    }
-                    return;
-                }
-                int connectionStatus = CONNECTION_STATUS_CONNECTED_VALIDATED;
+                int connectionStatus = !hasValidatedCapability ? CONNECTION_STATUS_CONNECTED : CONNECTION_STATUS_CONNECTED_VALIDATED;
                 if (!isNeedExcludeTransport(networkCapabilities, mNeedExcludeTransports)) {
                     checkAndCallNetworkListener(connectionStatus);
                 }
@@ -408,9 +385,6 @@ public class ConnectionUtil {
     private void addEvent() {
         ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), mNetworkCallback);
-        if (!isConnected()) {
-            callOnNetworkListener(CONNECTION_STATUS_NOT_CONNECTED);
-        }
     }
 
     private void delEvent() {
