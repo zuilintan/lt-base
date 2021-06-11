@@ -7,6 +7,7 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.support.annotation.IntDef;
+import android.support.annotation.WorkerThread;
 
 import com.lt.library.util.LogUtil;
 import com.lt.library.util.context.ContextUtil;
@@ -402,6 +403,7 @@ public class ConnectionUtil {
     }
 
     public interface OnConnectionListener {
+        @WorkerThread
         void onConnectionStatusChanged(@NetworkDef int connectionStatus);
     }
 
