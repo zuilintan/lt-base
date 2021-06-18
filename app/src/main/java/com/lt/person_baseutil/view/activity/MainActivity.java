@@ -1,6 +1,5 @@
 package com.lt.person_baseutil.view.activity;
 
-import android.net.NetworkCapabilities;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -43,22 +42,22 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements
         super.initEvent();
         mTestAdapter.setOnEntityItemClickListener(this);
         mConnectionUtil = new ConnectionUtil.Builder()
-                .setOnNetworkListener(networkConnectionStatus -> {
-                    LogUtil.d("networkConnectionStatus = " + networkConnectionStatus);
+                .setOnNetworkListener(connectionStatus -> {
+                    LogUtil.w("networkStatus = " + connectionStatus);
                 })
-                .setOnCellularNetworkListener(cellularConnectionStatus -> {
-                    LogUtil.d("cellularConnectionStatus = " + cellularConnectionStatus);
+                .setOnCellularNetworkListener(connectionStatus -> {
+                    LogUtil.w("CellularNetworkStatus = " + connectionStatus);
                 })
-                .setOnWifiNetworkListener(wifiConnectionStatus -> {
-                    LogUtil.d("wifiConnectionStatus = " + wifiConnectionStatus);
+                .setOnWifiNetworkListener(connectionStatus -> {
+                    LogUtil.w("wifiNetworkStatus = " + connectionStatus);
                 })
                 .build();
-        LogUtil.w("isActiveNetworkConnected = " + ConnectionUtil.isNetworkConnected());
-        LogUtil.w("isActiveNetworkConnected = " + ConnectionUtil.isNetworkConnected(NetworkCapabilities.TRANSPORT_WIFI) + ", excludeTransports = " + NetworkCapabilities.TRANSPORT_WIFI);
-        LogUtil.w("isActiveNetworkValidated = " + ConnectionUtil.isNetworkConnectedAndValidated());
-        LogUtil.w("isActiveNetworkNotMetered = " + ConnectionUtil.isNetworkNotMetered());
-        LogUtil.w("isActiveNetworkBelongTransport = " + ConnectionUtil.isNetworkBelongTransport(NetworkCapabilities.TRANSPORT_VPN));
-        LogUtil.w("getActiveNetworkTransport = " + ConnectionUtil.getNetworkTransport());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LogUtil.d();
     }
 
     @Override
