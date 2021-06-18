@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LogUtil {
     private static final AtomicBoolean sIsEnabled = new AtomicBoolean(true);//默认启用
-    private static final String PROCESS_NAME = Application.getProcessName();
+    private static final String PROCESS_NAME = getProcessName();
     private static final String CLASS_NAME = LogUtil.class.getName();
     private static final String UNK_FLAG = "<unk>";
     private static final String NULL_FLAG = "<null>";
@@ -27,6 +27,19 @@ public class LogUtil {
 
     private LogUtil() {
         throw new UnsupportedOperationException("cannot be instantiated");
+    }
+
+    private static String getProcessName() {
+        String result;
+        String processName = Application.getProcessName();
+        try {
+            int startIndex = processName.lastIndexOf('.');
+            result = processName.substring(startIndex + 1);
+        } catch (StringIndexOutOfBoundsException e) {
+            e.printStackTrace();
+            result = processName;
+        }
+        return result;
     }
 
     private static String createStdTag(String customTag) {
@@ -41,7 +54,7 @@ public class LogUtil {
                 fileName = stackTraceElements[i].getFileName();
                 lineNumber = stackTraceElements[i].getLineNumber();
                 methodName = stackTraceElements[i].getMethodName();
-                int index = methodName.indexOf('$');
+                int index = methodName.indexOf('$');//判断是否为Lambd表达式
                 if (index > -1) {
                     methodName = methodName.substring(0, index + 1);
                 }
@@ -50,11 +63,11 @@ public class LogUtil {
         }
         String tagFormat;
         if (TextUtils.isEmpty(customTag)) {
-            tagFormat = "%s:(%s:%d).%s()";//进程名:(文件名:行号).方法名()
-            result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, fileName, lineNumber, methodName);
+            tagFormat = "%s:%s(%s:%d)";//进程名:方法名(文件名:行号)
+            result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, methodName, fileName, lineNumber);
         } else {
-            tagFormat = "%s:(%s:%d).%s():%s";//进程名:(文件名:行号).方法名():自定义Tag
-            result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, fileName, lineNumber, methodName, customTag);
+            tagFormat = "%s:%s(%s:%d):%s";//进程名:方法名(文件名:行号):自定义Tag
+            result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, methodName, fileName, lineNumber, customTag);
         }
         return result;
     }//注意: tag及时间, 进程, 线程号, 日志等级的字数阈值约为128byte, 超出部分不显示(但还是会占用该条Log的可显示字数, 即覆盖msg)
@@ -69,7 +82,7 @@ public class LogUtil {
             result = msg;
         }
         return result;
-    }//注意: Android未限制msg字数阈值, 但限制了一条Log的字数阈值约为4096byte
+    }//注意: Android未限制msg字数阈值, 但限制了 tag + msg 的字数阈值约为4096byte
 
     public static boolean isEnable() {
         return sIsEnabled.get();
