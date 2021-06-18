@@ -6,8 +6,9 @@ import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.IntDef;
-import android.support.annotation.WorkerThread;
 
 import com.lt.library.util.LogUtil;
 import com.lt.library.util.context.ContextUtil;
@@ -24,20 +25,40 @@ public class ConnectionUtil {
     public static final int CONNECTION_STATUS_NOT_CONNECTED = 10;
     public static final int CONNECTION_STATUS_CONNECTED = 20;
     public static final int CONNECTION_STATUS_CONNECTED_VALIDATED = 21;
+    private static final int CONNECTION_TYPE_NETWORK = 0;
+    private static final int CONNECTION_TYPE_CELLULAR_NETWORK = 1;
+    private static final int CONNECTION_TYPE_WIFI_NETWORK = 2;
     private static final String TRANSPORT_KEY_UNKNOWN = "UNKNOWN";
     private static final int TRANSPORT_VALUE_UNKNOWN = -1;
+    private final Handler mHandler;
+    private final ConnectivityManager.NetworkCallback mNetworkCallback;
     private final Map<Network, NetworkCapabilities> mNetworkMap = new ConcurrentHashMap<>();
     private final Map<Network, NetworkCapabilities> mExcludedTransportsNetworkMap = new ConcurrentHashMap<>();
-    private final ConnectivityManager.NetworkCallback mNetworkCallback;
+    private final int[] mNeedExcludeTransports;
     private final AtomicInteger mNetworkConnectionStatus = new AtomicInteger();
     private final AtomicInteger mCellularNetworkConnectionStatus = new AtomicInteger();
     private final AtomicInteger mWifiNetworkConnectionStatus = new AtomicInteger();
-    private final int[] mNeedExcludeTransports;
     private OnConnectionListener mOnNetworkListener;
     private OnConnectionListener mOnCellularNetworkListener;
     private OnConnectionListener mOnWifiNetworkListener;
 
     {
+        mHandler = new Handler(Looper.getMainLooper(), msg -> {
+            switch (msg.what) {
+                case CONNECTION_TYPE_NETWORK:
+                    callOnNetworkListener((Integer) msg.obj);
+                    break;
+                case CONNECTION_TYPE_CELLULAR_NETWORK:
+                    callOnCellularNetworkListener((Integer) msg.obj);
+                    break;
+                case CONNECTION_TYPE_WIFI_NETWORK:
+                    callOnWifiNetworkListener((Integer) msg.obj);
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        });
         mNetworkCallback = new ConnectivityManager.NetworkCallback() {
             @Override
             public void onAvailable(Network network) {
@@ -335,7 +356,7 @@ public class ConnectionUtil {
         if (oldConnectionStatus == newConnectionStatus) {
             return;
         }
-        callOnNetworkListener(newConnectionStatus);
+        mHandler.sendMessage(mHandler.obtainMessage(CONNECTION_TYPE_NETWORK, newConnectionStatus));
         mNetworkConnectionStatus.set(newConnectionStatus);
     }
 
@@ -345,7 +366,7 @@ public class ConnectionUtil {
         if (oldConnectionStatus == newConnectionStatus) {
             return;
         }
-        callOnCellularNetworkListener(newConnectionStatus);
+        mHandler.sendMessage(mHandler.obtainMessage(CONNECTION_TYPE_CELLULAR_NETWORK, newConnectionStatus));
         mCellularNetworkConnectionStatus.set(newConnectionStatus);
     }
 
@@ -355,7 +376,7 @@ public class ConnectionUtil {
         if (oldConnectionStatus == newConnectionStatus) {
             return;
         }
-        callOnWifiNetworkListener(newConnectionStatus);
+        mHandler.sendMessage(mHandler.obtainMessage(CONNECTION_TYPE_WIFI_NETWORK, newConnectionStatus));
         mWifiNetworkConnectionStatus.set(newConnectionStatus);
     }
 
@@ -395,15 +416,15 @@ public class ConnectionUtil {
 
     public void release() {
         delEvent();
-        mOnNetworkListener = null;
-        mOnCellularNetworkListener = null;
-        mOnWifiNetworkListener = null;
         mNetworkMap.clear();
         mExcludedTransportsNetworkMap.clear();
+        mHandler.removeCallbacksAndMessages(null);
+        mOnNetworkListener = null;
+        mOnWifiNetworkListener = null;
+        mOnCellularNetworkListener = null;
     }
 
     public interface OnConnectionListener {
-        @WorkerThread
         void onConnectionStatusChanged(@NetworkDef int connectionStatus);
     }
 
