@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lt.library.base.livedata;
+package com.lt.library.util.livedata;
 
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;

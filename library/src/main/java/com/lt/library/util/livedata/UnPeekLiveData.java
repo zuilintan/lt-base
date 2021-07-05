@@ -1,4 +1,4 @@
-package com.lt.library.base.livedata;
+package com.lt.library.util.livedata;
 
 /**
  * TODO 唯一可信源设计

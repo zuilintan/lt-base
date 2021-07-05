@@ -1,4 +1,4 @@
-package com.lt.library.base.livedata;
+package com.lt.library.util.livedata;
 
 /**
  * TODO：UnPeekLiveData 的存在是为了在 "重回二级页面" 的场景下，解决 "数据倒灌" 的问题。

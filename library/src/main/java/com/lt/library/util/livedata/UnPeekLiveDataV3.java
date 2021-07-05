@@ -1,4 +1,4 @@
-package com.lt.library.base.livedata;
+package com.lt.library.util.livedata;
 
 /**
  * TODO：Note 2020.10.15:
