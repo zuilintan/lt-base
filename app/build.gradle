@@ -11,7 +11,7 @@ android {
         targetSdkVersion rootProject.ext.android.targetSdk
         versionCode rootProject.ext.android.versionCode
         versionName rootProject.ext.android.versionName
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
         release {
@@ -46,10 +46,10 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:' + rootProject.ext.dependencies.supportLib
     implementation 'com.android.support:support-v4:' + rootProject.ext.dependencies.supportLib
     implementation 'com.android.support:recyclerview-v7:' + rootProject.ext.dependencies.supportLib
-    implementation 'com.android.support.constraint:constraint-layout:latest.release'
+    implementation 'androidx.constraintlayout:constraintlayout:latest.release'
     testImplementation 'junit:junit:latest.release'
-    androidTestImplementation 'com.android.support.test:runner:latest.release'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:latest.release'
+    androidTestImplementation 'androidx.test.ext:junit:latest.release'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:latest.release'
 
     /**
      * CPY Maven Lib

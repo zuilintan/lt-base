@@ -8,7 +8,8 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.IntDef;
+
+import androidx.annotation.IntDef;
 
 import com.lt.library.util.LogUtil;
 import com.lt.library.util.context.ContextUtil;

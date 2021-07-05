@@ -16,10 +16,10 @@
 
 package com.lt.library.util.livedata;
 
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -49,17 +49,17 @@ import java.util.TimerTask;
 @Deprecated
 public class ProtectedUnPeekLiveDataV3<T> extends LiveData<T> {
 
+    private final Timer mTimer = new Timer();
     protected int DELAY_TO_CLEAR_EVENT = 1000;
     protected boolean isAllowNullValue;
     protected boolean isAllowToClear = true;
     private boolean isCleaning;
     private boolean hasHandled = true;
     private boolean isDelaying;
-    private Timer mTimer = new Timer();
     private TimerTask mTask;
 
     @Override
-    public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<T> observer) {
+    public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<? super T> observer) {
 
         super.observe(owner, t -> {
 
@@ -89,7 +89,7 @@ public class ProtectedUnPeekLiveDataV3<T> extends LiveData<T> {
      * @param observer
      */
     @Override
-    public void observeForever(@NonNull Observer<T> observer) {
+    public void observeForever(@NonNull Observer<? super T> observer) {
         throw new IllegalArgumentException("Do not use observeForever for communication between pages to avoid lifecycle security issues");
     }
 

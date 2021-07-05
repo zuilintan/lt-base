@@ -1,10 +1,11 @@
 package com.lt.library.util.livedata;
 
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,10 +57,10 @@ public class ProtectedUnPeekLiveData<T> extends LiveData<T> {
      * @param observer
      */
     @Override
-    public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<T> observer) {
+    public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<? super T> observer) {
         Observer<? super T> observer1 = getObserverProxy(observer);
         if (observer1 != null) {
-            super.observe(owner, (Observer<T>) observer1);
+            super.observe(owner, observer1);
         }
     }
 
@@ -75,10 +76,10 @@ public class ProtectedUnPeekLiveData<T> extends LiveData<T> {
      * @param observer
      */
     @Override
-    public void observeForever(@NonNull Observer<T> observer) {
+    public void observeForever(@NonNull Observer<? super T> observer) {
         Observer<? super T> observer1 = getObserverProxy(observer);
         if (observer1 != null) {
-            super.observeForever((Observer<T>) observer1);
+            super.observeForever(observer1);
         }
     }
 
@@ -136,7 +137,7 @@ public class ProtectedUnPeekLiveData<T> extends LiveData<T> {
     }
 
     @Override
-    public void removeObserver(@NonNull Observer<T> observer) {
+    public void removeObserver(@NonNull Observer<? super T> observer) {
         Observer<? super T> proxy;
         Observer<? super T> target;
         if (observer instanceof ProtectedUnPeekLiveData.ObserverProxy) {
@@ -149,7 +150,7 @@ public class ProtectedUnPeekLiveData<T> extends LiveData<T> {
         if (proxy != null && target != null) {
             observerProxyMap.remove(target);
             observerStateMap.remove(target);
-            super.removeObserver((Observer<T>) proxy);
+            super.removeObserver(proxy);
         }
     }
 

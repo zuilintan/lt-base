@@ -1,9 +1,10 @@
 package com.lt.person_baseutil.view.activity;
 
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.kyleduo.switchbutton.SwitchButton;
 import com.lt.library.base.BaseActivity;

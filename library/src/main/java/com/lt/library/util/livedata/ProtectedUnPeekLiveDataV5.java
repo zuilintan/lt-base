@@ -17,12 +17,12 @@
 
 package com.lt.library.util.livedata;
 
-import android.arch.core.internal.SafeIterableMap;
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.arch.core.internal.SafeIterableMap;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -87,7 +87,7 @@ public class ProtectedUnPeekLiveDataV5<T> extends LiveData<T> {
     }
 
     @Override
-    public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<T> observer) {
+    public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<? super T> observer) {
         if (owner instanceof Fragment && ((Fragment) owner).getViewLifecycleOwner() != null) {
             /**
              * Fragment 的场景下使用 getViewLifeCycleOwner 来作为 liveData 的订阅者，
@@ -105,7 +105,7 @@ public class ProtectedUnPeekLiveDataV5<T> extends LiveData<T> {
     }
 
     @Override
-    public void observeForever(@NonNull Observer<T> observer) {
+    public void observeForever(@NonNull Observer<? super T> observer) {
         Integer observeKey = System.identityHashCode(observer);
         observeForever(observeKey, observer);
     }
@@ -118,7 +118,7 @@ public class ProtectedUnPeekLiveDataV5<T> extends LiveData<T> {
             observers.put(observeKey, true);
         }
 
-        Observer registerObserver;
+        Observer<? super T> registerObserver;
         if (observerMap.get(observeKey) == null) {
             registerObserver = createProxyObserver(observer, observeKey);
             // 保存外部 Observer 以及内部代理 Observer 的映射关系
@@ -144,7 +144,7 @@ public class ProtectedUnPeekLiveDataV5<T> extends LiveData<T> {
             observers.put(observeKey, true);
         }
 
-        Observer registerObserver = foreverObservers.get(observeKey);
+        Observer<? super T> registerObserver = foreverObservers.get(observeKey);
         if (registerObserver == null) {
             registerObserver = createProxyObserver(observer, observeKey);
             foreverObservers.put(observeKey, registerObserver);
@@ -154,9 +154,9 @@ public class ProtectedUnPeekLiveDataV5<T> extends LiveData<T> {
     }
 
     @Override
-    public void removeObserver(@NonNull Observer<T> observer) {
+    public void removeObserver(@NonNull Observer<? super T> observer) {
         Integer observeKey = System.identityHashCode(observer);
-        Observer registerObserver = foreverObservers.remove(observeKey);
+        Observer<? super T> registerObserver = foreverObservers.remove(observeKey);
         if (registerObserver == null && observerMap.containsKey(observeKey)) {
             // 反射拿到真正注册到 LiveData 中的 observer
             Integer registerObserverStoreId = observerMap.remove(observeKey);

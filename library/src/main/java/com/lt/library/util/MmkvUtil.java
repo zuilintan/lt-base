@@ -6,7 +6,7 @@ import com.lt.library.util.context.ContextUtil;
 import com.tencent.mmkv.MMKV;
 
 public class MmkvUtil {
-    private MMKV mMMKV;
+    private final MMKV mMMKV;
 
     private MmkvUtil() {
         MMKV.initialize(ContextUtil.getAppContext());

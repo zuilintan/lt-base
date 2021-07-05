@@ -21,7 +21,7 @@ import static com.lt.library.util.json.gson.TypeFactory.$map;
  */
 
 public class GsonUtil {
-    private Gson mGson;
+    private final Gson mGson;
 
     private GsonUtil() {
         mGson = new Gson();

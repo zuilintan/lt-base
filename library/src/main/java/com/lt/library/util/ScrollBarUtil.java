@@ -1,8 +1,9 @@
 package com.lt.library.util;
 
 import android.graphics.drawable.Drawable;
-import android.support.annotation.IntDef;
 import android.view.View;
+
+import androidx.annotation.IntDef;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

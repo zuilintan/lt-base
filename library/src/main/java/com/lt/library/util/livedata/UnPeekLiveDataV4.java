@@ -1,8 +1,8 @@
 package com.lt.library.util.livedata;
 
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.Observer;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 
 /**
  * TODO：UnPeekLiveData 的存在是为了在 "重回二级页面" 的场景下，解决 "数据倒灌" 的问题。
@@ -28,7 +28,7 @@ import android.support.annotation.NonNull;
  * Create by KunMinX at 2020/7/21
  */
 @Deprecated
-public class UnPeekLiveDataV4<T> extends ProtectedUnPeekLiveData<T> {
+public class UnPeekLiveDataV4<T> extends ProtectedUnPeekLiveDataV4<T> {
 
     @Override
     public void setValue(T value) {
@@ -54,7 +54,7 @@ public class UnPeekLiveDataV4<T> extends ProtectedUnPeekLiveData<T> {
      */
     @Override
     @Deprecated
-    public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<T> observer) {
+    public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<? super T> observer) {
         throw new IllegalArgumentException("请不要在 UnPeekLiveData 中使用 observe 方法。" +
                                                    "取而代之的是在 Activity 和 Fragment 中分别使用 observeInActivity 和 observeInFragment 来观察。\n\n" +
                                                    "Taking into account the normal permission of preventing backflow logic, " +
@@ -76,7 +76,7 @@ public class UnPeekLiveDataV4<T> extends ProtectedUnPeekLiveData<T> {
      */
     @Override
     @Deprecated
-    public void observeForever(@NonNull Observer<T> observer) {
+    public void observeForever(@NonNull Observer<? super T> observer) {
         throw new IllegalArgumentException("出于生命周期安全的考虑，请不要在 UnPeekLiveData 中使用 observeForever 方法。\n\n" +
                                                    "Considering avoid lifecycle security issues," +
                                                    " do not use observeForever for communication between pages.");
@@ -94,8 +94,8 @@ public class UnPeekLiveDataV4<T> extends ProtectedUnPeekLiveData<T> {
             return this;
         }
 
-        public UnPeekLiveData<T> create() {
-            UnPeekLiveData<T> liveData = new UnPeekLiveData<>();
+        public UnPeekLiveDataV4<T> create() {
+            UnPeekLiveDataV4<T> liveData = new UnPeekLiveDataV4<>();
             liveData.isAllowNullValue = this.isAllowNullValue;
             return liveData;
         }

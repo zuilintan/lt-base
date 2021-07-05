@@ -1,7 +1,7 @@
 package com.lt.library.util.event;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;

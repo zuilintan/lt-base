@@ -1,11 +1,12 @@
 package com.lt.person_baseutil.view.adapter;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.kyleduo.switchbutton.SwitchButton;
 import com.lt.library.base.recyclerview.adapter.BaseAdapter;
