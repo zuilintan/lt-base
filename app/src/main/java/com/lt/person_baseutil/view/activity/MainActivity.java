@@ -10,7 +10,6 @@ import com.kyleduo.switchbutton.SwitchButton;
 import com.lt.library.base.BaseActivity;
 import com.lt.library.base.recyclerview.listener.OnEntityItemClickListener;
 import com.lt.library.util.LogUtil;
-import com.lt.library.util.net.ConnectionUtil;
 import com.lt.person_baseutil.R;
 import com.lt.person_baseutil.databinding.ActivityMainBinding;
 import com.lt.person_baseutil.model.repo.DataRepo;
@@ -19,7 +18,6 @@ import com.lt.person_baseutil.view.adapter.TestAdapter;
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements
         OnEntityItemClickListener {
     private TestAdapter mTestAdapter;
-    private ConnectionUtil mConnectionUtil;
 
     @Override
     protected ActivityMainBinding bindView() {
@@ -42,29 +40,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements
     protected void initEvent() {
         super.initEvent();
         mTestAdapter.setOnEntityItemClickListener(this);
-        mConnectionUtil = new ConnectionUtil.Builder()
-                .setOnNetworkListener(connectionStatus -> {
-                    LogUtil.w("networkStatus = " + connectionStatus);
-                })
-                .setOnCellularNetworkListener(connectionStatus -> {
-                    LogUtil.w("CellularNetworkStatus = " + connectionStatus);
-                })
-                .setOnWifiNetworkListener(connectionStatus -> {
-                    LogUtil.w("wifiNetworkStatus = " + connectionStatus);
-                })
-                .build();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         LogUtil.d();
-    }
-
-    @Override
-    protected void freeEvent() {
-        super.freeEvent();
-        mConnectionUtil.release();
     }
 
     @Override
