@@ -257,7 +257,7 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
     }
 
     protected Context getAppContext() {
-        return ContextUtil.getInstance().getApplicationContext();
+        return ContextUtil.getAppContext();
     }
 
     protected abstract V bindView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container);

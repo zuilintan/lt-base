@@ -21,14 +21,14 @@ public class DensityUtil {
 
     public static int dp2px(float dpValue) {
         float density = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValue,
-                                                  ContextUtil.getInstance().getApplicationContext()
+                                                  ContextUtil.getAppContext()
                                                              .getResources()
                                                              .getDisplayMetrics());
         return (int) (density + 0.5F);//加0.5F以四舍五入，eg: 1.4+0.5=1.9转为int是1，而1.5 + 0.5 = 2.0转换成int后就是2
     }//dp转px
 
     public static int px2dp(float pxValue) {
-        float scale = ContextUtil.getInstance().getApplicationContext()
+        float scale = ContextUtil.getAppContext()
                                  .getResources()
                                  .getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5F);//加0.5F以四舍五入，eg: 1.4+0.5=1.9转为int是1，而1.5 + 0.5 = 2.0转换成int后就是2
@@ -36,14 +36,14 @@ public class DensityUtil {
 
     public static int sp2px(float spValue) {
         float density = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, spValue,
-                                                  ContextUtil.getInstance().getApplicationContext()
+                                                  ContextUtil.getAppContext()
                                                              .getResources()
                                                              .getDisplayMetrics());
         return (int) (density + 0.5F);//加0.5F以四舍五入，eg: 1.4+0.5=1.9转为int是1，而1.5 + 0.5 = 2.0转换成int后就是2
     }//sp转px
 
     public static int px2sp(float pxValue) {
-        float scale = ContextUtil.getInstance().getApplicationContext()
+        float scale = ContextUtil.getAppContext()
                                  .getResources()
                                  .getDisplayMetrics().scaledDensity;
         return (int) (pxValue / scale + 0.5F);//加0.5F以四舍五入，eg: 1.4+0.5=1.9转为int是1，而1.5 + 0.5 = 2.0转换成int后就是2

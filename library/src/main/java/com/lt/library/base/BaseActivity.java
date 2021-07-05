@@ -67,7 +67,7 @@ public abstract class BaseActivity<V extends ViewBinding> extends AppCompatActiv
     }
 
     protected Context getAppContext() {
-        return ContextUtil.getInstance().getApplicationContext();
+        return ContextUtil.getAppContext();
     }
 
     protected abstract V bindView();//绑定视图(eg: ViewBinding)

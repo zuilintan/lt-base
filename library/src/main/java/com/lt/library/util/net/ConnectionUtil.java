@@ -63,7 +63,7 @@ public class ConnectionUtil {
             @Override
             public void onAvailable(Network network) {
                 super.onAvailable(network);
-                ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
                 LogUtil.d("network = " + network + ", networkCapabilities = " + networkCapabilities);
                 if (networkCapabilities == null) {
@@ -168,7 +168,7 @@ public class ConnectionUtil {
     }
 
     public static boolean isConnected(int... needExcludeTransports) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
         LogUtil.d("network = " + network);
         if (network == null) {
@@ -193,7 +193,7 @@ public class ConnectionUtil {
     }
 
     public static boolean isConnectedAndValidated(int... needExcludeTransports) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
         LogUtil.d("network = " + network);
         if (network == null) {
@@ -218,7 +218,7 @@ public class ConnectionUtil {
     }
 
     public static boolean isNotMetered(int... needExcludeTransports) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
         LogUtil.d("network = " + network);
         if (network == null) {
@@ -243,7 +243,7 @@ public class ConnectionUtil {
     }
 
     public static boolean isBelongTransport(int transport) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
         LogUtil.d("network = " + network);
         if (network == null) {
@@ -262,7 +262,7 @@ public class ConnectionUtil {
     }// TODO: 2021/6/8
 
     public static int getTransport() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
         LogUtil.d("network = " + network);
         if (network == null) {
@@ -308,7 +308,7 @@ public class ConnectionUtil {
     }// TODO: 2021/6/8
 
     public static String getRawTransport() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
         LogUtil.d("network = " + network);
         if (network == null) {
@@ -405,12 +405,12 @@ public class ConnectionUtil {
     }
 
     private void addEvent() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), mNetworkCallback);
     }
 
     private void delEvent() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) ContextUtil.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         connectivityManager.unregisterNetworkCallback(mNetworkCallback);
     }
 

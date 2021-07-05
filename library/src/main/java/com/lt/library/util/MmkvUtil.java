@@ -9,7 +9,7 @@ public class MmkvUtil {
     private MMKV mMMKV;
 
     private MmkvUtil() {
-        MMKV.initialize(ContextUtil.getInstance().getApplicationContext());
+        MMKV.initialize(ContextUtil.getAppContext());
         mMMKV = MMKV.defaultMMKV();
     }
 

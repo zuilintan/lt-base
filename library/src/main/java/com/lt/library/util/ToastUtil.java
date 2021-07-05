@@ -57,7 +57,7 @@ public class ToastUtil {
         if (!sEnable.get()) {
             return null;
         }
-        Context context = ContextUtil.getInstance().getApplicationContext();
+        Context context = ContextUtil.getAppContext();
         Toast toast;
         if (mLayoutRes == -1) {
             toast = Toast.makeText(context, mText, mDuration);
@@ -116,7 +116,7 @@ public class ToastUtil {
         private int mTextViewIdRes = -1;
 
         public Builder setText(@StringRes int stringRes) {
-            mText = ContextUtil.getInstance().getApplicationContext().getString(stringRes);
+            mText = ContextUtil.getAppContext().getString(stringRes);
             return this;
         }
 

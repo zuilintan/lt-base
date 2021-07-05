@@ -119,7 +119,7 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
     }
 
     protected Context getAppContext() {
-        return ContextUtil.getInstance().getApplicationContext();
+        return ContextUtil.getAppContext();
     }
 
     protected abstract V bindView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container);

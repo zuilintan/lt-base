@@ -51,8 +51,7 @@ public class ScreenUtil {
     }//隐藏StatusBar
 
     public static int getScreenWidth() {
-        WindowManager windowManager = (WindowManager) ContextUtil.getInstance().getApplicationContext()
-                                                                 .getSystemService(Context.WINDOW_SERVICE);
+        WindowManager windowManager = (WindowManager) ContextUtil.getAppContext().getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay()
                      .getMetrics(displayMetrics);
@@ -60,8 +59,7 @@ public class ScreenUtil {
     }//获取屏幕宽度
 
     public static int getScreenHeight() {
-        WindowManager windowManager = (WindowManager) ContextUtil.getInstance().getApplicationContext()
-                                                                 .getSystemService(Context.WINDOW_SERVICE);
+        WindowManager windowManager = (WindowManager) ContextUtil.getAppContext().getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay()
                      .getMetrics(displayMetrics);
@@ -78,10 +76,8 @@ public class ScreenUtil {
         //Object statusBarHeightObj = ReflectionUtil.getField("com.android.internal.R$dimen", "status_bar_height");
         //int resId = Integer.parseInt(Objects.requireNonNull(statusBarHeightObj).toString());
         //Plan B
-        int resId = ContextUtil.getInstance().getApplicationContext()
-                               .getResources().getIdentifier("status_bar_height", "dimen", "android");
-        return ContextUtil.getInstance().getApplicationContext()
-                          .getResources().getDimensionPixelSize(resId);
+        int resId = ContextUtil.getAppContext().getResources().getIdentifier("status_bar_height", "dimen", "android");
+        return ContextUtil.getAppContext().getResources().getDimensionPixelSize(resId);
     }//获取状态栏高度
 
     public static Drawable snapShotWithStatusBar(Activity activity) {

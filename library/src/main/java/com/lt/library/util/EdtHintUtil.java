@@ -22,7 +22,7 @@ public class EdtHintUtil {
     }
 
     public static CharSequence formatHint(int hintTextId, int hintSizeId) {
-        Context context = ContextUtil.getInstance().getApplicationContext();
+        Context context = ContextUtil.getAppContext();
         return formatHint(context.getString(hintTextId), (int) context.getResources().getDimension(hintSizeId));
     }
 }

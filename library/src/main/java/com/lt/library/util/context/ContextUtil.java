@@ -18,21 +18,23 @@ import android.content.Context;
 
 public class ContextUtil {
     private final Context mContext;
+    private final Context mAppContext;
 
     private ContextUtil() {
         mContext = ContextProvider.sContext;
+        mAppContext = ContextProvider.sContext.getApplicationContext();
     }
 
-    public static ContextUtil getInstance() {
+    private static ContextUtil getInstance() {
         return ContextProviderUtilHolder.INSTANCE;
     }
 
-    public Context getContext() {
-        return mContext;
+    public static Context getContext() {
+        return getInstance().mContext;
     }
 
-    public Context getApplicationContext() {
-        return mContext.getApplicationContext();
+    public static Context getAppContext() {
+        return getInstance().mAppContext;
     }
 
     private static class ContextProviderUtilHolder {

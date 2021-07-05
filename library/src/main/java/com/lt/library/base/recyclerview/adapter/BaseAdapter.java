@@ -52,6 +52,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private static final int ITEM_TYPE_EXTRAS = 1004;
     private static final int ITEM_TYPE_FOOTER = 1005;
     private final List<DS> mEntityList;
+    protected RecyclerView mRecyclerView;
     private OnHeaderItemClickListener mOnHeaderItemClickListener;
     private OnHeaderItemLongClickListener mOnHeaderItemLongClickListener;
     private OnStatusItemClickListener mOnStatusItemClickListener;
@@ -62,7 +63,6 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private OnExtrasItemLongClickListener mOnExtrasItemLongClickListener;
     private OnFooterItemClickListener mOnFooterItemClickListener;
     private OnFooterItemLongClickListener mOnFooterItemLongClickListener;
-    private RecyclerView mRecyclerView;
     private int mHeaderCount, mStatusCount, mExtrasCount, mFooterCount = 0;
     private int mHeaderViewId, mStatusViewId, mExtrasViewId, mFooterViewId = -1;
 
@@ -289,7 +289,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     }
 
     protected Context getAppContext() {
-        return ContextUtil.getInstance().getApplicationContext();
+        return ContextUtil.getAppContext();
     }
 
     @IntRange(from = 0)
@@ -485,6 +485,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
         if (isEntity(rawEntityPosition)) {
             if (!clickEntity(rawEntityPosition)) {
                 LogUtil.d("programmatic click no ready, the layout has not been calculated yet");
+                mRecyclerView.scrollToPosition(rawEntityPosition);
                 mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
