@@ -26,9 +26,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     protected void initView() {
         super.initView();
-        FragmentStateAdapter pagerAdapter = new TestFragmentPagerAdapter(getSupportFragmentManager(),
-                                                                         getLifecycle(),
-                                                                         mFragmentTagList);
+        FragmentStateAdapter pagerAdapter = new TestFragmentPagerAdapter(this, mFragmentTagList);
         mViewBinding.viewPager.setAdapter(pagerAdapter);
         for (int i = 0; i < mFragmentTagList.size(); i++) {
             mViewBinding.tlMain.addTab(mViewBinding.tlMain.newTab(), i, false);
