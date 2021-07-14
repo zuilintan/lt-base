@@ -1,23 +1,22 @@
 package com.lt.person_baseutil.view.activity;
 
-import android.view.View;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import com.kyleduo.switchbutton.SwitchButton;
 import com.lt.library.base.BaseActivity;
-import com.lt.library.base.recyclerview.listener.OnEntityItemClickListener;
-import com.lt.library.util.LogUtil;
-import com.lt.person_baseutil.R;
 import com.lt.person_baseutil.databinding.ActivityMainBinding;
-import com.lt.person_baseutil.model.repo.DataRepo;
-import com.lt.person_baseutil.view.adapter.TestAdapter;
+import com.lt.person_baseutil.view.adapter.TestFragmentPagerAdapter;
 
-public class MainActivity extends BaseActivity<ActivityMainBinding> implements
-        OnEntityItemClickListener {
-    private TestAdapter mTestAdapter;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends BaseActivity<ActivityMainBinding> {
+    private final List<String> mFragmentTagList = new ArrayList<String>() {
+        {
+            add("frag01");
+            add("frag02");
+        }
+    };
 
     @Override
     protected ActivityMainBinding bindView() {
@@ -27,40 +26,20 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements
     @Override
     protected void initView() {
         super.initView();
-        mTestAdapter = new TestAdapter(DataRepo.getInstance()
-                                               .getTestData());
-        mViewBinding.rcvMainTest.setLayoutManager(new LinearLayoutManager(this));
-        mViewBinding.rcvMainTest.setAdapter(mTestAdapter);
-        mViewBinding.rcvMainTest.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        mViewBinding.rcvMainTest.getItemAnimator()
-                                .setChangeDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
-    }
-
-    @Override
-    protected void initEvent() {
-        super.initEvent();
-        mTestAdapter.setOnEntityItemClickListener(this);
+        for (int i = 0; i < mFragmentTagList.size(); i++) {
+            mViewBinding.tlMain.addTab(mViewBinding.tlMain.newTab(), i, false);
+        }
+        PagerAdapter pagerAdapter = new TestFragmentPagerAdapter(getSupportFragmentManager(),
+                                                                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT,
+                                                                 mFragmentTagList);
+        mViewBinding.viewPager.setAdapter(pagerAdapter);
+        mViewBinding.tlMain.setupWithViewPager(mViewBinding.viewPager);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        LogUtil.d();
-    }
-
-    @Override
-    public void onEntityClick(View view, int position) {
-        mTestAdapter.notifyDataPositionSelected(position);
-        if (view instanceof ConstraintLayout) {
-            ConstraintLayout constraintLayout = (ConstraintLayout) view;
-            SwitchButton sBtn = (SwitchButton) constraintLayout.getViewById(R.id.sBtn_item_switch);
-            if (sBtn != null) {
-                sBtn.toggle();
-            }
-        }
-        if ((position & 1) == 1) {
-        } else {
-        }
+        mViewBinding.tlMain.getTabAt(0).select();
     }
 
     @Override
