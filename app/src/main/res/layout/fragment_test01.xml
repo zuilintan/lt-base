@@ -5,18 +5,6 @@
     android:layout_height="match_parent">
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/child_frag02"
-        android:name="com.lt.person_baseutil.view.fragment.Test01ChildTest02Fragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#B2DFDB"
-        android:tag="child_frag02"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/child_frag01"
         android:name="com.lt.person_baseutil.view.fragment.Test01ChildTest01Fragment"
         android:layout_width="0dp"
@@ -26,6 +14,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/child_frag02"
+        android:name="com.lt.person_baseutil.view.fragment.Test01ChildTest02Fragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#B2DFDB"
+        android:tag="child_frag02"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline

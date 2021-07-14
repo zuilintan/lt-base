@@ -34,6 +34,12 @@ public class Test01Fragment extends BaseFragment<FragmentTest01Binding> {
     }
 
     @Override
+    protected void initView() {
+        super.initView();
+        mViewBinding.childFrag01.bringToFront();
+    }
+
+    @Override
     protected void initData() {
         super.initData();
         mStateViewModel.getFillLiveData().observe(getViewLifecycleOwner(), aBoolean -> {
