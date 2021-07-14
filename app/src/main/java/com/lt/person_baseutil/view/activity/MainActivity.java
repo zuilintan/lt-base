@@ -1,8 +1,8 @@
 package com.lt.person_baseutil.view.activity;
 
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.lt.library.base.BaseActivity;
 import com.lt.person_baseutil.databinding.ActivityMainBinding;
 import com.lt.person_baseutil.view.adapter.TestFragmentPagerAdapter;
@@ -26,14 +26,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     protected void initView() {
         super.initView();
+        FragmentStateAdapter pagerAdapter = new TestFragmentPagerAdapter(getSupportFragmentManager(),
+                                                                         getLifecycle(),
+                                                                         mFragmentTagList);
+        mViewBinding.viewPager.setAdapter(pagerAdapter);
         for (int i = 0; i < mFragmentTagList.size(); i++) {
             mViewBinding.tlMain.addTab(mViewBinding.tlMain.newTab(), i, false);
         }
-        PagerAdapter pagerAdapter = new TestFragmentPagerAdapter(getSupportFragmentManager(),
-                                                                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT,
-                                                                 mFragmentTagList);
-        mViewBinding.viewPager.setAdapter(pagerAdapter);
-        mViewBinding.tlMain.setupWithViewPager(mViewBinding.viewPager);
+        new TabLayoutMediator(mViewBinding.tlMain, mViewBinding.viewPager, (tab, position) -> {
+            tab.setText("tab " + position);
+        }).attach();
     }
 
     @Override
