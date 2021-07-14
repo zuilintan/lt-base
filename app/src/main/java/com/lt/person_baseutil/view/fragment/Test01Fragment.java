@@ -37,6 +37,7 @@ public class Test01Fragment extends BaseFragment<FragmentTest01Binding> {
     protected void initData() {
         super.initData();
         mStateViewModel.getFillLiveData().observe(getViewLifecycleOwner(), aBoolean -> {
+            TransitionManager.beginDelayedTransition(mViewBinding.childFrag01);
             if (aBoolean) {
                 ConstraintSet constraintSet = new ConstraintSet();
                 constraintSet.clone(mViewBinding.getRoot());
@@ -48,7 +49,6 @@ public class Test01Fragment extends BaseFragment<FragmentTest01Binding> {
                 constraintSet.connect(mViewBinding.childFrag01.getId(), ConstraintSet.END, mViewBinding.guideline2.getId(), ConstraintSet.START);
                 constraintSet.applyTo(mViewBinding.getRoot());
             }
-            TransitionManager.beginDelayedTransition(mViewBinding.childFrag01);
         });
     }
 
