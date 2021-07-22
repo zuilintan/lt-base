@@ -64,8 +64,8 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
     private OnExtrasItemLongClickListener mOnExtrasItemLongClickListener;
     private OnFooterItemClickListener mOnFooterItemClickListener;
     private OnFooterItemLongClickListener mOnFooterItemLongClickListener;
-    private int mHeaderCount, mStatusCount, mExtrasCount, mFooterCount = 0;
-    private int mHeaderViewId, mStatusViewId, mExtrasViewId, mFooterViewId = -1;
+    private int mHeaderCount, mStatusCount, mExtrasCount, mFooterCount;
+    private int mHeaderViewId = -1, mStatusViewId = -1, mExtrasViewId = -1, mFooterViewId = -1;
 
     public BaseAdapter() {
         this(null);
