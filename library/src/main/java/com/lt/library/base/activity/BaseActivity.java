@@ -1,4 +1,4 @@
-package com.lt.library.base;
+package com.lt.library.base.activity;
 
 import android.content.Context;
 import android.os.Bundle;

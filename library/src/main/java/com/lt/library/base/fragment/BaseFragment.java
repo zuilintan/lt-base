@@ -1,4 +1,4 @@
-package com.lt.library.base;
+package com.lt.library.base.fragment;
 
 import android.annotation.TargetApi;
 import android.content.Context;
