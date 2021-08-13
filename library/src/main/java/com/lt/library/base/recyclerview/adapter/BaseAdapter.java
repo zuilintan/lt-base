@@ -84,7 +84,7 @@ public abstract class BaseAdapter<DS> extends RecyclerView.Adapter<BaseViewHolde
         View view;
         BaseViewHolder viewHolder;
         if (viewType == RecyclerView.INVALID_TYPE) {
-            throw new IllegalArgumentException("viewType = " + viewType + ", invalid");
+            throw new IllegalArgumentException("viewType invalid");
         }
         switch (viewType) {
             case ITEM_TYPE_HEADER:

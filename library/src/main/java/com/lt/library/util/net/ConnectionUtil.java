@@ -462,7 +462,7 @@ public class ConnectionUtil {
                 connectionUtil = new ConnectionUtil(this);
                 connectionUtil.addEvent();
             } else {
-                throw new RuntimeException("call at least one setOnXxxListener");
+                throw new RuntimeException("call at least one method 'setOnXxxListener'");
             }
             return connectionUtil;
         }
