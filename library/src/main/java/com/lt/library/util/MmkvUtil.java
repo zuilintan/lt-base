@@ -101,6 +101,14 @@ public class MmkvUtil {
         return getInstance().mMMKV.decodeParcelable(key, tClass, defValue);
     }
 
+    public static void remove(String key) {
+        getInstance().mMMKV.removeValueForKey(key);
+    }
+
+    public static void remove(String[] keys) {
+        getInstance().mMMKV.removeValuesForKeys(keys);
+    }
+
     private static class MmkvUtilHolder {
         private static final MmkvUtil INSTANCE = new MmkvUtil();
     }
