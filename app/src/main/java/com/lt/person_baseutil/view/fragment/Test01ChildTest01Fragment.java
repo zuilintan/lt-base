@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.lt.library.base.BaseFragment;
+import com.lt.library.base.fragment.BaseFragment;
 import com.lt.library.util.DensityUtil;
 import com.lt.library.util.LogUtil;
 import com.lt.person_baseutil.databinding.FragmentTest01ChildTest01Binding;

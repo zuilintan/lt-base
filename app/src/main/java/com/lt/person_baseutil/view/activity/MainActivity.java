@@ -3,7 +3,7 @@ package com.lt.person_baseutil.view.activity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.google.android.material.tabs.TabLayoutMediator;
-import com.lt.library.base.BaseActivity;
+import com.lt.library.base.activity.BaseActivity;
 import com.lt.person_baseutil.databinding.ActivityMainBinding;
 import com.lt.person_baseutil.view.adapter.TestFragmentPagerAdapter;
 

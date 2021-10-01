@@ -57,5 +57,5 @@ dependencies {
     implementation 'com.google.code.gson:gson:latest.release'
     implementation 'com.alibaba:fastjson:latest.release'
     implementation 'com.kyleduo.switchbutton:library:latest.release'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:latest.release'
+    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:latest.release'
 }

@@ -88,12 +88,12 @@ public class TestAdapter extends BaseAdapter<TestBean> {
                   .setBackground(R.id.csl_item_root, dataSource.isSelect() ? android.R.color.holo_purple : android.R.color.white);
         switch (viewType) {
             case TestBean.ITEM_TYPE_CONTENT:
-                TextView textView = viewHolder.findViewById(R.id.tv_item_content);
+                TextView textView = viewHolder.getView(R.id.tv_item_content);
                 textView.setText(dataSource.getItemValue());
                 break;
             case TestBean.ITEM_TYPE_SWITCH:
                 viewHolder.setImageDrawable(R.id.iv_item_ico, R.drawable.ic_fire);
-                SwitchButton switchButton = viewHolder.findViewById(R.id.sBtn_item_switch);
+                SwitchButton switchButton = viewHolder.getView(R.id.sBtn_item_switch);
                 switchButton.setChecked(Boolean.parseBoolean(dataSource.getItemValue()));
                 if ((position & 1) == 1) {
                     switchButton.setTag("sBtn_tag");
@@ -102,7 +102,7 @@ public class TestAdapter extends BaseAdapter<TestBean> {
                 break;
             case TestBean.ITEM_TYPE_SLIDE:
                 viewHolder.setImageDrawable(R.id.iv_item_ico, R.drawable.ic_toy);
-                SeekBar seekBar = viewHolder.findViewById(R.id.sb_item_slide);
+                SeekBar seekBar = viewHolder.getView(R.id.sb_item_slide);
                 seekBar.setProgress(Integer.parseInt(dataSource.getItemValue()));
                 if ((position & 1) == 1) {
                     seekBar.setTag("sb_tag");
@@ -117,12 +117,12 @@ public class TestAdapter extends BaseAdapter<TestBean> {
         super.onRecycledView(viewHolder, viewType);
         switch (viewType) {
             case TestBean.ITEM_TYPE_SWITCH:
-                SwitchButton switchButton = viewHolder.findViewById(R.id.sBtn_item_switch);
+                SwitchButton switchButton = viewHolder.getView(R.id.sBtn_item_switch);
                 switchButton.setOnCheckedChangeListener(null);
                 switchButton.setTag(null);
                 break;
             case TestBean.ITEM_TYPE_SLIDE:
-                SeekBar seekBar = viewHolder.findViewById(R.id.sb_item_slide);
+                SeekBar seekBar = viewHolder.getView(R.id.sb_item_slide);
                 seekBar.setOnSeekBarChangeListener(null);
                 seekBar.setTag(null);
                 break;
