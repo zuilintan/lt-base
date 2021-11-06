@@ -29,7 +29,7 @@ dependencies {
     /**
      * Module Lib
      */
-    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    compileOnly fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 
     /**
      * Project Lib
@@ -39,12 +39,9 @@ dependencies {
     /**
      * Android Lib
      */
-    implementation 'androidx.appcompat:appcompat:' + rootProject.ext.dependencies.'androidx.appcompat:appcompat'
-    implementation 'com.google.android.material:material:' + rootProject.ext.dependencies.'com.google.android.material:material'
-    implementation 'androidx.constraintlayout:constraintlayout:' + rootProject.ext.dependencies.'androidx.constraintlayout:constraintlayout'
-    implementation 'androidx.recyclerview:recyclerview:' + rootProject.ext.dependencies.'androidx.recyclerview:recyclerview'
-    implementation 'androidx.lifecycle:lifecycle-common-java8:' + rootProject.ext.dependencies.'androidx.lifecycle:lifecycle-common'
-    implementation 'androidx.lifecycle:lifecycle-extensions:' + rootProject.ext.dependencies.'androidx.lifecycle:lifecycle-extensions'
+    compileOnly 'androidx.appcompat:appcompat:' + rootProject.ext.dependencies['appcompat']
+    compileOnly 'androidx.recyclerview:recyclerview:' + rootProject.ext.dependencies['recyclerview']
+    compileOnly 'androidx.lifecycle:lifecycle-common-java8:' + rootProject.ext.dependencies['lifecycle-common-java8']
 
     /**
      * CPY Maven Lib
@@ -54,8 +51,8 @@ dependencies {
     /**
      * Third Party Lib
      */
-    compileOnly 'com.squareup.okhttp3:okhttp:latest.release'
-    compileOnly 'com.google.code.gson:gson:latest.release'
-    compileOnly 'com.alibaba:fastjson:latest.release'
-    compileOnly 'com.tencent:mmkv:latest.release'
+    compileOnly 'com.squareup.okhttp3:okhttp:' + rootProject.ext.dependencies['okhttp3']
+    compileOnly 'com.tencent:mmkv:' + rootProject.ext.dependencies['mmkv']
+    compileOnly 'com.alibaba:fastjson:' + rootProject.ext.dependencies['fastjson']
+    compileOnly 'com.google.code.gson:gson:' + rootProject.ext.dependencies['gson']
 }

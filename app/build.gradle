@@ -12,9 +12,23 @@ android {
         versionCode rootProject.ext.android.versionCode
         versionName rootProject.ext.android.versionName
     }
+    signingConfigs {
+        release {
+            /*storeFile file(rootProject.ext.android.storeFile)
+            storePassword rootProject.ext.android.storePassword
+            keyAlias rootProject.ext.android.keyAlias
+            keyPassword rootProject.ext.android.keyPassword*/
+        }
+    }
     buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -42,21 +56,17 @@ dependencies {
     /**
      * Android Lib
      */
-    implementation 'androidx.appcompat:appcompat:' + rootProject.ext.dependencies.'androidx.appcompat:appcompat'
-    implementation 'com.google.android.material:material:' + rootProject.ext.dependencies.'com.google.android.material:material'
-    implementation 'androidx.constraintlayout:constraintlayout:' + rootProject.ext.dependencies.'androidx.constraintlayout:constraintlayout'
-    implementation 'androidx.recyclerview:recyclerview:' + rootProject.ext.dependencies.'androidx.recyclerview:recyclerview'
-    implementation 'androidx.lifecycle:lifecycle-common-java8:' + rootProject.ext.dependencies.'androidx.lifecycle:lifecycle-common'
-    implementation 'androidx.lifecycle:lifecycle-extensions:' + rootProject.ext.dependencies.'androidx.lifecycle:lifecycle-extensions'
+    implementation 'com.google.android.material:material:' + rootProject.ext.dependencies['material']
+    implementation 'androidx.appcompat:appcompat:' + rootProject.ext.dependencies['appcompat']
+    implementation 'androidx.recyclerview:recyclerview:' + rootProject.ext.dependencies['recyclerview']
+    implementation 'androidx.constraintlayout:constraintlayout:' + rootProject.ext.dependencies['constraintlayout']
+    implementation 'androidx.lifecycle:lifecycle-common-java8:' + rootProject.ext.dependencies['lifecycle-common-java8']
 
     /**
      * CPY Maven Lib
      */
-    //compileOnly 'com.xxx.source:car:latest.release'
 
-    //Third Party Lib
-    implementation 'com.google.code.gson:gson:latest.release'
-    implementation 'com.alibaba:fastjson:latest.release'
-    implementation 'com.kyleduo.switchbutton:library:latest.release'
-    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:latest.release'
+    /**
+     * Third Party Lib
+     */
 }
