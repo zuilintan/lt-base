@@ -42,7 +42,8 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:' + rootProject.ext.dependencies.'androidx.appcompat:appcompat'
     implementation 'com.google.android.material:material:' + rootProject.ext.dependencies.'com.google.android.material:material'
     implementation 'androidx.constraintlayout:constraintlayout:' + rootProject.ext.dependencies.'androidx.constraintlayout:constraintlayout'
-    implementation 'androidx.lifecycle:lifecycle-common-java8:' + rootProject.ext.dependencies.'androidx.lifecycle:lifecycle-common-java8'
+    implementation 'androidx.recyclerview:recyclerview:' + rootProject.ext.dependencies.'androidx.recyclerview:recyclerview'
+    implementation 'androidx.lifecycle:lifecycle-common-java8:' + rootProject.ext.dependencies.'androidx.lifecycle:lifecycle-common'
     implementation 'androidx.lifecycle:lifecycle-extensions:' + rootProject.ext.dependencies.'androidx.lifecycle:lifecycle-extensions'
 
     /**
