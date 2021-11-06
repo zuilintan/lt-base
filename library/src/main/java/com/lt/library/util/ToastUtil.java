@@ -54,7 +54,7 @@ public class ToastUtil {
     }
 
     @SuppressLint("ShowToast")
-    private Toast make() {
+    private Toast createToast() {
         if (!sEnable.get()) {
             return null;
         }
@@ -79,8 +79,8 @@ public class ToastUtil {
         if (!sEnable.get()) {
             return;
         }
-        Toast make = make();
-        make.show();
+        Toast toast = createToast();
+        toast.show();
     }
 
     @Nullable
@@ -88,10 +88,10 @@ public class ToastUtil {
         if (!sEnable.get()) {
             return null;
         }
-        Toast make = make();
+        Toast _toast = createToast();
         cancel(toast);
-        make.show();
-        return make;
+        _toast.show();
+        return _toast;
     }
 
     public void cancel(@Nullable Toast toast) {
