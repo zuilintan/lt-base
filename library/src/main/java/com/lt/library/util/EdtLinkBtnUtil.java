@@ -23,6 +23,7 @@ public class EdtLinkBtnUtil implements TextWatcher {
     private ArrayMap<EditText, int[]> mEditTextMap;
     private Button mButton;
     private Float mButtonDisableAlpha;
+    private Integer[] mBtnEnableSpecialLengths;
     private Boolean mDiffSbcCase;
 
     private EdtLinkBtnUtil() {
@@ -32,6 +33,7 @@ public class EdtLinkBtnUtil implements TextWatcher {
         mEditTextMap = builder.mEditTextMap;
         mButton = builder.mButton;
         mButtonDisableAlpha = builder.mButtonDisableAlpha;
+        mBtnEnableSpecialLengths = builder.mBtnEnableSpecialLengths;
         mDiffSbcCase = builder.mDiffSbcCase;
     }
 
@@ -91,12 +93,25 @@ public class EdtLinkBtnUtil implements TextWatcher {
             } else {
                 isLeBtnEnableMaxLength = length <= btnEnableMaxLength;
             }
-            if (!isGeBtnEnableMinLength || !isLeBtnEnableMaxLength) {
-                isEnable = false;
-                break;
+            if (mBtnEnableSpecialLengths == null || mBtnEnableSpecialLengths.length == 0 || !isSpecialLength(mBtnEnableSpecialLengths, length)) {
+                if (!isGeBtnEnableMinLength || !isLeBtnEnableMaxLength) {
+                    isEnable = false;
+                    break;
+                }
             }
         }
         return isEnable;
+    }
+
+    private boolean isSpecialLength(Integer[] specialLengths, int curLength) {
+        boolean result = false;
+        for (Integer length : specialLengths) {
+            if (length != null && length == curLength) {
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
     public void addEvent() {
@@ -117,6 +132,7 @@ public class EdtLinkBtnUtil implements TextWatcher {
         private ArrayMap<EditText, int[]> mEditTextMap;
         private Button mButton;
         private Float mButtonDisableAlpha;
+        private Integer[] mBtnEnableSpecialLengths;
         private Boolean mDiffSbcCase = false;
 
         public Builder addEditText(EditText editText, int btnEnableLength) {
@@ -132,6 +148,11 @@ public class EdtLinkBtnUtil implements TextWatcher {
             } else {
                 throw new IllegalArgumentException("btnEnableMinLength has to be less than btnEnableMaxLength, [" + btnEnableMinLength + ", " + btnEnableMaxLength + "]");
             }
+            return this;
+        }
+
+        public Builder setBtnEnableSpecialLength(Integer... btnEnableLength) {
+            mBtnEnableSpecialLengths = btnEnableLength;
             return this;
         }
 
