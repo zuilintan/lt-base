@@ -2,8 +2,8 @@ package com.lt.library.util;
 
 import java.text.DecimalFormat;
 
-public class SizeUtil {
-    private SizeUtil() {
+public class DataSizeUtil {
+    private DataSizeUtil() {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 

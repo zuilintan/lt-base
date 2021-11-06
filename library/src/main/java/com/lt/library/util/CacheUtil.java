@@ -24,7 +24,7 @@ public class CacheUtil {
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             cacheSize += getFolderSize(Objects.requireNonNull(context.getExternalCacheDir()));
         }
-        return SizeUtil.format(cacheSize);
+        return DataSizeUtil.format(cacheSize);
     }
 
     /**
