@@ -16,6 +16,10 @@ import com.lt.library.util.context.ContextUtil;
  * @版本: 1.0
  * @描述: //BaseActivity
  * 1.0: Initial Commit
+ * <p>
+ * buildFeatures {
+ * viewBinding = true
+ * }
  */
 
 public abstract class BaseActivity<V extends ViewBinding> extends AppCompatActivity {

@@ -39,6 +39,10 @@ import com.lt.library.util.context.ContextUtil;
  * @版本: 1.0
  * @描述: //BaseDialogFragment
  * 1.0: Initial Commit
+ * <p>
+ * buildFeatures {
+ * viewBinding = true
+ * }
  */
 
 public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFragment {

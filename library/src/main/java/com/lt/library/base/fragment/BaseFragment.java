@@ -22,6 +22,10 @@ import com.lt.library.util.context.ContextUtil;
  * @版本: 1.0
  * @描述: //BaseFragment
  * 1.0: Initial Commit
+ * <p>
+ * buildFeatures {
+ * viewBinding = true
+ * }
  */
 
 public abstract class BaseFragment<V extends ViewBinding> extends Fragment {

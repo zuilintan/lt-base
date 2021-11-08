@@ -3,12 +3,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion rootProject.ext.android.compileSdk
-    buildToolsVersion rootProject.ext.android.buildTools
+    compileSdk rootProject.ext.android.compileSdk
     defaultConfig {
         applicationId "com.lt.person_baseutil"
-        minSdkVersion rootProject.ext.android.minSdk
-        targetSdkVersion rootProject.ext.android.targetSdk
+        minSdk rootProject.ext.android.minSdk
+        targetSdk rootProject.ext.android.targetSdk
         versionCode rootProject.ext.android.versionCode
         versionName rootProject.ext.android.versionName
     }
@@ -35,9 +34,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-    }
-    buildFeatures {
-        viewBinding true
     }
 }
 

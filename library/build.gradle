@@ -3,11 +3,10 @@ plugins {
 }
 
 android {
-    compileSdkVersion rootProject.ext.android.compileSdk
-    buildToolsVersion rootProject.ext.android.buildTools
+    compileSdk rootProject.ext.android.compileSdk
     defaultConfig {
-        minSdkVersion rootProject.ext.android.minSdk
-        targetSdkVersion rootProject.ext.android.targetSdk
+        minSdk rootProject.ext.android.minSdk
+        targetSdk rootProject.ext.android.targetSdk
         consumerProguardFiles 'consumer-rules.pro'
     }
     buildTypes {
@@ -19,9 +18,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    buildFeatures {
-        viewBinding = true
     }
 }
 
@@ -41,7 +37,7 @@ dependencies {
      */
     compileOnly 'androidx.appcompat:appcompat:' + rootProject.ext.dependencies['appcompat']
     compileOnly 'androidx.recyclerview:recyclerview:' + rootProject.ext.dependencies['recyclerview']
-    compileOnly 'androidx.lifecycle:lifecycle-common-java8:' + rootProject.ext.dependencies['lifecycle-common-java8']
+    compileOnly 'androidx.databinding:viewbinding:4.2.2'
 
     /**
      * CPY Maven Lib
