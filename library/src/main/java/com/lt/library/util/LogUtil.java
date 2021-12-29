@@ -11,38 +11,30 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @作者: LinTan
  * @日期: 2018/12/29 20:27
  * @版本: 1.0
- * @描述: //LogUtil, Tag格式: 三级及之后域名:(文件名:行号).方法名():自定义Tag
+ * @描述: //LogUtil
  * 源址: http://blog.51cto.com/9098858/2096644
  * 1.0: Initial Commit
  */
 
 public class LogUtil {
     private static final AtomicBoolean sIsEnabled = new AtomicBoolean(true);//默认启用
-    private static final String PROCESS_NAME = getProcessName();
     private static final String CLASS_NAME = LogUtil.class.getName();
     private static final String UNK_FLAG = "<unk>";
     private static final String NULL_FLAG = "<null>";
     private static final String EMPTY_FLAG = "<empty>";
     private static final String METHOD_FLAG = "<method>";
+    private static final int LARGE_MSG_SEGMENT_LENGTH = 3 * 1024;
+    private static String GLOBAL_TAG;
+
+    static {
+        GLOBAL_TAG = Application.getProcessName();
+    }
 
     private LogUtil() {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 
-    private static String getProcessName() {
-        String result;
-        String processName = Application.getProcessName();
-        try {
-            int startIndex = processName.lastIndexOf('.');
-            result = processName.substring(startIndex + 1);
-        } catch (StringIndexOutOfBoundsException e) {
-            e.printStackTrace();
-            result = processName;
-        }
-        return result;
-    }
-
-    private static String createStdTag(String customTag) {
+    private static String formatStdTag(String customTag) {
         String result;
         String fileName = UNK_FLAG;
         int lineNumber = 0;
@@ -54,7 +46,7 @@ public class LogUtil {
                 fileName = stackTraceElements[i].getFileName();
                 lineNumber = stackTraceElements[i].getLineNumber();
                 methodName = stackTraceElements[i].getMethodName();
-                int index = methodName.indexOf('$');//判断是否为Lambd表达式
+                int index = methodName.indexOf('$');//判断是否为Lambda表达式
                 if (index > -1) {
                     methodName = methodName.substring(0, index + 1);
                 }
@@ -63,33 +55,99 @@ public class LogUtil {
         }
         String tagFormat;
         if (TextUtils.isEmpty(customTag)) {
-            tagFormat = "%s:%s(%s:%d)";//进程名:方法名(文件名:行号)
-            result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, methodName, fileName, lineNumber);
+            tagFormat = "%s:(%s:%d):%s";//全局Tag:(文件名:行号):方法名
+            result = String.format(Locale.getDefault(), tagFormat, GLOBAL_TAG, fileName, lineNumber, methodName);
         } else {
-            tagFormat = "%s:%s(%s:%d):%s";//进程名:方法名(文件名:行号):自定义Tag
-            result = String.format(Locale.getDefault(), tagFormat, PROCESS_NAME, methodName, fileName, lineNumber, customTag);
+            tagFormat = "%s:(%s:%d):%s:%s";//全局Tag:(文件名:行号):方法名:自定义Tag
+            result = String.format(Locale.getDefault(), tagFormat, GLOBAL_TAG, fileName, lineNumber, methodName, customTag);
         }
         return result;
     }//注意: tag及时间, 进程, 线程号, 日志等级的字数阈值约为128byte, 超出部分不显示(但还是会占用该条Log的可显示字数, 即覆盖msg)
 
-    private static String createStdMsg(String msg) {
-        String result;
+    private static void printlnLog(int logLevel, String tag, String msg, Throwable tr) {
         if (msg == null) {
-            result = NULL_FLAG;
-        } else if (msg.isEmpty()) {
-            result = EMPTY_FLAG;
-        } else {
-            result = msg;
+            printlnLogInternal(logLevel, tag, NULL_FLAG, tr);
+            return;
         }
-        return result;
+        if (msg.isEmpty()) {
+            printlnLogInternal(logLevel, tag, EMPTY_FLAG, tr);
+            return;
+        }
+        if (msg.length() <= LARGE_MSG_SEGMENT_LENGTH) {
+            printlnLogInternal(logLevel, tag, msg, tr);
+            return;
+        }
+        while (msg.length() > LARGE_MSG_SEGMENT_LENGTH) {//循环分段打印日志
+            printlnLogInternal(logLevel, tag, msg.substring(0, LARGE_MSG_SEGMENT_LENGTH), tr);
+            msg = msg.substring(LARGE_MSG_SEGMENT_LENGTH);
+        }
+        printlnLogInternal(logLevel, tag, msg, tr);//打印剩余日志
     }//注意: Android未限制msg字数阈值, 但限制了 tag + msg 的字数阈值约为4096byte
 
+    private static void printlnLogInternal(int logLevel, String tag, String msg, Throwable tr) {
+        switch (logLevel) {
+            case Log.VERBOSE:
+                if (tr == null) {
+                    Log.v(tag, msg);
+                } else {
+                    Log.v(tag, msg, tr);
+                }
+                break;
+            case Log.DEBUG:
+                if (tr == null) {
+                    Log.d(tag, msg);
+                } else {
+                    Log.d(tag, msg, tr);
+                }
+                break;
+            case Log.INFO:
+                if (tr == null) {
+                    Log.i(tag, msg);
+                } else {
+                    Log.i(tag, msg, tr);
+                }
+                break;
+            case Log.WARN:
+                if (tr == null) {
+                    Log.w(tag, msg);
+                } else {
+                    Log.w(tag, msg, tr);
+                }
+                break;
+            case Log.ERROR:
+                if (tr == null) {
+                    Log.e(tag, msg);
+                } else {
+                    Log.e(tag, msg, tr);
+                }
+                break;
+            case Log.ASSERT:
+                if (tr == null) {
+                    Log.wtf(tag, msg);
+                } else {
+                    Log.wtf(tag, msg, tr);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isEnable() {
         return sIsEnabled.get();
     }
 
     public static void setEnable(boolean isEnabled) {
         sIsEnabled.set(isEnabled);
+    }
+
+    public static String getGlobalTag() {
+        return GLOBAL_TAG;
+    }
+
+    public static void setGlobalTag(String tag) {
+        GLOBAL_TAG = tag;
     }
 
     public static void v() {
@@ -112,12 +170,7 @@ public class LogUtil {
         if (!isEnable()) {
             return;
         }
-        tag = createStdTag(tag);
-        if (tr == null) {
-            Log.v(tag, createStdMsg(msg));
-        } else {
-            Log.v(tag, createStdMsg(msg), tr);
-        }
+        printlnLog(Log.VERBOSE, formatStdTag(tag), msg, tr);
     }
 
     public static void d() {
@@ -140,12 +193,7 @@ public class LogUtil {
         if (!isEnable()) {
             return;
         }
-        tag = createStdTag(tag);
-        if (tr == null) {
-            Log.d(tag, createStdMsg(msg));
-        } else {
-            Log.d(tag, createStdMsg(msg), tr);
-        }
+        printlnLog(Log.DEBUG, formatStdTag(tag), msg, tr);
     }
 
     public static void i() {
@@ -168,12 +216,7 @@ public class LogUtil {
         if (!isEnable()) {
             return;
         }
-        tag = createStdTag(tag);
-        if (tr == null) {
-            Log.i(tag, createStdMsg(msg));
-        } else {
-            Log.i(tag, createStdMsg(msg), tr);
-        }
+        printlnLog(Log.INFO, formatStdTag(tag), msg, tr);
     }
 
     public static void w() {
@@ -196,12 +239,7 @@ public class LogUtil {
         if (!isEnable()) {
             return;
         }
-        tag = createStdTag(tag);
-        if (tr == null) {
-            Log.w(tag, createStdMsg(msg));
-        } else {
-            Log.w(tag, createStdMsg(msg), tr);
-        }
+        printlnLog(Log.WARN, formatStdTag(tag), msg, tr);
     }
 
     public static void e() {
@@ -224,12 +262,7 @@ public class LogUtil {
         if (!isEnable()) {
             return;
         }
-        tag = createStdTag(tag);
-        if (tr == null) {
-            Log.e(tag, createStdMsg(msg));
-        } else {
-            Log.e(tag, createStdMsg(msg), tr);
-        }
+        printlnLog(Log.ERROR, formatStdTag(tag), msg, tr);
     }
 
     public static void wtf() {
@@ -252,11 +285,6 @@ public class LogUtil {
         if (!isEnable()) {
             return;
         }
-        tag = createStdTag(tag);
-        if (tr == null) {
-            Log.wtf(tag, createStdMsg(msg));
-        } else {
-            Log.wtf(tag, createStdMsg(msg), tr);
-        }
+        printlnLog(Log.ASSERT, formatStdTag(tag), msg, tr);
     }
 }

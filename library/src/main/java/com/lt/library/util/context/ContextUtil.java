@@ -1,6 +1,7 @@
 package com.lt.library.util.context;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
 import android.content.Context;
 
 /**
@@ -35,6 +36,10 @@ public class ContextUtil {
 
     public static Context getAppContext() {
         return getInstance().mAppContext;
+    }
+
+    public static Application getApp() {
+        return (Application) getInstance().mAppContext;
     }
 
     private static class ContextProviderUtilHolder {
