@@ -16,7 +16,7 @@ import java.util.Map;
  * @作者: LinTan
  * @日期: 2020/12/27 14:01
  * @版本: 1.0
- * @描述: //自定义TypeAdapter, 修复默认TypeAdapter{@link ObjectTypeAdapter}, 在Json转Map时, 类型Integer变为Double的问题
+ * @描述: 自定义TypeAdapter, 修复默认TypeAdapter{@link ObjectTypeAdapter}, 在Json转Map时, 类型Integer变为Double的问题
  * <p>
  * implementation 'com.google.code.gson:gson:2.8.5'
  */

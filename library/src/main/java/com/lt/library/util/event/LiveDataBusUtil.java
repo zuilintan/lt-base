@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @作者: LinTan
  * @日期: 2020/5/6 23:32
  * @版本: 1.0
- * @描述: //LiveDataBusUtil
+ * @描述: LiveDataBusUtil
  * 源址: https://github.com/BugRui/LiveDataBus
  * 1.0: Initial Commit
  */

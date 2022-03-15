@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * @作者: LinTan
  * @日期: 2020/8/9 10:59
  * @版本: 1.0
- * @描述: //EdtLinkBtnUtil, 联动EditText与Button
+ * @描述: EdtLinkBtnUtil, 联动EditText与Button
  * 1.0: Initial Commit
  */
 

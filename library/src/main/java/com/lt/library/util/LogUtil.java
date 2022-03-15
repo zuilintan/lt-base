@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @作者: LinTan
  * @日期: 2018/12/29 20:27
  * @版本: 1.0
- * @描述: //LogUtil
+ * @描述: LogUtil
  * 源址: http://blog.51cto.com/9098858/2096644
  * 1.0: Initial Commit
  */

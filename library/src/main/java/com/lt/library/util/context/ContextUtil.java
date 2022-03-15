@@ -8,7 +8,7 @@ import android.content.Context;
  * @作者: LinTan
  * @日期: 2020/4/20 16:03
  * @版本: 1.0
- * @描述: //ContextUtil, 注意在AndroidManifest.xml中注册
+ * @描述: ContextUtil, 注意在AndroidManifest.xml中注册
  * 1.0: Initial Commit
  * <p>
  * <provider

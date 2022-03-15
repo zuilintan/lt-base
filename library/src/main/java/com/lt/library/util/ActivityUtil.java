@@ -8,7 +8,7 @@ import java.util.Stack;
  * @作者: LinTan
  * @日期: 2018/12/29 19:53
  * @版本: 1.0
- * @描述: //ActivityUtil
+ * @描述: ActivityUtil
  * 源址: 《第一行代码(第二版)》中 2.6 活动的最佳实践内的Example
  * 1.0: Initial Commit
  */

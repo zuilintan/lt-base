@@ -21,7 +21,7 @@ import java.util.Objects;
  * @作者: LinTan
  * @日期: 2018/12/25 17:11
  * @版本: 1.0
- * @描述: //ScreenUtil
+ * @描述: ScreenUtil
  * 源址: https://blog.csdn.net/lmj623565791/article/details/38965311
  * 1.0: Initial Commit
  */

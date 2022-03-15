@@ -12,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
  * @作者: LinTan
  * @日期: 2020/1/13 15:50
  * @版本: 1.0
- * @描述: //ScrollBarUtil, 通过反射动态设置RecyclerView或ListView的滚动条的显示效果
+ * @描述: ScrollBarUtil, 通过反射动态设置RecyclerView或ListView的滚动条的显示效果
  * 1.0: Initial Commit
  */
 

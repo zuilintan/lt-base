@@ -37,7 +37,7 @@ import com.lt.library.util.context.ContextUtil;
  * @作者: LinTan
  * @日期: 2019/5/15 10:23
  * @版本: 1.0
- * @描述: //BaseDialogFragment
+ * @描述: BaseDialogFragment
  * 1.0: Initial Commit
  * <p>
  * buildFeatures {
@@ -60,11 +60,11 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
     private Integer mWindowAnimation;
     private Float mDimAmount;
     private Boolean mIsOutCancel;
-    private boolean mIsKeepSystemUiState;
+    private Boolean mIsKeepSystemUiVisibility;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mActivity = (FragmentActivity) context;
     }
@@ -74,18 +74,24 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
         super.onCreate(savedInstanceState);
     }
 
+    /**
+     * Plan A, 蠢拒, 一般用于创建替代传统的Dialog对话框的场景, UI简单, 功能单一
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         return super.onCreateDialog(savedInstanceState);
-    }//Plan A, 蠢拒, 一般用于创建替代传统的Dialog对话框的场景, UI简单, 功能单一
+    }
 
+    /**
+     * Plan B; 推荐, 一般用于创建复杂内容弹窗, 全屏展示效果, 或有网络请求等异步操作的场景, UI复杂, 功能繁多
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mViewBinding = bindView(inflater, container);
         return mViewBinding.getRoot();
-    }//Plan B, 推荐, 一般用于创建复杂内容弹窗, 全屏展示效果, 或有网络请求等异步操作的场景, UI复杂, 功能繁多
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -113,7 +119,7 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
         Window aW = mActivity.getWindow();
         Window dW = getDialog().getWindow();
         if (aW != null && dW != null) {
-            if (mIsKeepSystemUiState) {
+            if (mIsKeepSystemUiVisibility != null && mIsKeepSystemUiVisibility) {
                 keepSystemUiState(aW, dW);
             } else {
                 super.onStart();
@@ -167,22 +173,22 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
     }
 
     @Override
-    public void onCancel(DialogInterface dialog) {
+    public void onCancel(@NonNull DialogInterface dialog) {
         super.onCancel(dialog);
     }
 
     @Override
-    public void onDismiss(DialogInterface dialog) {
+    public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
     }
 
     @Override
     public void show(FragmentManager manager, String tag) {
         Fragment fragment = manager.findFragmentByTag(tag);
+        //规避并发点击时, IllegalStateException: Fragment already added
         if (fragment == null) {
             super.show(manager, tag);
-        }//规避并发点击时, IllegalStateException: Fragment already added
-        else {
+        } else {
             LogUtil.w("dialogFragment added, tag = " + tag);
         }
     }
@@ -194,6 +200,204 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
         } else {
             LogUtil.w("dialogFragment not added");
         }
+    }
+
+    /**
+     * 设置窗口类型
+     *
+     * @param windowType 窗口类型 (e.g. WindowManager.LayoutParams.TYPE_SYSTEM_ERROR)
+     * @return this
+     */
+    public BaseDialogFragment<V> setWindowType(Integer windowType) {
+        mWindowType = windowType;
+        return this;
+    }
+
+    /**
+     * 设置布局大小
+     *
+     * @param width  宽度
+     * @param height 高度
+     * @return this
+     */
+    public BaseDialogFragment<V> setLayout(@Dimension(unit = Dimension.DP) int width, int height) {
+        mLayoutWidth = width;
+        mLayoutHeight = height;
+        return this;
+    }
+
+    /**
+     * 设置X轴偏移量
+     *
+     * @param x 水平偏移量
+     * @return this
+     */
+    public BaseDialogFragment<V> setOffsetX(@Dimension(unit = Dimension.DP) int x) {
+        mOffsetX = x;
+        return this;
+    }
+
+    /**
+     * 设置Y轴偏移量
+     *
+     * @param y 垂直偏移量
+     * @return this
+     */
+    public BaseDialogFragment<V> setOffsetY(@Dimension(unit = Dimension.DP) int y) {
+        mOffsetY = y;
+        return this;
+    }
+
+    /**
+     * 设置显示位置
+     *
+     * @param gravity 引力
+     * @return this
+     */
+    public BaseDialogFragment<V> setGravity(int gravity) {
+        mGravity = gravity;
+        return this;
+    }
+
+    /**
+     * 设置过场动画
+     *
+     * @param windowAnimation 窗口动画
+     * @return this
+     */
+    public BaseDialogFragment<V> setWindowAnimation(@StyleRes int windowAnimation) {
+        mWindowAnimation = windowAnimation;
+        return this;
+    }
+
+    /**
+     * 设置外部暗度
+     *
+     * @param dimAmount 外部暗度
+     * @return this
+     */
+    public BaseDialogFragment<V> setDimAmount(@FloatRange(from = 0, to = 1) float dimAmount) {
+        mDimAmount = dimAmount;
+        return this;
+    }
+
+    /**
+     * 设置外部取消
+     *
+     * @param isOutCancel 是否外部取消
+     * @return this
+     */
+    public BaseDialogFragment<V> setOutCancel(boolean isOutCancel) {
+        mIsOutCancel = isOutCancel;
+        return this;
+    }
+
+    /**
+     * 设置保持 SystemUiVisibility
+     *
+     * @param isKeepSystemUiVisibility 是否保持 SystemUiVisibility
+     * @return this
+     */
+    public BaseDialogFragment<V> setKeepSystemUiVisibility(boolean isKeepSystemUiVisibility) {
+        mIsKeepSystemUiVisibility = isKeepSystemUiVisibility;
+        return this;
+    }
+
+    public BaseDialogFragment<V> setOnPositiveButtonClickListener(OnPositiveButtonClickListener onPositiveButtonClickListener) {
+        mOnPositiveButtonClickListener = onPositiveButtonClickListener;
+        return this;
+    }
+
+    public BaseDialogFragment<V> setOnNegativeButtonClickListener(OnNegativeButtonClickListener onNegativeButtonClickListener) {
+        mOnNegativeButtonClickListener = onNegativeButtonClickListener;
+        return this;
+    }
+
+    public BaseDialogFragment<V> setOnNeutralButtonClickListener(OnNeutralButtonClickListener onNeutralButtonClickListener) {
+        mOnNeutralButtonClickListener = onNeutralButtonClickListener;
+        return this;
+    }
+
+    protected void callOnPositiveButtonClick(View view, Object object) {
+        if (mOnPositiveButtonClickListener != null) {
+            mOnPositiveButtonClickListener.onPositiveButtonClick(this, view, object);
+        }
+    }
+
+    protected void callOnNegativeButtonClick(View view, Object object) {
+        if (mOnNegativeButtonClickListener != null) {
+            mOnNegativeButtonClickListener.onNegativeButtonClick(this, view, object);
+        }
+    }
+
+    protected void callOnNeutralButtonClick(View view, Object object) {
+        if (mOnNeutralButtonClickListener != null) {
+            mOnNeutralButtonClickListener.onNeutralButtonClick(this, view, object);
+        }
+    }
+
+    /**
+     * 绑定视图 (e.g. ViewBinding)
+     *
+     * @return ViewBinding
+     */
+    protected abstract V bindView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container);
+
+    /**
+     * 绑定数据 (e.g. Bundle, SaveInstanceState, SharedPreferences, MMKV)
+     *
+     * @param arguments          外部传入的数据
+     * @param savedInstanceState 已存储的实例状态
+     */
+    protected void bindData(@Nullable Bundle arguments, @Nullable Bundle savedInstanceState) {
+    }
+
+    /**
+     * 初始化视图
+     */
+    protected void initView() {
+    }
+
+    /**
+     * 初始化数据
+     */
+    protected void initData() {
+    }
+
+    /**
+     * 初始化事件 (e.g. OnClickListener)
+     */
+    protected void initEvent() {
+    }
+
+    /**
+     * 存储临时数据 (e.g. SaveInstanceState)
+     *
+     * @param outState 用以存储实例状态的 Bundle
+     */
+    protected void saveState(@NonNull Bundle outState) {
+    }
+
+    /**
+     * 释放事件 (e.g. OnClickListener)
+     */
+    protected void freeEvent() {
+    }
+
+    /**
+     * 释放数据
+     */
+    protected void freeData() {
+    }
+
+    /**
+     * 释放视图
+     */
+    protected void freeView() {
+    }
+
+    protected Context getAppContext() {
+        return ContextUtil.getAppContext();
     }
 
     private void initParam(@NonNull Window dW) {
@@ -229,126 +433,25 @@ public abstract class BaseDialogFragment<V extends ViewBinding> extends DialogFr
         }
     }
 
+    /**
+     * 焦点变更时保持SystemUi状态
+     *
+     * @param aW Activity 的 Window
+     * @param dW Dialog 的 Window
+     */
     private void keepSystemUiState(@NonNull Window aW, @NonNull Window dW) {
         int aSystemUiVisibility = aW.getDecorView().getSystemUiVisibility();
         int dSystemUiVisibility = dW.getDecorView().getSystemUiVisibility();
         boolean isDiffVisibility = aSystemUiVisibility != dSystemUiVisibility;
+        //CallSuper 前, 主动移除焦点, 规避 SystemUiVisibility 变化
         if (isDiffVisibility) {
             dW.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-        }//super.onStart()前, 主动移除焦点, 规避SystemUiVisibility变化
+        }
         super.onStart();
+        //CallSuper 后, 以 Activity 为准, 统一 SystemUiVisibility, 并取回焦点
         if (isDiffVisibility) {
             dW.getDecorView().setSystemUiVisibility(aSystemUiVisibility);
             dW.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-        }//super.onStart()后, 以Activity为准, 统一SystemUiVisibility, 并取回焦点
-    }//焦点变更时保持SystemUi状态
-
-    protected void callOnPositiveButtonClick(View view, Object object) {
-        if (mOnPositiveButtonClickListener != null) {
-            mOnPositiveButtonClickListener.onPositiveButtonClick(this, view, object);
         }
-    }
-
-    protected void callOnNegativeButtonClick(View view, Object object) {
-        if (mOnNegativeButtonClickListener != null) {
-            mOnNegativeButtonClickListener.onNegativeButtonClick(this, view, object);
-        }
-    }
-
-    protected void callOnNeutralButtonClick(View view, Object object) {
-        if (mOnNeutralButtonClickListener != null) {
-            mOnNeutralButtonClickListener.onNeutralButtonClick(this, view, object);
-        }
-    }
-
-    protected Context getAppContext() {
-        return ContextUtil.getAppContext();
-    }
-
-    protected abstract V bindView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container);
-
-    protected void bindData(@Nullable Bundle arguments, @Nullable Bundle savedInstanceState) {
-    }//绑定数据(eg: Bundle, SaveInstanceState, SharedPreferences)
-
-    protected void initView() {
-    }//初始化视图
-
-    protected void initData() {
-    }//初始化数据
-
-    protected void initEvent() {
-    }//初始化事件(eg: OnClickListener)
-
-    protected void saveState(@NonNull Bundle outState) {
-    }//存储临时数据(eg: SaveInstanceState)
-
-    protected void freeEvent() {
-    }//释放事件(eg: OnClickListener)
-
-    protected void freeData() {
-    }//释放数据
-
-    protected void freeView() {
-    }//释放视图
-
-    public BaseDialogFragment<V> setWindowType(Integer windowType) {
-        mWindowType = windowType;
-        return this;
-    }//设置窗口类型(eg: WindowManager.LayoutParams.TYPE_SYSTEM_ERROR)
-
-    public BaseDialogFragment<V> setLayout(@Dimension(unit = Dimension.DP) int width, int height) {
-        mLayoutWidth = width;
-        mLayoutHeight = height;
-        return this;
-    }//设置布局大小
-
-    public BaseDialogFragment<V> setOffsetX(@Dimension(unit = Dimension.DP) int x) {
-        mOffsetX = x;
-        return this;
-    }//设置X轴偏移量
-
-    public BaseDialogFragment<V> setOffsetY(@Dimension(unit = Dimension.DP) int y) {
-        mOffsetY = y;
-        return this;
-    }//设置Y轴偏移量
-
-    public BaseDialogFragment<V> setGravity(int gravity) {
-        mGravity = gravity;
-        return this;
-    }//设置显示位置
-
-    public BaseDialogFragment<V> setWindowAnimation(@StyleRes int windowAnimation) {
-        mWindowAnimation = windowAnimation;
-        return this;
-    }//设置过场动画
-
-    public BaseDialogFragment<V> setDimAmount(@FloatRange(from = 0, to = 1) float dimAmount) {
-        mDimAmount = dimAmount;
-        return this;
-    }//设置外围暗度
-
-    public BaseDialogFragment<V> setOutCancel(boolean isOutCancel) {
-        mIsOutCancel = isOutCancel;
-        return this;
-    }//设置外部取消
-
-    public BaseDialogFragment<V> setKeepSystemUiState(boolean isKeepSystemUiState) {
-        mIsKeepSystemUiState = isKeepSystemUiState;
-        return this;
-    }//设置保持SystemUi状态
-
-    public BaseDialogFragment<V> setOnPositiveButtonClickListener(OnPositiveButtonClickListener onPositiveButtonClickListener) {
-        mOnPositiveButtonClickListener = onPositiveButtonClickListener;
-        return this;
-    }
-
-    public BaseDialogFragment<V> setOnNegativeButtonClickListener(OnNegativeButtonClickListener onNegativeButtonClickListener) {
-        mOnNegativeButtonClickListener = onNegativeButtonClickListener;
-        return this;
-    }
-
-    public BaseDialogFragment<V> setOnNeutralButtonClickListener(OnNeutralButtonClickListener onNeutralButtonClickListener) {
-        mOnNeutralButtonClickListener = onNeutralButtonClickListener;
-        return this;
     }
 }

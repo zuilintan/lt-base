@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
  * @作者: LinTan
  * @日期: 2018/12/25 17:12
  * @版本: 1.0
- * @描述: //ReflectionUtil
+ * @描述: ReflectionUtil
  * 源址: https://blog.csdn.net/ShiXueTanLang/article/details/79512356
  * 1.0: Initial Commit
  */
@@ -134,7 +134,7 @@ public class ReflectionUtil {
             e.printStackTrace();
         }
         return null;
-    }//调用方法(无参), 根据类类型与对象, 适用于obj不是cls实例的场景; eg: RecyclerView的ScrollBar与View
+    }//调用方法(无参), 根据类类型与对象, 适用于obj不是cls实例的场景; e.g. RecyclerView的ScrollBar与View
 
     public static Object invokeMethod(String className, String methodName, Class[] paramsTypes, Object[] paramsValues) {
         try {
@@ -174,5 +174,5 @@ public class ReflectionUtil {
             e.printStackTrace();
         }
         return null;
-    }//调用方法(有参), 根据类类型与对象, 适用于obj不是cls实例的场景; eg: RecyclerView的ScrollBar与View
+    }//调用方法(有参), 根据类类型与对象, 适用于obj不是cls实例的场景; e.g. RecyclerView的ScrollBar与View
 }

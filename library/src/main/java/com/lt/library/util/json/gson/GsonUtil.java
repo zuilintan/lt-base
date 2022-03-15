@@ -1,19 +1,19 @@
 package com.lt.library.util.json.gson;
 
+import static com.lt.library.util.json.gson.TypeFactory.$list;
+import static com.lt.library.util.json.gson.TypeFactory.$map;
+
 import com.google.gson.Gson;
 
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
-import static com.lt.library.util.json.gson.TypeFactory.$list;
-import static com.lt.library.util.json.gson.TypeFactory.$map;
-
 /**
  * @作者: LinTan
  * @日期: 2018/12/25 17:16
  * @版本: 1.0
- * @描述: //GsonUtil, 解决泛型擦除, 以及JSON转Map时, Integer变为Double的问题
+ * @描述: GsonUtil, 解决泛型擦除, 以及JSON转Map时, Integer变为Double的问题
  * 源址: https://www.jianshu.com/p/9ddd2d5b2d37
  * 1.0: Initial Commit
  * <p>

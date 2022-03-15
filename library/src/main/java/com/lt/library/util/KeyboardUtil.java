@@ -10,7 +10,7 @@ import com.lt.library.util.context.ContextUtil;
  * @作者: LinTan
  * @日期: 2020/8/9 10:58
  * @版本: 1.0
- * @描述: //KeyboardUtil
+ * @描述: KeyboardUtil
  * 1.0: Initial Commit
  */
 public class KeyboardUtil {

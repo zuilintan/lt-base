@@ -9,22 +9,26 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelStore;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 /**
  * @作者: LinTan
  * @日期: 2020/8/9 11:00
  * @版本: 1.0
- * @描述: //ContextProvider
+ * @描述: ContextProvider
  * 1.0: Initial Commit
  */
 
-public class ContextProvider extends ContentProvider {
+public class ContextProvider extends ContentProvider implements ViewModelStoreOwner {
     @SuppressLint("StaticFieldLeak")
     public static Context sContext;
+    private ViewModelStore mAppViewModelStore;
 
     @Override
     public boolean onCreate() {
         sContext = getContext();
+        mAppViewModelStore = new ViewModelStore();
         return false;
     }
 
@@ -54,5 +58,11 @@ public class ContextProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
         return 0;
+    }
+
+    @NonNull
+    @Override
+    public ViewModelStore getViewModelStore() {
+        return mAppViewModelStore;
     }
 }

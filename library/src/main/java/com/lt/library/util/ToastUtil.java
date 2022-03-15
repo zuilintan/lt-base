@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @作者: LinTan
  * @日期: 2019/1/5 18:02
  * @版本: 1.0
- * @描述: //ToastUtil
+ * @描述: ToastUtil
  * 源址: https://www.jianshu.com/p/c226225db747
  * 1.0: Initial Commit
  */

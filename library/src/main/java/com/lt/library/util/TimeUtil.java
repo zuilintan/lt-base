@@ -14,7 +14,7 @@ import java.util.Locale;
  * @作者: LinTan
  * @日期: 2019/5/1 20:57
  * @版本: 1.0
- * @描述: //TimeUtil
+ * @描述: TimeUtil
  * 1.0: Initial Commit
  */
 
@@ -49,7 +49,7 @@ public class TimeUtil {
             e.printStackTrace();
         }
         return stringDate;
-    }//获取偏移后的日期。eg: offsetDay为1, 即得到明天的日期, offsetDay为-1, 即得到昨天的日期)
+    }//获取偏移后的日期。e.g. offsetDay为1, 即得到明天的日期, offsetDay为-1, 即得到昨天的日期)
 
     public static String getTime(@HourMode int hourMode) {
         Date date = new Date();
@@ -74,8 +74,8 @@ public class TimeUtil {
             index = 7 - index * -1 % 7;
         }//规范索引的范围
         String[] strings = {"日", "一", "二", "三", "四", "五", "六"};
-        return strings[index];//注意, Java中一周的第一天是周日; eg: [周日, 周一, 周二, 周三, 周四, 周五, 周六]
-    }//获取偏移后的星期。eg: offsetDay为1, 即得到明天的星期, offsetDay为-1, 即得到昨天的星期
+        return strings[index];//注意, Java中一周的第一天是周日; e.g. [周日, 周一, 周二, 周三, 周四, 周五, 周六]
+    }//获取偏移后的星期。e.g. offsetDay为1, 即得到明天的星期, offsetDay为-1, 即得到昨天的星期
 
     public static int getCurrentYear() {
         return calendar.get(Calendar.YEAR);
