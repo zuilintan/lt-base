@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
@@ -33,7 +32,6 @@ import com.lt.library.util.context.ContextUtil;
 
 public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
     protected V mViewBinding;
-    protected FragmentActivity mActivity;
     private ViewModelProvider mAppViewModelProvider;
     private ViewModelProvider mActivityViewModelProvider;
     private ViewModelProvider mFragmentViewModelProvider;
@@ -42,7 +40,6 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        mActivity = (FragmentActivity) context;
     }
 
     @Override
@@ -124,7 +121,6 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mActivity = null;
     }
 
     /**
@@ -226,7 +222,7 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
      */
     protected <T extends ViewModel> T getActivityScopeViewModel(@NonNull Class<T> cls) {
         if (mActivityViewModelProvider == null) {
-            mActivityViewModelProvider = new ViewModelProvider(mActivity);
+            mActivityViewModelProvider = new ViewModelProvider(requireActivity());
         }
         return mActivityViewModelProvider.get(cls);
     }
@@ -243,5 +239,35 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
             mFragmentViewModelProvider = new ViewModelProvider(this);
         }
         return mFragmentViewModelProvider.get(cls);
+    }
+
+    /**
+     * 获取 Fragment 级别作用域的 ViewModel
+     *
+     * @param cls           ViewModel 类
+     * @param <T>           ViewModel
+     * @param fragmentClass 目标 Fragment Class
+     * @return ViewModel 实例
+     */
+    protected <T extends ViewModel, F extends Fragment> T getFragmentScopeViewModel(@NonNull Class<T> cls, @NonNull Class<F> fragmentClass) {
+        if (mFragmentViewModelProvider == null) {
+            mFragmentViewModelProvider = new ViewModelProvider(findFragment(this, fragmentClass));
+        }
+        return mFragmentViewModelProvider.get(cls);
+    }
+
+    /**
+     * 查找包含源 Fragment 的父 Fragment 树中, 为目标 Class 的实例
+     *
+     * @param sourceFragment      此 Fragment
+     * @param targetFragmentClass 目标 Fragment Class
+     * @param <T>                 Fragment
+     * @return Fragment 实例
+     */
+    protected <T extends Fragment> Fragment findFragment(@NonNull Fragment sourceFragment, @NonNull Class<T> targetFragmentClass) {
+        if (targetFragmentClass.isInstance(sourceFragment)) {
+            return sourceFragment;
+        }
+        return findFragment(sourceFragment.requireParentFragment(), targetFragmentClass);
     }
 }
