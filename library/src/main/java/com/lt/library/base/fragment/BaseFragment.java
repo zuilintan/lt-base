@@ -221,10 +221,7 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
      * @return ViewModel 实例
      */
     protected <T extends ViewModel> T getActivityScopeViewModel(@NonNull Class<T> cls) {
-        if (mActivityViewModelProvider == null) {
-            mActivityViewModelProvider = new ViewModelProvider(requireActivity());
-        }
-        return mActivityViewModelProvider.get(cls);
+        return new ViewModelProvider(requireActivity()).get(cls);
     }
 
     /**
@@ -235,10 +232,7 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
      * @return ViewModel 实例
      */
     protected <T extends ViewModel> T getFragmentScopeViewModel(@NonNull Class<T> cls) {
-        if (mFragmentViewModelProvider == null) {
-            mFragmentViewModelProvider = new ViewModelProvider(this);
-        }
-        return mFragmentViewModelProvider.get(cls);
+        return new ViewModelProvider(this).get(cls);
     }
 
     /**
@@ -250,10 +244,7 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment {
      * @return ViewModel 实例
      */
     protected <T extends ViewModel, F extends Fragment> T getFragmentScopeViewModel(@NonNull Class<T> cls, @NonNull Class<F> fragmentClass) {
-        if (mFragmentViewModelProvider == null) {
-            mFragmentViewModelProvider = new ViewModelProvider(findFragment(this, fragmentClass));
-        }
-        return mFragmentViewModelProvider.get(cls);
+        return new ViewModelProvider(findFragment(this, fragmentClass)).get(cls);
     }
 
     /**

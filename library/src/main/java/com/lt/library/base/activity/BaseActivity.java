@@ -27,8 +27,6 @@ import com.lt.library.util.context.ContextUtil;
 
 public abstract class BaseActivity<V extends ViewBinding> extends AppCompatActivity {
     protected V mViewBinding;
-    private ViewModelProvider mAppViewModelProvider;
-    private ViewModelProvider mActivityViewModelProvider;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -148,10 +146,7 @@ public abstract class BaseActivity<V extends ViewBinding> extends AppCompatActiv
      * @return ViewModel 实例
      */
     protected <T extends ViewModel> T getAppScopeViewModel(@NonNull Class<T> cls) {
-        if (mAppViewModelProvider == null) {
-            mAppViewModelProvider = new ViewModelProvider((ViewModelStoreOwner) ContextUtil.getContext());
-        }
-        return mAppViewModelProvider.get(cls);
+        return new ViewModelProvider((ViewModelStoreOwner) ContextUtil.getContext()).get(cls);
     }
 
     /**
@@ -162,9 +157,6 @@ public abstract class BaseActivity<V extends ViewBinding> extends AppCompatActiv
      * @return ViewModel 实例
      */
     protected <T extends ViewModel> T getActivityScopeViewModel(@NonNull Class<T> cls) {
-        if (mActivityViewModelProvider == null) {
-            mActivityViewModelProvider = new ViewModelProvider(this);
-        }
-        return mActivityViewModelProvider.get(cls);
+        return new ViewModelProvider(this).get(cls);
     }
 }
